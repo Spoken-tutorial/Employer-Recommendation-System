@@ -2,6 +2,7 @@
 from email import message
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.models import Group,User
 
 from events.models import *
 from .models import *
@@ -57,6 +58,7 @@ import datetime
 from django.core.mail import send_mail
 from smtplib import SMTPException
 from collections import defaultdict
+import logging
 
 import random, os
 
@@ -100,6 +102,20 @@ def check_student(view_func):
             raise PermissionDenied()
         return view_func(request,pk, *args, **kwargs)
     return inner
+
+def is_spoken_user(email):
+    try:
+        return User.objects.using('spk').get(email__iexact=email)
+    except:
+        return None
+
+def is_spoken_student(userid):
+    try:
+        return SpokenStudent.objects.using('spk').get(user_id=userid)
+    except:
+        return None
+
+
 
 def check_student_job(view_func):
     @wraps(view_func)
@@ -1574,3 +1590,113 @@ def notify_student(request):
             response.status_code = 403
             return response
     return HttpResponse("Success!")
+
+def get_create_user(row):
+    msg = ""
+    fields = row.split(",")
+    try:
+        email = fields[2].strip()
+        jrs_user = User.objects.get(email=email)
+        msg ="{email} : User already present in JRS".format(email=email)
+
+        try:
+            jrs_student = Student.objects.get(user=jrs_user)
+        except:
+            jrs_student = Student(user=jrs_user, gender=fields[3])
+            jrs_student.save()
+
+        
+        #save to student_grade table
+        try:
+            student_grade = StudentGrade(user=jrs_user, student=jrs_student, grade=fields[4])
+            student_grade.save()
+        except:
+            msg +="{email} : User entry already added".format(email=email)              
+
+        return jrs_user, msg
+
+    except User.DoesNotExist:
+        sp_user = is_spoken_user(email)#check user in spoken
+
+
+        if sp_user:
+            spuserid = sp_user.id
+            user = User(username=email, email=email, first_name=fields[0], last_name=fields[1])
+            stg = Group.objects.get(name='ST_USER')
+            fsg = Group.objects.get(name='FS_STUDENT')            
+            user.save()
+
+            sp_student = is_spoken_student(spuserid)#check user in spoken student role
+            print(sp_student,"###################")
+
+            if sp_student:
+                st_stud = Group.objects.get(name='STUDENT')
+                st_stud.user_set.add(user)
+
+            stg.user_set.add(user)
+            fsg.user_set.add(user)
+            
+
+            msg = "{email} : User present in spoken records.Assigned Spoken and Fossee Student role ".format(email=email)
+            
+
+
+            #send_registration_confirmation_mail
+        else:
+            print("NOt a spoken user entry")
+            spuserid = None
+            user = User(username=email, email=email, first_name=fields[0], last_name=fields[1])
+            user.set_password(fields[0]+'@ST123')            
+            user.save()
+
+            fsg = Group.objects.get(name='FS_STUDENT')
+            fsg.user_set.add(user)
+            msg = "{email} : User not present in spoken records.Assigned Fossee Student role ".format(email=email)
+            #send_registration_confirmation_mail
+
+        #create student entry
+        student = Student(user=user, gender=fields[3], spk_usr_id=spuserid)
+        student.save()
+        
+        #save to student_grade table
+        student_grade = StudentGrade(user=user, student=student, grade=fields[4])
+        student_grade.save()
+
+        return user, msg
+
+@user_passes_test(is_manager)
+def upload_users_csv(request):
+    data = {}
+    student_count = 0
+    if request.method == 'GET':
+        return render(request, 'emp/upload_users_csv.html', data)
+    # if not GET, then proceed with processing
+    try:
+        csv_file = request.FILES["csv_file"]
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request,'File is not CSV type')
+            return HttpResponseRedirect(reverse("upload_users_csv"))
+
+        file_data = csv_file.read().decode("utf-8")      
+
+        lines = file_data.split("\n")
+        
+        #loop over the lines and save them in db. If error shows up , store as string and then display
+        for row in lines:
+            if not row:
+                break
+            print("1 print", row)                             
+            user, msg = get_create_user(row)
+            print(msg)
+
+            student_count = student_count+1
+            messages.warning(request, msg)
+
+    except Exception as e:
+        logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
+        messages.error(request,"Unable to upload CVS file. "+repr(e))
+
+    return HttpResponseRedirect(reverse("upload_users_csv"))
+
+
+
