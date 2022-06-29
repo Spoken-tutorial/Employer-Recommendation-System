@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import * 
 from . import views
+# app_name = 'emp'
 
 urlpatterns = [
     path('',views.index,name='index'),
@@ -27,6 +28,8 @@ urlpatterns = [
     path('my_jobs/', views.student_jobs, name='student_jobs'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
     path('job_listings/', JobListingView.as_view(), name='job-listing'),
+
+    path('upload_users_csv/', views.upload_users_csv, name='upload_users_csv'),
     path('api/jobs/<req_user>/',views.jobs,name='jobs'),
     ################### jobshortlist
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),

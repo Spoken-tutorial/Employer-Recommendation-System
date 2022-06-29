@@ -197,15 +197,21 @@
           <span>View Jobs</span>
           </a>
         </li>
+
+        <li class="nav-item" id="nav-upload_user">
+          <a class="nav-link" href="{% url 'upload_users_csv' %}" style="margin-left: 30px;">
+          <span>Upload User CSV</span>
+          </a>
+        </li>
         <li class="nav-item"><hr></li>
 
-        <li class="nav-item" id="nav-add-company">
+        <li class="nav-item" id="nav-add-event">
           <a class="nav-link" href="{% url 'event-create' %}">
             <i class="bi bi-calendar-check icons-nav"></i> <span>Add Event</span>
           </a>
         </li>
 
-        <li class="nav-item" id="nav-view-company">
+        <li class="nav-item" id="nav-view-event">
           <a class="nav-link " href="{% url 'event-list' %}" style="margin-left: 30px;">View Events</a>
         </li>
 

@@ -1,5 +1,7 @@
 from django.shortcuts import render,redirect
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth.models import Group,User
+
 
 from events.models import *
 from .models import *
@@ -48,8 +50,102 @@ from smtplib import SMTPException
 from .utility import *
 from .helper import *
 from collections import defaultdict
+import logging
 
-import os
+
+import random, os
+
+# STATUS = {'ACTIVE' :1,'INACTIVE' :0}
+
+APPLIED = 0 # student has applied but not yet shortlisted by HR Manager
+APPLIED_SHORTLISTED = 1 # student has applied & shortlisted by HR Manager
+
+RATING = {
+    'ONLY_VISIBLE_TO_ADMIN_HR':0,
+    'DISPLAY_ON_HOMEPAGE':1,
+    'VISIBLE_TO_ALL_USERS':2
+}
+
+JOB_RATING=[(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
+JOB_STATUS=[(1,'Active'),(0,'Inactive')]
+COMPANY_RATING = [(RATING['VISIBLE_TO_ALL_USERS'],'Visible to all users'),(RATING['ONLY_VISIBLE_TO_ADMIN_HR'],'Only visible to Admin/HR'),(RATING['DISPLAY_ON_HOMEPAGE'],'Display on homepage')]
+
+CURRENT_EDUCATION = 1
+PAST_EDUCATION = 2
+JOB_APP_STATUS = {'RECEIVED_APP':0,'FIRST_SHORTLIST':1,'REJECTED':2}
+DEFAULT_JOB_TYPE=1
+SECOND_SHORTLIST_EMAIL = 2
+MANDATORY_FOSS = 1
+OPTIONAL_FOSS = 2
+
+
+# test functions to limit access to pages start
+def is_student(user):
+    b = settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
+    return settings.ROLES['STUDENT'][1] in [x.name for x in user.groups.all()]
+
+def is_manager(user):
+    b = settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
+    return settings.ROLES['MANAGER'][1] in [x.name for x in user.groups.all()]
+
+def check_student(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        if request.user.student.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+
+def is_spoken_user(email):
+    try:
+        return User.objects.using('spk').get(email__iexact=email)
+    except:
+        return None
+
+def is_spoken_student(userid):
+    try:
+        return SpokenStudent.objects.using('spk').get(user_id=userid)
+    except:
+        return None
+
+
+
+def check_student_job(view_func):
+    @wraps(view_func)
+    def inner(request,pk,job, *args, **kwargs):
+        student = request.user.student
+        job_obj = Job.objects.get(id=job)
+        jobs = get_recommended_jobs(student)
+        if student.id!=int(pk) or not job_obj in jobs:
+            raise PermissionDenied()
+        return view_func(request,pk,job, *args, **kwargs)
+    return inner
+
+def check_user(view_func):
+    @wraps(view_func)
+    def inner(request,pk, *args, **kwargs):
+        if request.user.id!=int(pk):
+            raise PermissionDenied()
+        return view_func(request,pk, *args, **kwargs)
+    return inner
+# test functions to limit access to pages ends
+def access_profile(view_func):
+    @wraps(view_func)
+    def inner(request,id,job, *args, **kwargs):
+        if is_manager(request.user):
+            return view_func(request,id,job, *args, **kwargs)
+        if is_student(request.user):
+            rec_jobs = get_recommended_jobs(request.user.student)
+            try:
+                job_obj = Job.objects.get(id=job)
+                if job_obj in rec_jobs and request.user.student.spk_usr_id==int(id):
+                    return view_func(request,id,job, *args, **kwargs)
+            except:
+                raise PermissionDenied()
+        raise PermissionDenied()
+    return inner
+
+
 @check_user
 def document_view(request,pk):
     try:
@@ -1434,6 +1530,119 @@ def notify_student(request):
             return response
     return HttpResponse("Success!")
 
+def get_create_user(row):
+    msg = ""
+    fields = row.split(",")
+    try:
+        email = fields[2].strip()
+        jrs_user = User.objects.get(email=email)
+        msg ="{email} : User already present in JRS".format(email=email)
+
+        try:
+            jrs_student = Student.objects.get(user=jrs_user)
+        except:
+            jrs_student = Student(user=jrs_user, gender=fields[3])
+            jrs_student.save()
+
+        
+        #save to student_grade table
+        try:
+            student_grade = StudentGrade(user=jrs_user, student=jrs_student, grade=fields[4])
+            student_grade.save()
+        except:
+            msg +="{email} : User entry already added in grade table".format(email=email)              
+
+        return jrs_user, msg
+
+    except User.DoesNotExist:
+        #user not in JRS
+        sp_user = is_spoken_user(email)#check user in spoken
+
+
+        if sp_user:
+            spuserid = sp_user.id
+            #create user in JRS
+            user = User(username=email, email=email, first_name=fields[0], last_name=fields[1])
+            #assign groups
+            stg = Group.objects.get(name='ST_USER')
+            fsg = Group.objects.get(name='FS_STUDENT')            
+            user.save()
+
+            sp_student = is_spoken_student(spuserid)#check user in spoken student role
+            print(sp_student,"###################")
+
+            if sp_student:
+                #id student in spoken assign student role in JRS
+                st_stud = Group.objects.get(name='STUDENT')
+                st_stud.user_set.add(user)
+
+            stg.user_set.add(user)
+            fsg.user_set.add(user)
+            
+
+            msg = "{email} : User present in spoken records.Assigned Spoken and Fossee Student role ".format(email=email)
+            
+
+
+            #send_registration_confirmation_mail
+        else:
+            print("Not a spoken user entry")
+            spuserid = None
+            #create Jrs user without spoken userid
+            user = User(username=email, email=email, first_name=fields[0], last_name=fields[1])
+            user.set_password(fields[0]+'@ST123')            
+            user.save()
+
+            fsg = Group.objects.get(name='FS_STUDENT')
+            fsg.user_set.add(user)
+            msg = "{email} : User not present in spoken records.Assigned Fossee Student role ".format(email=email)
+            #send_registration_confirmation_mail
+
+        #create student entry
+        student = Student(user=user, gender=fields[3], spk_usr_id=spuserid)
+        student.save()
+        
+        #save to student_grade table
+        student_grade = StudentGrade(user=user, student=student, grade=fields[4])
+        student_grade.save()
+
+        return user, msg
+
+@user_passes_test(is_manager)
+def upload_users_csv(request):
+    data = {}
+    student_count = 0
+    if request.method == 'GET':
+        return render(request, 'emp/upload_users_csv.html', data)
+    # if not GET, then proceed with processing
+    try:
+        csv_file = request.FILES["csv_file"]
+        if not csv_file.name.endswith('.csv'):
+            messages.error(request,'File is not CSV type')
+            return HttpResponseRedirect(reverse("upload_users_csv"))
+
+        file_data = csv_file.read().decode("utf-8")      
+
+        lines = file_data.split("\n")
+        
+        #loop over the lines and save them in db. If error shows up , store as string and then display
+        for row in lines:
+            if not row:
+                break
+            print("1 print", row)                             
+            user, msg = get_create_user(row)
+            print(msg)
+
+            student_count = student_count+1
+            messages.warning(request, msg)
+
+    except Exception as e:
+        logging.getLogger("error_logger").error("Unable to upload file. "+repr(e))
+        messages.error(request,"Unable to upload CVS file. "+repr(e))
+
+    return HttpResponseRedirect(reverse("upload_users_csv"))
+
+
 def jobs(request, req_user):
     context={}
     try:
@@ -1474,3 +1683,4 @@ def get_foss(value):
         if foss:
             return foss
     return []
+
