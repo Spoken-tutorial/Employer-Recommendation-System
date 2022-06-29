@@ -28,13 +28,14 @@ urlpatterns = [
     path('my_jobs/', views.student_jobs, name='student_jobs'),
     path('job/<slug:slug>/', JobDetailView.as_view(), name='job-detail'),
     path('job_listings/', JobListingView.as_view(), name='job-listing'),
+
     path('upload_users_csv/', views.upload_users_csv, name='upload_users_csv'),
+    path('api/jobs/<req_user>/',views.jobs,name='jobs'),
     ################### jobshortlist
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
     path('logout', views.handlelogout, name='logout'),
     path('<pk>/document', views.document_view, name='document_view'), #resume & cover_letter as 'type' query
-    # path('employer',views.employer_homepage,name="employer"),
     ################### Degree urls : currently only accessible to MANAGER Role : Set conditions via admin
     path('add_degree/', DegreeCreateView.as_view(), name='add_degree'),
     path('<slug:slug>/update-degree/', DegreeUpdateView.as_view(), name='update-degree'),
