@@ -298,9 +298,9 @@
         );
 
       mass_mail_url = JSON.parse(document.getElementById('name').textContent);
-      tb_s = $('#tb-shortlisted').DataTable();  
-      tb_a = $('#tb-awaiting').DataTable();
-      tb_r = $('#tb-rejected').DataTable();
+      tb_s = $('#tb-shortlisted').DataTable({"pageLength": 50});  
+      tb_a = $('#tb-awaiting').DataTable({"pageLength": 50});
+      tb_r = $('#tb-rejected').DataTable({"pageLength": 50});
       var selected = [];
       
 
