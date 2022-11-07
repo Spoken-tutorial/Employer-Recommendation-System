@@ -67,7 +67,7 @@
 {% block js %}
 <script type = "text/javascript">
     $(document).ready(function(){
-        $('#tb-domain').DataTable();
+        $('#tb-domain').DataTable({"pageLength": 50});
         $('[data-bs-toggle="tooltip"]').tooltip();
     });
 </script>

@@ -65,7 +65,7 @@
 {% block js %}
 <script type = "text/javascript">
     $(document).ready(function(){
-        $('#shortlisted').DataTable();
+        $('#shortlisted').DataTable({"pageLength": 50});
         $('[data-bs-toggle="tooltip"]').tooltip();
       });
 </script>
