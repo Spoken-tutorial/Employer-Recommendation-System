@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'rest_framework',
 
 ]
 
@@ -227,3 +228,8 @@ GALLERY_TESTIMONIAL = GALLERY_TESTIMONIAL
 CONTACT_MAIL = CONTACT_MAIL
 
 PASS_GRADE=PASS_GRADE
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS' : 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE' : 25
+}

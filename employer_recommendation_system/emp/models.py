@@ -135,6 +135,9 @@ class Discipline(models.Model):
             obj = Discipline.objects.get(name=self.name,date_created=self.date_created)
             obj.slug = slugify(obj.id) 
             obj.save()
+            
+    def __str__(self):
+        return self.name
 
 class Education(models.Model):
     degree = models.ForeignKey(Degree,null=True,on_delete=models.CASCADE)
@@ -146,8 +149,8 @@ class Education(models.Model):
     end_year = models.IntegerField(choices=END_YEAR_CHOICES, null=True)
     gpa = models.CharField(max_length=10,null=True)
     order = models.IntegerField(default=1) #1 : Current Education 2: Pas education
-    # def __str__(self):
-    #     return self.degree.name+'_'+str(self.institute)
+    def __str__(self):
+        return self.degree.name+'_'+str(self.institute)
 
 
 def user_directory_path(instance, filename):

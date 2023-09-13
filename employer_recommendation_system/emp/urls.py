@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import * 
 from . import views
+from .utility import StudentListView
 
 urlpatterns = [
     path('',views.index,name='index'),
@@ -78,4 +79,7 @@ urlpatterns = [
     
     ################### public urls
     path('companies',CompanyList.as_view(),name='companies'),
+    
+    ################### v2 apis
+    path('api/students/',StudentListView.as_view(),name='student-list-api'),
 ]
