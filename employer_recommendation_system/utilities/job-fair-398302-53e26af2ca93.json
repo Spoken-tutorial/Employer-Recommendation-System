@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "job-fair-398302",
+  "private_key_id": "53e26af2ca9379db0926ec6759af177e4e5c5854",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDLBlIgQIOGmiOA\nWMOuVzPg+vOn2S538DFSoe7H3q4qh4RnzbFZ1J3/bCjEQmcga/Qs9HihmidJtRi+\nVPftr/08jODnm1MshgCKcfTyVEw8gKy8KBTUjVv7QNZQcntmVEgMFsDIYbxGvpjZ\nuXIuSq0PKxjp6/VxS3/EpSxM0nmogBdVExxvFzdE42VOJd1XnsiS5NsBWDl6KG24\n5dEx+dM+TS1pUHP7NVj1Iv3kMhDOxsDHwFiWZ4yKLks0J6smccBYhYqto07uZXeU\n7NHc9va/wr6UQAQilsQz9+m1m2QWVwrTMJWeDZGxfv7KfjuxF1f74nchZ8N6ft12\nUV/ct+aFAgMBAAECggEATJvOeogNeUmJcuFLuWoDU/Yt4dy0SaKzYdxjxzySGM85\nGZhGv0BY/Cw6d9AcrOG/agU3zbbm80uoEg3q3eAmHOaF6S81o9vOsW8NwDEp8TyW\nsYsoTQooNrdBB2sjgDn2U8V0Kkii7Ej4UVPGL4yTH+GhzYbxfzY/eJrhC/3x1TAP\n6momydpKw7y8ejL0FJHLkv97rWDDzJYj5PoeGRKAwckLgjVVub+CuzaC2SYSHFSy\n58LJi6YZ3j1yFO6w8l8dK98j0I27JyWmVqIyVDHmP4oiFg/lBWp/ljdRCu+scjLT\n+IMTPrNyvTLNYXYkRo2Xb+e58v6sFoGJ1GD79IzvUwKBgQD0CeykJO2VH0xORQzE\nWzM36lFQqefV/qJNeATEr/Vzeax+BRbEE8zMbHIuRAWMOx9Sv1tcdVlc5ESvSfhi\n89n2IQNh8NHNcDbCAtBsupUqrRUwGRQpmBjScaP8n9RF615Lvyfp66JNJM7BuOsA\nqDvQHwHQgjF3YjiupcfgqpNLLwKBgQDU+cW+aLNBx5lgJGBVAbjA2rsxI8XSZ+RY\nUZZNKM1sFtMd+BMIjXEa6HG5qtumhaOuEMhkXTmWNQP07YPlOgJvlHivY6qZ0PLl\nP8lE0QNLVLGmRJ3Nc+ykv49G1EXyWrOyXh4XbW0R1BCqrEkg43pR/bEUaGmYhEUq\nNsfX8s4siwKBgAWT/H68AVo5PutDFMmgNAmBJ56qY4w2p8sRhTphs0CSdWjkAOM2\neKXrjKiWEXJlH5Aqo5H3dLV02kUPccgBPugrVQJ2GLWTbQz+N3lkwmgZULSqvhU9\nTsPwqQjrNlTqzlr44ZatNiaBQuCWs3huX/+f1dDISQ0rh5QmYe02uOstAoGAMaLM\nzWXFcW09d8TCls1B6+COhBNcRX9lHphVOUJrLefb6D4q4XFljOnjp2wEqTi4Pxc2\nPP3lL/bHJ0w70y7D5pFp1yaZWiPymC9XjyxPYj0o8iFHzdxYqMTkdZN/gc5V1xpM\nVRVxuBf+kmh42qtplLZVkPYMtjkNjZsa1F+IYaUCgYA79fEsXsH065UAtxvOYqd8\n2S6kBlBDYE16ap39k7GtsCK0x9JzuEhi0sH/sUGbkJIo569ms31Xk5o1Ax9iZYrJ\njLvTctAFPygD3G9Mjvwj+Aq94LmTZ0yugjJcOCneqJdQOX/MMNS2d+JnIaiEQD/p\nXw2iClQUkRgHyHTazBnHZA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "job-fair@job-fair-398302.iam.gserviceaccount.com",
+  "client_id": "114252800178464690673",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/job-fair%40job-fair-398302.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

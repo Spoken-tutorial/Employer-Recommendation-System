@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_filters',
     'django_crontab',
+    'rest_framework',
     'emp',
     'accounts',
     'crispy_forms',
@@ -48,6 +49,9 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'utilities',
+    
+    
 
 ]
 
@@ -171,7 +175,7 @@ ROLE_NAME = {
 }
 ROLE_ID = { 'MANAGER': 1,'STUDENT':2,'EMPLOYER':3}
 ROLES = {'MANAGER':(1,'MANAGER'),'STUDENT':(2,'STUDENT'),'EMPLOYER':(3,'EMPLOYER')}
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 MESSAGE_TAGS = {
     messages.DEBUG: 'alert-info',
     messages.INFO: 'alert-info',
@@ -227,3 +231,6 @@ GALLERY_TESTIMONIAL = GALLERY_TESTIMONIAL
 CONTACT_MAIL = CONTACT_MAIL
 
 PASS_GRADE=PASS_GRADE
+
+# CRISPY_TEMPLATE_PACK = ''
+# CRISPY_TEMPLATE_PACK = 'bootstrap4'
