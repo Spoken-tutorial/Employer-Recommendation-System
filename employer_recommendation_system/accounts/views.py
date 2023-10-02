@@ -25,6 +25,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from datetime import datetime
+from django.views.decorators.csrf import csrf_exempt
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
 
@@ -236,3 +237,9 @@ def change_password(request):
 		context['code'] = profile.confirmation_code
 
 	return render(request, 'accounts/change_password.html', context)
+
+@csrf_exempt
+def login(request):
+    #ToDo Login Logic
+    print(f"\033[92mLogged In **  \033[0m")
+    return JsonResponse({'status':True})
