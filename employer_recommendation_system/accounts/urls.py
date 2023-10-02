@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
+
 from django.views.generic import TemplateView
+
 
 from .views import *
 
@@ -16,6 +18,9 @@ urlpatterns = [
     path('validate_student/', validate_student, name='validate_student'),
     path('forgot-password/', reset_password, name='reset_password'),
     path('accounts/change-password/', change_password, name='change_password'),
+    
+    # APIs
+    path('api/login/', login, name='api_login'),
 
 ]
 
