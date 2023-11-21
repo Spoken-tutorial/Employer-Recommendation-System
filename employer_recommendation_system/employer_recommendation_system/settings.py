@@ -13,6 +13,7 @@ from .config import *
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -48,12 +49,18 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'rest_framework',
+    'corsheaders',
+    'utilities',
+    'rest_framework_simplejwt.token_blacklist',
+    'rest_framework_simplejwt',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -227,3 +234,48 @@ GALLERY_TESTIMONIAL = GALLERY_TESTIMONIAL
 CONTACT_MAIL = CONTACT_MAIL
 
 PASS_GRADE=PASS_GRADE
+
+# CORS settings
+CORS_ALLOW_ALL_ORIGINS = True  # Set to True to allow all origins, use responsibly in development
+# CORS_ALLOW_CREDENTIALS = True  # Set to True if you need to allow credentials (e.g., cookies)
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',  # Add the origins (domains) allowed to access your API
+#     # Add more origins as needed
+# ]
+
+# You can configure other CORS options as needed, e.g., headers, methods, etc.
+# For example:
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+]
+
+CORS_ALLOW_HEADERS = [
+    'Content-Type',
+    'Authorization',
+    # Add other headers as needed
+]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache_email_otp',  # Specify your cache table name
+    }
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+}

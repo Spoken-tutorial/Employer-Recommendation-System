@@ -30,6 +30,8 @@ class SkillInline(admin.TabularInline):
     model = Skill
 class SkillGroupAdmin(admin.ModelAdmin):
     inlines = [SkillInline]
+class CompanyManagersAdmin(admin.ModelAdmin):
+    pass
 
 admin.site.register(Degree,DegreeAdmin)
 admin.site.register(Course,CourseAdmin)
@@ -43,4 +45,5 @@ admin.site.register(Education,EducationAdmin)
 admin.site.register(Skill,SkillAdmin)
 admin.site.register(Discipline,DisciplineAdmin)
 admin.site.register(SkillGroup,SkillGroupAdmin)
+admin.site.register(CompanyManagers,CompanyManagersAdmin)
 

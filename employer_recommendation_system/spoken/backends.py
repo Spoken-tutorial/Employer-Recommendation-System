@@ -15,6 +15,7 @@ from django.core.validators import validate_email
 
 class SpokenStudentBackend(ModelBackend):    
     def authenticate(self, request, username=None, password=None): #Only check for email
+        print(f"\033[96m SpokenStudentBackend \033[0m")
         email=username
         try:
             validate_email(email)

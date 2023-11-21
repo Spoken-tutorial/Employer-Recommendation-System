@@ -49,6 +49,11 @@ from .helper import *
 from collections import defaultdict
 import csv
 import os
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+
+from .serializers import CompanySerializer, JobSerializer
 
 @check_user
 def document_view(request,pk):
@@ -1531,3 +1536,59 @@ def update_jobfair_student_status(request):
         except Exception as e:
             print(f"Exception : {e}")
             return JsonResponse({'error': 'Error occured while enrolling.'}, status=400)
+        
+class RegistrationView(APIView):
+    def get(self, request):
+        data = ['Item 1', 'Item 2', 'Item 3']
+        return Response(data, status=status.HTTP_200_OK)
+
+class CompanyView(APIView):
+    def get(self, request):
+        print(f"\033[92m CompanyView Called \033[0m")
+        comp_status = self.request.query_params.get('status', None)
+        if comp_status:
+            companies = Company.objects.filter(status=comp_status)
+        else:
+            companies = Company.objects.all()
+        serializer = CompanySerializer(companies, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, *args, **kwargs):
+        data_to_update = request.data
+        print(f"\033[97m data_to_update : {data_to_update} \033[0m")
+        try:
+            obj = Company.objects.get(pk=kwargs['pk'])
+            obj.status = data_to_update['status']
+            obj.save()
+            print(f"\033[95m saved new status \033[0m")
+        except Exception as e:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
+
+
+class JobView(APIView):
+    def get(self, request):
+        print(f"\033[92m CompanyView Called \033[0m")
+        job_status = self.request.query_params.get('status', None)
+        if job_status:
+            print(f"\033[92m inside if \033[0m")
+            jobs = Job.objects.filter(status=job_status)
+        else:
+            print(f"\033[92m inside else \033[0m")
+            jobs = Job.objects.all()
+        serializer = JobSerializer(jobs, many=True)
+        print(f"\033[97m Job seriralizer returning response \033[0m")
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, *args, **kwargs):
+        data_to_update = request.data
+        print(f"\033[97m data_to_update : {data_to_update} \033[0m")
+        try:
+            obj = Job.objects.get(pk=kwargs['pk'])
+            obj.status = data_to_update['status']
+            obj.save()
+            print(f"\033[95m saved new status \033[0m")
+        except Exception as e:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
+
