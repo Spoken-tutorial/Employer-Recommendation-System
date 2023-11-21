@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 import datetime
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 from spoken.models import AcademicCenter
@@ -9,7 +9,7 @@ import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
-
+from utilities.models import FossCategory
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
 START_YEAR_CHOICES = []
@@ -171,7 +171,7 @@ class SkillGroup(models.Model):
 
 class Skill(models.Model):
     name = models.CharField(max_length=250)
-    group = models.ForeignKey(SkillGroup, on_delete=models.CASCADE)
+    group = models.ForeignKey(SkillGroup, on_delete=models.CASCADE, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     
@@ -227,7 +227,12 @@ class Student(models.Model):
         return reverse('student_profile',kwargs={'pk':self.id}) 
 
 class Company(models.Model):
-    name = models.CharField(max_length=200)
+    STATUS_CHOICES = [
+        ('pending_approval', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+    name = models.CharField(max_length=200, unique=True,verbose_name="Company Name")
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
     emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
     state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
@@ -244,11 +249,13 @@ class Company(models.Model):
     website = models.URLField(null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
     date_updated = models.DateTimeField(auto_now=True )
-    status = models.BooleanField(default=True)
+    # status = models.BooleanField(default=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_approval')
     added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
-
+    agency = models.ForeignKey('self',null=True,on_delete=models.SET_NULL, blank=True,related_name='client_companies')
+    is_agency = models.BooleanField(default=False)
     def __str__(self):
         return self.name
 
@@ -271,6 +278,12 @@ class Foss(models.Model):
         return self.foss
 
 class Job(models.Model):
+    STATUS = [
+        ('draft', 'Draft'),
+        ('pending_approval', 'pending approval'),
+        ('published', 'Published'),
+        ('closed', 'Closed'),
+    ]
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
     state_job = models.IntegerField(null=True,blank=False)  
@@ -290,14 +303,14 @@ class Job(models.Model):
     # 2: Job Application Date is over
     # 3: Job Application is in process with HR & Company
     # 4: Student selected & job closed.
-    status = models.IntegerField(default=1,blank=True)
+    status = models.CharField(max_length=20, choices=STATUS, default='draft')
     requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
     shift_time = models.CharField(max_length=200,blank=True, null=True)
     key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    last_app_date = models.DateTimeField(verbose_name="Last Application Date")
+    last_app_date = models.DateTimeField(verbose_name="Last Application Date", null=True,blank=True)
     rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
     foss = models.CharField(max_length=200)
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
@@ -314,6 +327,7 @@ class Job(models.Model):
     degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
     discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines', null=True)
     job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
+    
     def __str__(self):
         return self.title
 
@@ -410,3 +424,36 @@ class Feedback(models.Model):
     message = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
+
+class JobFoss(models.Model):
+    CHOICES = (
+        ('Mandatory', 'Mandatory'),
+        ('Optional', 'Optional'),
+    )
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    foss = models.ForeignKey(FossCategory,on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=CHOICES, default='Mandatory')
+    status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.foss)
+    
+class JobGraduatingYear(models.Model):
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    year = models.IntegerField(null=True,blank=True)
+
+    class Meta:
+        ordering = ['year']
+    def __str__(self):
+        return str(self.job)+'-'+str(self.year)
+    
+class CompanyManagers(models.Model):
+    company = models.ForeignKey(Company,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.company)+'-'+str(self.user)

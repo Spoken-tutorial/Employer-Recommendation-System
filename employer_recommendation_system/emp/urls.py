@@ -78,4 +78,18 @@ urlpatterns = [
     
     ################### public urls
     path('companies',CompanyList.as_view(),name='companies'),
+
+    #API for registration
+    path('api/register/',RegistrationView.as_view(),name='register'),
+
+    #Utils APi
+    path('api/utils/cities/',get_cities_from_states,name='get-cities-from-state'),
+
+    #API for companies
+    path('api/companies/',CompanyView.as_view(),name='company'),
+    path('api/companies/<int:pk>',CompanyView.as_view(),name='company-patch'),
+
+    #API for jobs
+    path('api/jobs/',JobView.as_view(),name='jobs'),
+    path('api/jobs/<int:pk>',JobView.as_view(),name='jobs-patch'),
 ]

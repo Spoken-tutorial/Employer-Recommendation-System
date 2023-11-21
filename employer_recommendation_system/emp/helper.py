@@ -7,6 +7,15 @@ from spoken.helper import is_spk_student_role, is_ILW
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import wraps
+from django.db.models import F
+from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from django.core.cache import cache
+from rest_framework.response import Response
+import random
+from rest_framework import status
+
+
 
 RATING = {
     'ONLY_VISIBLE_TO_ADMIN_HR':0,
@@ -303,3 +312,37 @@ def get_state_city_lst():
     states = SpokenState.objects.all()
     cities = SpokenCity.objects.all()
     return states, cities
+
+def get_cities_from_states(request):
+    states = request.GET.getlist('states[]')
+    print(f"states : {states}")
+    print(f"Total cities: {SpokenCity.objects.all().count()}")
+    if states != ['']:
+        cities = SpokenCity.objects.filter(state__id__in=states).values('name','id').order_by('name')
+        print(f"After filter : {cities.count()}")
+    else:
+        print(f"No cities")
+        cities = []
+    
+    return JsonResponse({'cities':list(cities)})
+
+@api_view(['POST'])
+def store_otp(request):
+    print(f"\033[97m request.data - {request.data} \033[0m")
+    try:
+        email = request.data.get('email')
+        if email:
+            otp = random.randint(100000, 999999)
+            print(f"OTP : {otp}")
+            cache.set(email, otp, 60) #60 seconds - 1 minute
+            return Response({'status':True,'message':'OTP sent successfully'})
+    except:
+        return Response({'status':False,'message':f'Error in generating OTP for email : {email}'})
+    return Response({'status':False,'message':'Invalid request'})
+
+
+def validate_otp(email, otp):
+    if email and otp:
+        if cache.get(email)==otp:
+            return True
+    return False

@@ -106,6 +106,7 @@ class MdlUser(models.Model):
     #trustbitmask = models.BigIntegerField()
     imagealt = models.CharField(max_length=765, blank=True)
     class Meta(object):
+        managed = False
         db_table = 'mdl_user'
 
 class MdlQuizGrades(models.Model):
@@ -117,6 +118,6 @@ class MdlQuizGrades(models.Model):
     timemodified = models.BigIntegerField()
 
     class Meta:
-        # managed = False
+        managed = False
         db_table = 'mdl_quiz_grades'
         # app_label = 'mdl'
