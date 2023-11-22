@@ -47,7 +47,7 @@ export default function LeftDrawer() {
       {/*Nav menu*/}
       <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
         {navItems.map((text, index) => (
-          <ListItem key={text} disablePadding>
+          <ListItem key={index} disablePadding>
             <ListItemButton>
               <ListItemText
                 primary={text}

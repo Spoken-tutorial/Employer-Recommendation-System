@@ -13,7 +13,7 @@ import LeftDrawer from "./leftDrawer";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
 
-function ResponsiveAppBar() {
+function Navbar() {
   return (
     <AppBar position="static" sx={{ backgroundColor: "#002648" }}>
       <Container maxWidth="xl">
@@ -23,7 +23,7 @@ function ResponsiveAppBar() {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="#"
             sx={{
               mr: 2,
               display: { xs: "none", md: "flex" },
@@ -71,7 +71,7 @@ function ResponsiveAppBar() {
           >
             <List sx={{ display: "flex" }}>
               {navItems.map((text, index) => (
-                <ListItem key={text} disablePadding>
+                <ListItem key={index} disablePadding>
                   <ListItemButton>
                     <ListItemText primary={text} sx={{ color: "#ffffff" }} />
                   </ListItemButton>
@@ -86,4 +86,4 @@ function ResponsiveAppBar() {
     </AppBar>
   );
 }
-export default ResponsiveAppBar;
+export default Navbar;

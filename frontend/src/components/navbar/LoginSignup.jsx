@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types"; // Import PropTypes
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
@@ -59,5 +60,8 @@ function LoginSigup({ type }) {
     </Box>
   );
 }
+LoginSigup.propTypes = {
+  type: PropTypes.string.isRequired,
+};
 
 export default LoginSigup;

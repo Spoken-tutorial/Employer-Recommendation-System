@@ -1,9 +1,10 @@
-import Navbar from "../components/navbar/navbar.jsx";
-
+import NavbarParent from "../components/navbar/navbarParent";
+import FooterParent from "../components/footer/footerParent";
 const Homepage = () => {
   return (
     <>
-      <Navbar></Navbar>
+      <NavbarParent></NavbarParent>
+      <FooterParent></FooterParent>
     </>
   );
 };
