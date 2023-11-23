@@ -12,8 +12,6 @@ function Footer() {
   return (
     <Box
       sx={{
-        position: "absolute",
-        bottom: "0",
         backgroundColor: "#002648",
         width: "100%",
       }}
