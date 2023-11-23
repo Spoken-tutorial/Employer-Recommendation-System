@@ -14,9 +14,11 @@ function ContactDetails() {
         flexDirection: { xs: "row", md: "column" },
       }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={2} justifyContent="center">
         <Grid item sm={12} md={12}>
-          <Box sx={{ display: "flex", direction: "row" }}>
+          <Box
+            sx={{ display: "flex", direction: "row", justifyContent: "center" }}
+          >
             <LocationOnRoundedIcon
               sx={{ color: "#ffffff" }}
             ></LocationOnRoundedIcon>
@@ -31,7 +33,14 @@ function ContactDetails() {
           </Box>
         </Grid>
         <Grid item sm={6} md={6}>
-          <Box sx={{ display: "flex", direction: "row", mt: "0.3rem" }}>
+          <Box
+            sx={{
+              display: "flex",
+              direction: "row",
+              mt: "0.3rem",
+              justifyContent: "center",
+            }}
+          >
             <CallRoundedIcon sx={{ color: "#ffffff" }}></CallRoundedIcon>
             <Typography
               variant="caption"

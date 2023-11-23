@@ -13,6 +13,13 @@ function FooterList({ fTitle, fList }) {
           fontWeight: "bold",
           mt: "0.5rem",
           ml: "0.4rem",
+          textAlign: {
+            xs: "center",
+            sm: "center",
+            md: "left",
+            lg: "left",
+            xl: "left",
+          },
         }}
       >
         {fTitle}
@@ -23,7 +30,17 @@ function FooterList({ fTitle, fList }) {
           variant="caption"
           display="block"
           gutterBottom
-          sx={{ color: "#ffffff", ml: "0.4rem" }}
+          sx={{
+            color: "#ffffff",
+            ml: "0.4rem",
+            textAlign: {
+              xs: "center",
+              sm: "center",
+              md: "left",
+              lg: "left",
+              xl: "left",
+            },
+          }}
         >
           {text}
         </Typography>
