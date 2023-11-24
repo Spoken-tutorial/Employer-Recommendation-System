@@ -12,6 +12,7 @@ import AdbIcon from "@mui/icons-material/Adb";
 import LeftDrawer from "./leftDrawer";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
   return (
@@ -70,12 +71,23 @@ function Navbar() {
             }}
           >
             <List sx={{ display: "flex" }}>
-              {navItems.map((text, index) => (
-                <ListItem key={index} disablePadding>
-                  <ListItemButton>
-                    <ListItemText primary={text} sx={{ color: "#ffffff" }} />
-                  </ListItemButton>
-                </ListItem>
+              {navItems.map((obj, index) => (
+                <NavLink
+                  to={obj.url}
+                  key={index}
+                  style={{ textDecoration: "none" }}
+                >
+                  {({ isActive }) => (
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemText
+                          primary={obj.text}
+                          sx={{ color: isActive ? "#FFA500CC" : "#ffffff" }}
+                        />
+                      </ListItemButton>
+                    </ListItem>
+                  )}
+                </NavLink>
               ))}
             </List>
           </Box>

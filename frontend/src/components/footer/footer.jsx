@@ -12,6 +12,8 @@ function Footer() {
   return (
     <Box
       sx={{
+        position: { sm: "relative", md: "relative", lg: "absolute" },
+        bottom: { xs: "", sm: "", md: "", lg: -100, xl: "0" },
         backgroundColor: "#002648",
         width: "100%",
       }}

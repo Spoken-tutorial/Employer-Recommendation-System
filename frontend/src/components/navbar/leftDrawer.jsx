@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
+import { NavLink } from "react-router-dom";
 
 export default function LeftDrawer() {
   const [state, setState] = React.useState({
@@ -46,15 +47,22 @@ export default function LeftDrawer() {
       <Divider sx={{ backgroundColor: "#ffffff", mt: "0.3rem" }}></Divider>
       {/*Nav menu*/}
       <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
-        {navItems.map((text, index) => (
-          <ListItem key={index} disablePadding>
-            <ListItemButton>
-              <ListItemText
-                primary={text}
-                sx={{ color: "#ffffff", marginTop: "0.5rem" }}
-              />
-            </ListItemButton>
-          </ListItem>
+        {navItems.map((obj, index) => (
+          <NavLink to={obj.url} key={index} style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <ListItem key={index} disablePadding>
+                <ListItemButton>
+                  <ListItemText
+                    primary={obj.text}
+                    sx={{
+                      color: isActive ? "#FFA500CC" : "#ffffff",
+                      marginTop: "0.5rem",
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            )}
+          </NavLink>
         ))}
       </List>
     </Box>
