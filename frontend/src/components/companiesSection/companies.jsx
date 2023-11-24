@@ -43,6 +43,7 @@ function CompaniesSection() {
           justifyContent="center"
           alignItems="center"
           spacing={3}
+          rowSpacing={4}
           sx={{ marginTop: "-1rem" }}
         >
           {companyList.map((obj, index) => (
