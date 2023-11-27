@@ -83,7 +83,7 @@ function EventLayout({ data }) {
             <Grid container>
               <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
                 <CalendarMonthTwoToneIcon
-                  sx={{ color: "#5E5D5D", ml: "0.5rem", mt: "0.5rem" }}
+                  sx={{ color: "#FFA500CC", ml: "0.5rem", mt: "0.5rem" }}
                 ></CalendarMonthTwoToneIcon>
                 <Typography
                   variant="body2"
@@ -97,7 +97,7 @@ function EventLayout({ data }) {
 
               <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
                 <LocationOnTwoToneIcon
-                  sx={{ color: "#5E5D5D", ml: "0.5rem", mt: "0.3rem" }}
+                  sx={{ color: "#FFA500CC", ml: "0.5rem", mt: "0.3rem" }}
                 ></LocationOnTwoToneIcon>
                 <Typography
                   variant="body2"
@@ -119,7 +119,13 @@ function EventLayout({ data }) {
                 sx={{ display: "flex", justifyContent: "center" }}
               >
                 <OpenInFullTwoToneIcon
-                  sx={{ width: "1rem", color: "#002648" }}
+                  sx={{
+                    width: "1rem",
+                    color: "#002648",
+                    "&:hover": {
+                      transform: "scale(1.3)",
+                    },
+                  }}
                 ></OpenInFullTwoToneIcon>
               </Grid>
             </Grid>

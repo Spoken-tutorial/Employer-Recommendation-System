@@ -8,7 +8,7 @@ import FooterList from "./footer-list";
 import BottomEnd from "./copyright-social";
 import ContactDetails from "./contact-details";
 
-function Footer() {
+function FooterMain() {
   return (
     <Box
       sx={{
@@ -79,4 +79,4 @@ function Footer() {
     </Box>
   );
 }
-export default Footer;
+export default FooterMain;

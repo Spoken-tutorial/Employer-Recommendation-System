@@ -1,10 +1,10 @@
 import { createBrowserRouter } from "react-router-dom";
 import Homepage from "../pages/Homepage";
 import Error from "../pages/Error";
-import HeroParent from "../components/heroSection/heroParent";
-import AboutSection from "../components/aboutSection/about";
-import EventSection from "../components/eventsSection/events";
-import CompaniesSection from "../components/companiesSection/companies";
+import Hero from "../views/heroSection/hero";
+import About from "../views/aboutSection/about";
+import Events from "../views/eventsSection/events";
+import Companies from "../views/companiesSection/companies";
 import TestimonialsSection from "../components/Testimonials/testimonials";
 
 const router = createBrowserRouter([
@@ -15,19 +15,19 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <HeroParent />,
+        element: <Hero />,
       },
       {
         path: "/about",
-        element: <AboutSection />,
+        element: <About />,
       },
       {
         path: "/events",
-        element: <EventSection />,
+        element: <Events />,
       },
       {
         path: "/companies",
-        element: <CompaniesSection />,
+        element: <Companies />,
       },
       {
         path: "/testimonials",

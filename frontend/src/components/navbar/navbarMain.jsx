@@ -14,7 +14,7 @@ import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
 import { NavLink } from "react-router-dom";
 
-function Navbar() {
+function NavbarMain() {
   return (
     <AppBar position="static" sx={{ backgroundColor: "#002648" }}>
       <Container maxWidth="xl">
@@ -98,4 +98,4 @@ function Navbar() {
     </AppBar>
   );
 }
-export default Navbar;
+export default NavbarMain;
