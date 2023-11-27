@@ -14,7 +14,7 @@ function CompanyLayout({ data }) {
     >
       <Box
         sx={{
-          width: { xs: "17rem", sm: "18rem", md: "20rem" },
+          width: { xs: "17rem", sm: "18rem", md: "20rem", lg: "19rem" },
           height: "5rem",
           display: "flex",
           alignItems: "center",

@@ -52,7 +52,7 @@ function CompaniesSection() {
               xs={12}
               sm={12}
               md={6}
-              lg={3}
+              lg={4}
               xl={3}
               key={index}
               sx={{ display: "flex", justifyContent: "center" }}
