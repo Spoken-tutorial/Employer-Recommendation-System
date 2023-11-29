@@ -4,6 +4,8 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import { NavLink } from "react-router-dom";
+
 function LoginSigup({ type }) {
   return (
     <Box
@@ -22,16 +24,20 @@ function LoginSigup({ type }) {
         justifyContent={type === "lg" ? "flex-end" : "flex-start"}
       >
         <Grid item>
-          <Button sx={{ p: 0 }}>
-            <Typography
-              variant="overline"
-              display="block"
-              gutterBottom
-              sx={{ color: "#ffffff" }}
-            >
-              Login
-            </Typography>
-          </Button>
+          <NavLink to="login" style={{ textDecoration: "none" }}>
+            {({ isActive }) => (
+              <Button sx={{ p: 0 }}>
+                <Typography
+                  variant="overline"
+                  display="block"
+                  gutterBottom
+                  sx={{ color: isActive ? "#FFA500CC" : "#ffffff" }}
+                >
+                  Login
+                </Typography>
+              </Button>
+            )}
+          </NavLink>
         </Grid>
       </Grid>
     </Box>

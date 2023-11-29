@@ -6,6 +6,7 @@ import About from "../views/aboutSection/about";
 import Events from "../views/eventsSection/events";
 import Companies from "../views/companiesSection/companies";
 import TestimonialsSection from "../components/Testimonials/testimonials";
+import Login from "../views/login/login";
 
 const router = createBrowserRouter([
   {
@@ -32,6 +33,10 @@ const router = createBrowserRouter([
       {
         path: "/testimonials",
         element: <TestimonialsSection />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
       },
     ],
   },
