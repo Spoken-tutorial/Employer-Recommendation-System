@@ -1,6 +1,11 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
+import {
+  testimonialList1,
+  testimonialList2,
+} from "../../constants/testimonials";
+import TitleAndVideo from "./title&video";
 
 function TestimonialsSection() {
   return (
@@ -23,6 +28,22 @@ function TestimonialsSection() {
             mt: "0.3rem",
           }}
         ></Divider>
+
+        {/* first event  */}
+        <TitleAndVideo
+          data={testimonialList1}
+          defaultExpand={true}
+        ></TitleAndVideo>
+        {/* second event */}
+        <TitleAndVideo
+          data={testimonialList2}
+          defaultExpand={false}
+        ></TitleAndVideo>
+        {/* third */}
+        <TitleAndVideo
+          data={testimonialList1}
+          defaultExpand={false}
+        ></TitleAndVideo>
       </Box>
     </>
   );

@@ -18,11 +18,11 @@ function FooterMain() {
           position: {
             xs: "",
             sm: "",
-            md: "absolute",
-            lg: "static",
-            xl: "absoulte",
+            md: "relative",
+            lg: "relative",
+            xl: "absolute",
           },
-          bottom: { xs: "", sm: "", md: "0", lg: "", xl: "0" },
+          bottom: { xs: "", sm: "", md: "0", lg: "0", xl: "0" },
           marginTop: "auto",
         }}
       >
