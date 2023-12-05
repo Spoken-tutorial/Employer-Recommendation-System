@@ -1,11 +1,13 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import YouTubeIcon from "@mui/icons-material/YouTube";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
+import { Link } from "react-router-dom";
 function BottomEnd() {
   const currentYear = new Date().getFullYear();
   return (
@@ -40,50 +42,74 @@ function BottomEnd() {
           lg={5}
           sx={{ display: "flex", justifyContent: "center" }}
         >
-          <IconButton aria-label="delete">
-            <FacebookRoundedIcon
-              sx={{
-                color: "#9396A3",
-                width: "1.3rem",
-                "&:hover": {
-                  color: "#ffffff",
-                },
-              }}
-            ></FacebookRoundedIcon>
-          </IconButton>
-          <IconButton aria-label="delete">
-            <YouTubeIcon
-              sx={{
-                color: "#9396A3",
-                width: "1.3rem",
-                "&:hover": {
-                  color: "#ffffff",
-                },
-              }}
-            ></YouTubeIcon>
-          </IconButton>
-          <IconButton aria-label="delete">
-            <LinkedInIcon
-              sx={{
-                color: "#9396A3",
-                width: "1.3rem",
-                "&:hover": {
-                  color: "#ffffff",
-                },
-              }}
-            ></LinkedInIcon>
-          </IconButton>
-          <IconButton aria-label="delete">
-            <LanguageRoundedIcon
-              sx={{
-                color: "#9396A3",
-                width: "1.3rem",
-                "&:hover": {
-                  color: "#ffffff",
-                },
-              }}
-            ></LanguageRoundedIcon>
-          </IconButton>
+          <Link
+            to="https://www.facebook.com/SpokenTutorial.org"
+            reloadDocument
+            target="_blank"
+          >
+            <IconButton aria-label="delete">
+              <FacebookRoundedIcon
+                sx={{
+                  color: "#9396A3",
+                  width: "1.3rem",
+                  "&:hover": {
+                    color: "#ffffff",
+                  },
+                }}
+              ></FacebookRoundedIcon>
+            </IconButton>
+          </Link>
+          <Link
+            to="https://www.youtube.com/user/SpokenTutorialIITB"
+            reloadDocument
+            target="_blank"
+          >
+            <IconButton aria-label="delete">
+              <YouTubeIcon
+                sx={{
+                  color: "#9396A3",
+                  width: "1.3rem",
+                  "&:hover": {
+                    color: "#ffffff",
+                  },
+                }}
+              ></YouTubeIcon>
+            </IconButton>
+          </Link>
+          <Link
+            to="https://www.linkedin.com/company/spokentutorial/"
+            reloadDocument
+            target="_blank"
+          >
+            <IconButton aria-label="delete">
+              <LinkedInIcon
+                sx={{
+                  color: "#9396A3",
+                  width: "1.3rem",
+                  "&:hover": {
+                    color: "#ffffff",
+                  },
+                }}
+              ></LinkedInIcon>
+            </IconButton>
+          </Link>
+          <Link
+            to="https://spoken-tutorial.org/"
+            reloadDocument
+            target="_blank"
+          >
+            <IconButton aria-label="delete">
+              <LanguageRoundedIcon
+                sx={{
+                  color: "#9396A3",
+                  width: "1.3rem",
+                  "&:hover": {
+                    color: "#ffffff",
+                  },
+                }}
+              ></LanguageRoundedIcon>
+            </IconButton>
+          </Link>
         </Grid>
       </Grid>
     </Box>

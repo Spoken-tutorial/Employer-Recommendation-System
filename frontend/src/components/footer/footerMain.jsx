@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
@@ -7,6 +8,7 @@ import { about } from "../../constants/footer";
 import FooterList from "./footer-list";
 import BottomEnd from "./copyright-social";
 import ContactDetails from "./contact-details";
+import { Link } from "react-router-dom";
 
 function FooterMain() {
   return (
@@ -29,25 +31,34 @@ function FooterMain() {
         <Grid container spacing={2}>
           {/* Title & Logo */}
           <Grid item xs={12} md={3}>
-            <Avatar
-              sx={{
-                width: "4rem",
-                height: "4rem",
-                textAlign: "center",
-                margin: "auto",
-                marginTop: "0.5rem",
-              }}
-              alt="IIT Bombay"
-              src="../../../iitb-logo.png"
-            />
-            <Typography
-              variant="overline"
-              display="block"
-              gutterBottom
-              sx={{ color: "#ffffff", textAlign: "center" }}
+            <Link to="https://www.iitb.ac.in/" reloadDocument target="_blank">
+              <Avatar
+                sx={{
+                  width: "4rem",
+                  height: "4rem",
+                  textAlign: "center",
+                  margin: "auto",
+                  marginTop: "0.5rem",
+                }}
+                alt="IIT Bombay"
+                src="../../../iitb-logo.png"
+              />
+            </Link>
+            <Link
+              to="https://www.iitb.ac.in/"
+              reloadDocument
+              target="_blank"
+              style={{ textDecoration: "none" }}
             >
-              Developed at IIT Bombay
-            </Typography>
+              <Typography
+                variant="overline"
+                display="block"
+                gutterBottom
+                sx={{ color: "#ffffff", textAlign: "center" }}
+              >
+                Developed at IIT Bombay
+              </Typography>
+            </Link>
             <Typography
               variant="h6"
               gutterBottom

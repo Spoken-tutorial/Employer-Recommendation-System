@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import { Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
+import { Link } from "react-router-dom";
 
 function TextAndBtn() {
   return (
@@ -70,29 +71,31 @@ function TextAndBtn() {
         </Typography>
       </Grid>
       <Grid item>
-        <Button
-          size="small"
-          variant="contained"
-          sx={{
-            backgroundColor: "#054C77",
-            color: "#ffffff",
-            mt: "1.5rem",
-            p: 1,
-
-            fontSize: {
-              xs: "0.7rem",
-              sm: "0.9rem",
-              md: "0.8rem",
-              xl: "1.5rem",
-            },
-            "&:hover": {
+        <Link to="login">
+          <Button
+            size="small"
+            variant="contained"
+            sx={{
+              backgroundColor: "#054C77",
               color: "#ffffff",
-              backgroundColor: "#002648",
-            },
-          }}
-        >
-          Get Started
-        </Button>
+              mt: "1.5rem",
+              p: 1,
+
+              fontSize: {
+                xs: "0.7rem",
+                sm: "0.9rem",
+                md: "0.8rem",
+                xl: "1.5rem",
+              },
+              "&:hover": {
+                color: "#ffffff",
+                backgroundColor: "#002648",
+              },
+            }}
+          >
+            Get Started
+          </Button>
+        </Link>
       </Grid>
     </Grid>
   );
