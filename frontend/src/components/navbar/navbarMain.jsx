@@ -8,18 +8,27 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Container from "@mui/material/Container";
-import AdbIcon from "@mui/icons-material/Adb";
 import LeftDrawer from "./leftDrawer";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
 import { NavLink } from "react-router-dom";
+import Avatar from "@mui/material/Avatar";
 
 function NavbarMain() {
   return (
     <AppBar position="static" sx={{ backgroundColor: "#002648" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <Avatar
+            sx={{
+              backgroundColor: "#ffffff",
+              ml: "0.5rem",
+              mr: "0.5rem",
+              display: { xs: "none", sm: "none", md: "inline" },
+            }}
+            alt="IIT Bombay"
+            src="../../../st-logo.png"
+          />
           <Typography
             variant="h6"
             noWrap
@@ -41,7 +50,18 @@ function NavbarMain() {
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <LeftDrawer></LeftDrawer>
           </Box>
-          <AdbIcon sx={{ display: { xs: "flex", md: "none" }, mr: 1 }} />
+          <Avatar
+            sx={{
+              backgroundColor: "#ffffff",
+              ml: "0.5rem",
+              mr: "0.5rem",
+              width: { xs: "1.5rem", sm: "1.8rem" },
+              height: { xs: "1.5rem", sm: "1.8rem" },
+              display: { xs: "flex", md: "none" },
+            }}
+            alt="IIT Bombay"
+            src="../../../st-logo.png"
+          />
           {/*Mobile Screen*/}
           <Typography
             variant="h5"
@@ -56,10 +76,11 @@ function NavbarMain() {
               fontWeight: 700,
               letterSpacing: ".05rem",
               color: "inherit",
+              fontSize: { xs: "0.9rem", sm: "1.2rem" },
               textDecoration: "none",
             }}
           >
-            Spoken Tutorial
+            Spoken Tutorial JRS
           </Typography>
           {/*Nav Items lg*/}
           <Box
