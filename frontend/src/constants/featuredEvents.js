@@ -1,4 +1,4 @@
-const eventList = [
+const featuredEventList = [
   {
     eventName: "Exploring Job Recommendation Systems",
     startDate: "Feb 15, 2023",
@@ -55,4 +55,4 @@ const eventList = [
   },
 ];
 
-export { eventList };
+export { featuredEventList };

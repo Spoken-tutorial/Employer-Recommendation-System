@@ -1,4 +1,4 @@
-const companyList = [
+const featuredCompanyList = [
   {
     companyName: "Convergence IT Services",
     domain: "Information Technology",
@@ -52,4 +52,4 @@ const companyList = [
   },
 ];
 
-export { companyList };
+export { featuredCompanyList };

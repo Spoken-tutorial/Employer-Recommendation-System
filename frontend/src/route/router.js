@@ -7,7 +7,10 @@ import Events from "../views/eventsSection/events";
 import Companies from "../views/companiesSection/companies";
 import Testimonials from "../views/testimonialsSection/testimonials";
 import Login from "../views/login/login";
-
+import FeaturedEvents from "../components/eventsSection/featuredEvents";
+import ViewAllEvents from "../components/eventsSection/viewAllEvents";
+import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
+import ViewallCompanies from "../components/companiesSection/viewallCompanies";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -25,10 +28,18 @@ const router = createBrowserRouter([
       {
         path: "/events",
         element: <Events />,
+        children: [
+          { path: "", element: <FeaturedEvents /> },
+          { path: "view-all", element: <ViewAllEvents /> },
+        ],
       },
       {
         path: "/companies",
         element: <Companies />,
+        children: [
+          { path: "", element: <FeaturedCompanies /> },
+          { path: "view-all", element: <ViewallCompanies /> },
+        ],
       },
       {
         path: "/testimonials",
