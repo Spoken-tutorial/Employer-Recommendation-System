@@ -27,7 +27,7 @@ function NavbarMain() {
               display: { xs: "none", sm: "none", md: "inline" },
             }}
             alt="IIT Bombay"
-            src="../../../st-logo.png"
+            src="https://jrs.spoken-tutorial.org/static/images/st-logo.png"
           />
           <Typography
             variant="h6"
@@ -53,14 +53,13 @@ function NavbarMain() {
           <Avatar
             sx={{
               backgroundColor: "#ffffff",
-              ml: "0.5rem",
               mr: "0.5rem",
               width: { xs: "1.5rem", sm: "1.8rem" },
               height: { xs: "1.5rem", sm: "1.8rem" },
               display: { xs: "flex", md: "none" },
             }}
             alt="IIT Bombay"
-            src="../../../st-logo.png"
+            src="https://jrs.spoken-tutorial.org/static/images/st-logo.png"
           />
           {/*Mobile Screen*/}
           <Typography

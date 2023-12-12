@@ -43,7 +43,7 @@ function CompanyLayout({ data }) {
             }}
           >
             <Avatar
-              alt="Remy Sharp"
+              alt="Company Logo"
               src={data.logo}
               sx={{ width: "5rem", height: "3rem" }}
             />

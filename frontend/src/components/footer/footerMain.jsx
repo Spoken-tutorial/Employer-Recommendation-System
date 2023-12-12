@@ -41,7 +41,7 @@ function FooterMain() {
                   marginTop: "0.5rem",
                 }}
                 alt="IIT Bombay"
-                src="../../../iitb-logo.png"
+                src="https://jrs.spoken-tutorial.org/static/images/iitb-logo.png"
               />
             </Link>
             <Link

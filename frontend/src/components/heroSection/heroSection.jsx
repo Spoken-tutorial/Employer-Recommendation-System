@@ -31,7 +31,7 @@ function HeroSection() {
                 textAlign: "center",
               }}
               alt="IIT Bombay"
-              src="../../../heroSectionAsset.png"
+              src="https://jrs.spoken-tutorial.org/static/images/heroSectionAsset.png"
             />
           </Grid>
         </Grid>
