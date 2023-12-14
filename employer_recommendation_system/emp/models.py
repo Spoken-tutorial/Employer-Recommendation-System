@@ -9,7 +9,8 @@ import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
-from utilities.models import FossCategory
+from utilities.models import FossCategory, State, District, City
+
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
 START_YEAR_CHOICES = []
@@ -256,6 +257,7 @@ class Company(models.Model):
     rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
     agency = models.ForeignKey('self',null=True,on_delete=models.SET_NULL, blank=True,related_name='client_companies')
     is_agency = models.BooleanField(default=False)
+    show_on_homepage = models.BooleanField(default=True)
     def __str__(self):
         return self.name
 
@@ -288,7 +290,8 @@ class Job(models.Model):
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
     state_job = models.IntegerField(null=True,blank=False)  
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    city_job = models.IntegerField(null=True,blank=False)  
+    # city_job = models.IntegerField(null=True,blank=False)  
+    city_job = models.ManyToManyField(City,related_name='jobs')
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     skills = models.ManyToManyField(Skill, related_name='jobs')
     description = RichTextField(null=True,blank=True,verbose_name="Job Description")
@@ -329,7 +332,7 @@ class Job(models.Model):
     job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     
     def __str__(self):
-        return self.title
+        return self.designation
 
     def get_absolute_url(self):
         return reverse('job-detail', kwargs={'slug': self.slug})
@@ -438,6 +441,9 @@ class JobFoss(models.Model):
     def __str__(self):
         return str(self.job)+'-'+str(self.foss)
     
+    class Meta:
+        unique_together = ('job', 'foss',)
+    
 class JobGraduatingYear(models.Model):
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
     year = models.IntegerField(null=True,blank=True)
@@ -457,3 +463,48 @@ class CompanyManagers(models.Model):
 
     def __str__(self):
         return str(self.company)+'-'+str(self.user)
+    
+class JobFilterState(models.Model):
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.state)
+    
+class JobFilterCity(models.Model):
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    city = models.ForeignKey(City,on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.city)
+    
+# class JobFilterDegree(models.Model):
+#     job = models.ForeignKey(Job,on_delete=models.CASCADE)
+#     degree = models.ForeignKey(Degree,on_delete=models.CASCADE)
+#     created = models.DateTimeField(auto_now_add=True)
+#     updated = models.DateTimeField(auto_now=True)
+
+#     def __str__(self):
+#         return str(self.job)+'-'+str(self.degree)
+    
+# class JobFilterDiscipline(models.Model):
+#     job = models.ForeignKey(Job,on_delete=models.CASCADE)
+#     discipline = models.ForeignKey(Discipline,on_delete=models.CASCADE)
+#     created = models.DateTimeField(auto_now_add=True)
+#     updated = models.DateTimeField(auto_now=True)
+
+#     def __str__(self):
+#         return str(self.job)+'-'+str(self.discipline)
+    
+class JobFilterYear(models.Model):
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    year = models.IntegerField(null=True,blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.year)

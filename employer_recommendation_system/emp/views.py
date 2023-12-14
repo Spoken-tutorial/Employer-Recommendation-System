@@ -51,8 +51,10 @@ import csv
 import os
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-
+from rest_framework import viewsets, status
+from django.db.models import Prefetch
+from accounts.models import Profile
+from .filters import CompanyFilter
 from .serializers import CompanySerializer, JobSerializer
 
 @check_user
@@ -1542,28 +1544,45 @@ class RegistrationView(APIView):
         data = ['Item 1', 'Item 2', 'Item 3']
         return Response(data, status=status.HTTP_200_OK)
 
-class CompanyView(APIView):
-    def get(self, request):
-        print(f"\033[92m CompanyView Called \033[0m")
-        comp_status = self.request.query_params.get('status', None)
-        if comp_status:
-            companies = Company.objects.filter(status=comp_status)
-        else:
-            companies = Company.objects.all()
-        serializer = CompanySerializer(companies, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+class CompanyViewSet(viewsets.ViewSet):
+    company_manager_prefetch = Prefetch(
+        'companymanagers_set',
+        queryset=CompanyManagers.objects.prefetch_related(
+            Prefetch(
+                'user__profile', 
+                queryset=Profile.objects.all(), 
+                to_attr='user_profile'
+            )
+        )
+    )
     
-    def patch(self, request, *args, **kwargs):
-        data_to_update = request.data
-        print(f"\033[97m data_to_update : {data_to_update} \033[0m")
-        try:
-            obj = Company.objects.get(pk=kwargs['pk'])
-            obj.status = data_to_update['status']
-            obj.save()
-            print(f"\033[95m saved new status \033[0m")
-        except Exception as e:
-            return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
+    def list(self, request):
+        # http://127.0.0.1:8000/api/companies/?show_on_homepage=True
+        queryset = Company.objects.prefetch_related(self.company_manager_prefetch,'domain').all()
+        filtered_queryset = CompanyFilter(request.GET, queryset=queryset).qs
+        serializer = CompanySerializer(filtered_queryset, many=True)
+        return Response(serializer.data)
+    # def get(self, request):
+    #     print(f"\033[92m CompanyView Called \033[0m")
+    #     comp_status = self.request.query_params.get('status', None)
+    #     if comp_status:
+    #         companies = Company.objects.filter(status=comp_status)
+    #     else:
+    #         companies = Company.objects.all()
+    #     serializer = CompanySerializer(companies, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    # def patch(self, request, *args, **kwargs):
+    #     data_to_update = request.data
+    #     print(f"\033[97m data_to_update : {data_to_update} \033[0m")
+    #     try:
+    #         obj = Company.objects.get(pk=kwargs['pk'])
+    #         obj.status = data_to_update['status']
+    #         obj.save()
+    #         print(f"\033[95m saved new status \033[0m")
+    #     except Exception as e:
+    #         return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        # return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
 
 
 class JobView(APIView):

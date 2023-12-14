@@ -11,6 +11,11 @@ import FeaturedEvents from "../components/eventsSection/featuredEvents";
 import ViewAllEvents from "../components/eventsSection/viewAllEvents";
 import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
 import ViewallCompanies from "../components/companiesSection/viewallCompanies";
+
+import CompanyRegistration, {
+  action as compRegAction,
+  loader as compRegLoader,
+} from "../pages/CompanyRegistration";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -50,6 +55,13 @@ const router = createBrowserRouter([
         element: <Login />,
       },
     ],
+  },
+  {
+    path: "company/registration",
+    element: <CompanyRegistration />,
+    errorElement: <Error />,
+    action: compRegAction,
+    loader: compRegLoader,
   },
 ]);
 

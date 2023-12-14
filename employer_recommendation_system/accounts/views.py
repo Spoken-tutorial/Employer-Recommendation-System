@@ -36,6 +36,7 @@ from accounts.models import Profile as JRSProfile
 from emp.helper import validate_otp
 from .serializers import CustomTokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from accounts.serializers import CompanyRegistrationSerializer, CompanyManagerSerializer
 
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
@@ -255,110 +256,128 @@ class RegistrationDataView(APIView):
 		
 		data = {}
 		data['roles'] = settings.ROLES
-		data['groups'] = Group.objects.all().values('id','name')
-		data['domains'] = Domain.objects.all().values('id','name').order_by('name')
-		data['states'] = SpokenState.objects.all().values('id','name').order_by('name')
-		data['cities'] = SpokenCity.objects.all().values('id','name').order_by('name')
-		data['jobtypes'] = JobType.objects.all().values('id','jobtype').order_by('jobtype')
-		data['fosses'] = FossMdlCourses.objects.all().values('foss__id','foss__foss').order_by('foss__foss')
-		data['skills'] = Skill.objects.all().values('id','name').order_by('name')
-		data['degrees'] = Degree.objects.all().values('id','name').order_by('name')
-		data['disciplines'] = Discipline.objects.all().values('id','name').order_by('name')
+		data['groups'] = [{'label': group['name'], 'value': group['id']} for group in Group.objects.values('id','name')]
+		data['domains'] = [{'label': group['name'], 'value': group['id']} for group in Domain.objects.values('id','name').order_by('name')]
+		data['states'] = [{'label': group['name'], 'value': group['id']} for group in SpokenState.objects.values('id','name').order_by('name')]
+		data['cities'] = [{'label': group['name'], 'value': group['id']} for group in SpokenCity.objects.values('id','name').order_by('name')]
+		data['jobtypes'] = [{'label': group['jobtype'], 'value': group['id']} for group in JobType.objects.values('id','jobtype').order_by('jobtype')]
+		data['fosses'] = [{'label': group['foss__foss'], 'value': group['foss__id']} for group in FossMdlCourses.objects.values('foss__id','foss__foss').order_by('foss__foss')]
+		data['skills'] = [{'label': group['name'], 'value': group['id']} for group in Skill.objects.values('id','name').order_by('name')]
+		data['degrees'] =[{'label': group['name'], 'value': group['id']} for group in Degree.objects.values('id','name').order_by('name')]
+		data['disciplines'] = [{'label': group['name'], 'value': group['id']} for group in Discipline.objects.values('id','name').order_by('name')]
+		
 		return Response(data, status=status.HTTP_200_OK)
 	
 	def post(self, request):
-		print(request.data)
-		company = request.data.get('company_name')
-		fname = request.data.get('user_fname')
-		lname = request.data.get('user_lname')
-		phone = request.data.get('user_phone')
-		email = request.data.get('user_email')
-		pwd = request.data.get('user_password')
-		cnf_pwd = request.data.get('user_confirm_password')
-		website = request.data.get('company_website')
-		is_agency = request.data.get('is_agency') == 'true'
-		job_title = request.data.get('job_title')
-		domain = request.data.get('job_domain',None)
-		job_state = request.data.get('job_state',None)
-		job_city = request.data.get('job_city',None)
-		job_type = request.data.get('job_type',None)
-		job_skills = request.data.get('job_skills',None)
-		mandatory_skills = request.data.get('job_mandatory_skills',None)
-		option_skills = request.data.get('job_optional_skills',None)
-		new_skills = [x for x in job_skills if type(x) == str]
-		existing_skills = [x for x in job_skills if type(x) == int]
-		salary_min = request.data.get('job_min_salary',None)
-		salary_max = request.data.get('job_max_salary',None)
-		years = request.data.get('student_years',None)
-		job_description = request.data.get('job_description','Not available')
-		job_responsibilities = request.data.get('job_responsibilities','Not available')
-		job_additional_skills = request.data.get('job_additional_skills','Not available')
-		vacancies = request.data.get('vacancies',None)
-		otp = int(request.data.get('otp',None))
-		
-		#validate otp
-		if validate_otp(email, otp):
-			print(f"\033[92m OTP IS VALID : {email} - {otp} \033[0m")
-			for skill in new_skills:
-				s = Skill.objects.create(name=skill)
-				existing_skills.append(s.id)
-			print(f"\033[1m new_skills : {new_skills} \033[0m")
+		print(f"\033[92m request data: {request.data} \033[0m")
+		serializer = CompanyRegistrationSerializer(data=request.data)
+		if serializer.is_valid():
+			print(f"\033[95m serizlier is valid \033[0m")
+			a=serializer.save()
 			
-			if pwd != cnf_pwd:
-				return Response("Password and Confirm Password does not match.", status=status.HTTP_400_BAD_REQUEST)
-			# email='test@gmail.com'
-			serializer = RegistrationFormSerializer(data=request.data)
-			error_msg = ''
-			error = False
-			if serializer.is_valid():
-				print("inside valid")
-				
-				existing_company = Company.objects.filter(name=company).exists()
-				existing_user = User.objects.filter(email=email).exists()
-				if existing_company:
-					error_msg = "Company already registered with JRS. "
-					error = True
-				if existing_user:
-					error_msg = error_msg + "User already registered with JRS."
-					error = True
-				if error:
-					return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
-				else:
-					try:
-						print(f"\033[92m is_agency : {is_agency} {type(is_agency)} \033[0m")
-						company = Company.objects.create(name=company, website=website, is_agency=is_agency)
-						user = User.objects.create_user(username=email,email=email,password=pwd,first_name=fname,last_name=lname)
-						profile = JRSProfile.objects.create(user=user, phone=phone)
-						CompanyManagers.objects.create(company=company, user=user, group=Group.objects.get(name='COMPANY_MANAGER'))
-						if job_title:
-							job = Job.objects.create(company=company, title=job_title, domain_id=domain, state_job=job_state, 
-								city_job=job_city, job_type_id=job_type, salary_range_min=salary_min, salary_range_max=salary_max,
-								job_description=job_description, job_responsibilities=job_responsibilities, job_additional_skills=job_additional_skills,
-								num_vacancies=vacancies)
-							
-							job.skills.set(existing_skills)
-							if mandatory_skills:
-								obj = [JobFoss(job=job, foss_id=x, type='Mandatory') for x in mandatory_skills]
-								JobFoss.objects.bulk_create(obj)
-							if option_skills:
-								obj = [JobFoss(job=job, foss_id=x, type='Optional') for x in option_skills]
-								JobFoss.objects.bulk_create(obj)
-						if years:
-							obj = [JobGraduatingYear(job=job, year=x, type='Mandatory') for x in years]
-							JobGraduatingYear.objects.bulk_create(obj)
-					except IntegrityError as e:
-						err = str(e)
-						print(e)
-						return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
-				return Response(serializer.data, status=status.HTTP_201_CREATED)
-			else:
-				print("inside invalid")
-				print(serializer.errors)
-				return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+			print(f"\033[92m THE INSTANCE IS SAVED \033[0m")
+			print(f"\033[94m THE INSTACE A = { type(a)} \033[0m")
+			print(f"\033[1m INSANCE DATA serializer.data : {serializer.data} \033[0m")
+			return Response("SUCCESS", status=status.HTTP_201_CREATED)
 		else:
-			print(f"\033[91m OTP is invalid : {email} - {otp} \033[0m")
-			return Response("Invalid OTP" , status=status.HTTP_400_BAD_REQUEST)
+			print(f"\033[93m serializer error : {serializer.errors} \033[0m")
+		# return Response({"name": "name error"}, status=status.HTTP_400_BAD_REQUEST)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+	
+		
+	# def post(self, request):
+	# 	print(request.data)
+	# 	company = request.data.get('company_name')
+	# 	fname = request.data.get('user_fname')
+	# 	lname = request.data.get('user_lname')
+	# 	phone = request.data.get('user_phone')
+	# 	email = request.data.get('user_email')
+	# 	pwd = request.data.get('user_password')
+	# 	cnf_pwd = request.data.get('user_confirm_password')
+	# 	website = request.data.get('company_website')
+	# 	is_agency = request.data.get('is_agency') == 'true'
+	# 	job_title = request.data.get('job_title')
+	# 	domain = request.data.get('job_domain',None)
+	# 	job_state = request.data.get('job_state',None)
+	# 	job_city = request.data.get('job_city',None)
+	# 	job_type = request.data.get('job_type',None)
+	# 	job_skills = request.data.get('job_skills',None)
+	# 	mandatory_skills = request.data.get('job_mandatory_skills',None)
+	# 	option_skills = request.data.get('job_optional_skills',None)
+	# 	new_skills = [x for x in job_skills if type(x) == str]
+	# 	existing_skills = [x for x in job_skills if type(x) == int]
+	# 	salary_min = request.data.get('job_min_salary',None)
+	# 	salary_max = request.data.get('job_max_salary',None)
+	# 	years = request.data.get('student_years',None)
+	# 	job_description = request.data.get('job_description','Not available')
+	# 	job_responsibilities = request.data.get('job_responsibilities','Not available')
+	# 	job_additional_skills = request.data.get('job_additional_skills','Not available')
+	# 	vacancies = request.data.get('vacancies',None)
+	# 	otp = int(request.data.get('otp',None))
+		
+	# 	#validate otp
+	# 	if validate_otp(email, otp):
+	# 		print(f"\033[92m OTP IS VALID : {email} - {otp} \033[0m")
+	# 		for skill in new_skills:
+	# 			s = Skill.objects.create(name=skill)
+	# 			existing_skills.append(s.id)
+	# 		print(f"\033[1m new_skills : {new_skills} \033[0m")
+			
+	# 		if pwd != cnf_pwd:
+	# 			return Response("Password and Confirm Password does not match.", status=status.HTTP_400_BAD_REQUEST)
+	# 		# email='test@gmail.com'
+	# 		serializer = RegistrationFormSerializer(data=request.data)
+	# 		error_msg = ''
+	# 		error = False
+	# 		if serializer.is_valid():
+	# 			print("inside valid")
+				
+	# 			existing_company = Company.objects.filter(name=company).exists()
+	# 			existing_user = User.objects.filter(email=email).exists()
+	# 			if existing_company:
+	# 				error_msg = "Company already registered with JRS. "
+	# 				error = True
+	# 			if existing_user:
+	# 				error_msg = error_msg + "User already registered with JRS."
+	# 				error = True
+	# 			if error:
+	# 				return Response(error_msg, status=status.HTTP_400_BAD_REQUEST)
+	# 			else:
+	# 				try:
+	# 					print(f"\033[92m is_agency : {is_agency} {type(is_agency)} \033[0m")
+	# 					company = Company.objects.create(name=company, website=website, is_agency=is_agency)
+	# 					user = User.objects.create_user(username=email,email=email,password=pwd,first_name=fname,last_name=lname)
+	# 					profile = JRSProfile.objects.create(user=user, phone=phone)
+	# 					CompanyManagers.objects.create(company=company, user=user, group=Group.objects.get(name='COMPANY_MANAGER'))
+	# 					if job_title:
+	# 						job = Job.objects.create(company=company, title=job_title, domain_id=domain, state_job=job_state, 
+	# 							city_job=job_city, job_type_id=job_type, salary_range_min=salary_min, salary_range_max=salary_max,
+	# 							job_description=job_description, job_responsibilities=job_responsibilities, job_additional_skills=job_additional_skills,
+	# 							num_vacancies=vacancies)
+							
+	# 						job.skills.set(existing_skills)
+	# 						if mandatory_skills:
+	# 							obj = [JobFoss(job=job, foss_id=x, type='Mandatory') for x in mandatory_skills]
+	# 							JobFoss.objects.bulk_create(obj)
+	# 						if option_skills:
+	# 							obj = [JobFoss(job=job, foss_id=x, type='Optional') for x in option_skills]
+	# 							JobFoss.objects.bulk_create(obj)
+	# 					if years:
+	# 						obj = [JobGraduatingYear(job=job, year=x, type='Mandatory') for x in years]
+	# 						JobGraduatingYear.objects.bulk_create(obj)
+	# 				except IntegrityError as e:
+	# 					err = str(e)
+	# 					print(e)
+	# 					return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+	# 			return Response(serializer.data, status=status.HTTP_201_CREATED)
+	# 		else:
+	# 			print("inside invalid")
+	# 			print(serializer.errors)
+	# 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+	# 	else:
+	# 		print(f"\033[91m OTP is invalid : {email} - {otp} \033[0m")
+	# 		return Response("Invalid OTP" , status=status.HTTP_400_BAD_REQUEST)
 
 			
 
