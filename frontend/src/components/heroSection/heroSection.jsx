@@ -7,7 +7,10 @@ import TextAndBtn from "./textAndBtn";
 function HeroSection() {
   return (
     <>
-      <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}>
+      <Box
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "3.5rem" }}
+        id="home"
+      >
         <Grid container alignItems="center">
           {/*Left part*/}
           <Grid item sm={12} md={8} sx={{ pl: "1rem" }}>

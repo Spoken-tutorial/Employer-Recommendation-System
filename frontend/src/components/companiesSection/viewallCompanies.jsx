@@ -1,19 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import CompanyLayout from "./companyCardLayout";
 import { viewAllCompanyList } from "../../constants/viewAllCompanies";
-import { Link } from "react-router-dom";
-function ViewallCompanies() {
+import { HashLink } from "react-router-hash-link";
+import scrollWithOffset from "../../utils/hashScrollwithOffset";
+import CompaniesSection from "./companies";
+import { scrollToTop } from "../../utils/scrollToTop";
+
+function ViewAllCompaniesCards() {
+  useEffect(() => {
+    scrollToTop();
+  }, []);
+
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="../" style={{ textDecoration: "none" }}>
+        <HashLink
+          to="/#companies"
+          style={{ textDecoration: "none" }}
+          scroll={(el) => scrollWithOffset(el)}
+        >
           <Button size="small" variant="text">
             Go Back
           </Button>
-        </Link>
+        </HashLink>
       </Box>
       <Grid
         container
@@ -42,5 +54,10 @@ function ViewallCompanies() {
     </>
   );
 }
+function ViewAllCompanies() {
+  return (
+    <CompaniesSection Component={<ViewAllCompaniesCards />}></CompaniesSection>
+  );
+}
 
-export default ViewallCompanies;
+export default ViewAllCompanies;

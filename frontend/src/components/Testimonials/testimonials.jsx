@@ -1,17 +1,16 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import {
-  testimonialList1,
-  testimonialList2,
-} from "../../constants/testimonials";
-import TitleAndVideo from "./title&video";
 
-function TestimonialsSection() {
+function TestimonialsSection(props) {
   return (
     <>
-      <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}>
+      <Box
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "3.5rem" }}
+        id="testimonials"
+      >
         <Typography
           variant="h3"
           gutterBottom
@@ -29,22 +28,7 @@ function TestimonialsSection() {
             mt: "0.3rem",
           }}
         ></Divider>
-
-        {/* first event  */}
-        <TitleAndVideo
-          data={testimonialList1}
-          defaultExpand={true}
-        ></TitleAndVideo>
-        {/* second event */}
-        <TitleAndVideo
-          data={testimonialList2}
-          defaultExpand={false}
-        ></TitleAndVideo>
-        {/* third */}
-        <TitleAndVideo
-          data={testimonialList1}
-          defaultExpand={false}
-        ></TitleAndVideo>
+        {props.Component}
       </Box>
     </>
   );

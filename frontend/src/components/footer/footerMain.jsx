@@ -17,15 +17,6 @@ function FooterMain() {
         sx={{
           backgroundColor: "#002648",
           width: "100%",
-          position: {
-            xs: "",
-            sm: "",
-            md: "relative",
-            lg: "relative",
-            xl: "absolute",
-          },
-          bottom: { xs: "", sm: "", md: "0", lg: "0", xl: "0" },
-          marginTop: "auto",
         }}
       >
         <Grid container spacing={2}>

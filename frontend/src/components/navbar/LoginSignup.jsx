@@ -31,7 +31,10 @@ function LoginSigup({ type }) {
                   variant="overline"
                   display="block"
                   gutterBottom
-                  sx={{ color: isActive ? "#FFA500CC" : "#ffffff" }}
+                  sx={{
+                    color: isActive ? "#FFA500CC" : "#ffffff",
+                    mt: "0.3rem",
+                  }}
                 >
                   Login
                 </Typography>

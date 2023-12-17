@@ -8,8 +8,9 @@ function AboutSection() {
         sx={{
           marginTop: "2rem",
           p: "1rem",
-          marginBottom: "2.5rem",
+          marginBottom: "3.5rem",
         }}
+        id="about-us"
       >
         <Typography
           variant="h3"

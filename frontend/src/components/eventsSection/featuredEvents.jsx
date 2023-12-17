@@ -5,7 +5,8 @@ import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
 import { Link } from "react-router-dom";
 import { featuredEventList } from "../../constants/featuredEvents";
-function FeaturedEvents() {
+import EventSection from "./eventSectionLayout";
+function FeaturedEventsCards() {
   return (
     <Box
       sx={{
@@ -15,7 +16,7 @@ function FeaturedEvents() {
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="view-all" style={{ textDecoration: "none" }}>
+        <Link to="events/view-all" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>
@@ -48,5 +49,7 @@ function FeaturedEvents() {
     </Box>
   );
 }
-
+function FeaturedEvents() {
+  return <EventSection Component={<FeaturedEventsCards />}></EventSection>;
+}
 export default FeaturedEvents;

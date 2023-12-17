@@ -1,11 +1,15 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import { Outlet } from "react-router-dom";
-function EventSection() {
+
+function EventSectionLayout(props) {
   return (
     <>
-      <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}>
+      <Box
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}
+        id="events"
+      >
         <Typography
           variant="h3"
           gutterBottom
@@ -23,10 +27,10 @@ function EventSection() {
             mt: "0.3rem",
           }}
         ></Divider>
-        <Outlet></Outlet>
+        {props.Component}
       </Box>
     </>
   );
 }
 
-export default EventSection;
+export default EventSectionLayout;

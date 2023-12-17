@@ -1,17 +1,18 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import { Outlet } from "react-router-dom";
 
-function CompaniesSection() {
+function CompaniesSection(props) {
   return (
     <>
       <Box
         sx={{
           marginTop: "2rem",
           p: "1rem",
-          marginBottom: "2.5rem",
+          marginBottom: "3.5rem",
         }}
+        id="companies"
       >
         <Typography
           variant="h3"
@@ -30,7 +31,7 @@ function CompaniesSection() {
             mt: "0.3rem",
           }}
         ></Divider>
-        <Outlet></Outlet>
+        {props.Component}
       </Box>
     </>
   );

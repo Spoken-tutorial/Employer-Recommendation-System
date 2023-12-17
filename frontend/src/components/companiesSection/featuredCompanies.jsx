@@ -5,12 +5,13 @@ import Grid from "@mui/material/Grid";
 import CompanyLayout from "./companyCardLayout";
 import { featuredCompanyList } from "../../constants/featuredCompanies";
 import { Link } from "react-router-dom";
+import CompaniesSection from "./companies";
 
-function FeaturedCompanies() {
+function FeaturedCompaniesCards() {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="view-all" style={{ textDecoration: "none" }}>
+        <Link to="companies/view-all" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>
@@ -41,6 +42,11 @@ function FeaturedCompanies() {
         ))}
       </Grid>
     </>
+  );
+}
+function FeaturedCompanies() {
+  return (
+    <CompaniesSection Component={<FeaturedCompaniesCards />}></CompaniesSection>
   );
 }
 
