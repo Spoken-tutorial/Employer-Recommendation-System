@@ -21,7 +21,6 @@ function TextAndBtn() {
                 sm: "2rem",
                 md: "3.2rem",
                 lg: "4rem",
-                xl: "5rem",
               },
             }}
           >
@@ -40,7 +39,6 @@ function TextAndBtn() {
               xs: "1.7rem",
               md: "1.8rem",
               lg: "2.5rem",
-              xl: "3.5rem",
             },
           }}
         >
@@ -64,7 +62,7 @@ function TextAndBtn() {
         <Typography
           variant="subtitle1"
           gutterBottom
-          sx={{ mt: "0.7rem", fontSize: { xl: "2rem" } }}
+          sx={{ mt: "0.7rem", fontSize: {} }}
         >
           A platform to connect potential employers with students having the
           right skills set across India.
@@ -85,7 +83,6 @@ function TextAndBtn() {
                 xs: "0.7rem",
                 sm: "0.9rem",
                 md: "0.8rem",
-                xl: "1.5rem",
               },
               "&:hover": {
                 color: "#ffffff",
