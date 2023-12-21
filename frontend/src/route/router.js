@@ -6,6 +6,7 @@ import LoginPage from "../pages/Login";
 import ViewAllEvents from "../components/eventsSection/viewAllEvents";
 import ViewAllCompanies from "../components/companiesSection/viewallCompanies";
 import ViewAllTestimonials from "../components/Testimonials/viewAllTestimonials";
+import StudentProfile from "../components/student/studentProfile";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
       { path: "/events/view-all", element: <ViewAllEvents /> },
       { path: "/companies/view-all", element: <ViewAllCompanies /> },
       { path: "/testimonials/view-all", element: <ViewAllTestimonials /> },
+      { path: "/student-profile", element: <StudentProfile></StudentProfile> },
     ],
   },
 ]);
