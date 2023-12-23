@@ -3,16 +3,8 @@ import { Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import TextField from "@mui/material/TextField";
-import Alert from "@mui/material/Alert";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
 import Button from "@mui/material/Button";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -29,20 +21,12 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AddProjectModal from "./addProjectModal";
 import UpdateProjectModal from "./updateProjectModal";
+import TestScores from "./testScores";
+import EducationalDetails from "./educationalDetails";
+import AlertBox from "../common/alertBox";
+
 //for score table
 function StudentProfile() {
-  function createData(name, calories, fat, carbs, protein) {
-    return { name, calories, fat, carbs, protein };
-  }
-
-  const rows = [
-    createData("C", 40.0, "Feb. 12, 2020, 5:58 a.m."),
-    createData("Cpp", 80.32, "Feb. 12, 2020, 9:03 a.m."),
-    createData("Python 3.4.3", 66.0, "May. 5, 2021, 08:15 a.m."),
-    createData("RDBMS PostgreSQL", 70.0, "Aug. 11, 2021, 12:28 p.m."),
-    createData("PHP and MYSQL", 44.46, "Oct. 8, 2021, 7:53 a.m."),
-  ];
-
   //for multi select skills
   const ITEM_HEIGHT = 48;
   const ITEM_PADDING_TOP = 8;
@@ -112,8 +96,9 @@ function StudentProfile() {
   return (
     <Box
       sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}
-      id="events"
+      id="student-profile"
     >
+      {/* page title and divider */}
       <Typography
         variant="h3"
         gutterBottom
@@ -131,6 +116,7 @@ function StudentProfile() {
           mt: "0.3rem",
         }}
       ></Divider>
+
       {/* name email box */}
       <Box
         sx={{
@@ -187,41 +173,14 @@ function StudentProfile() {
         />
       </Box>
       {/* table alert */}
-      <Alert
-        severity="info"
-        sx={{ mt: "2rem", width: { xs: "100%", md: "73%" } }}
-      >
-        Spoken Tutorial Test Scores
-      </Alert>
+      <AlertBox
+        alertMessage={" Spoken Tutorial Test Scores"}
+        alertType={"info"}
+        style={{ mt: "2rem", width: { xs: "100%", md: "73%" } }}
+      ></AlertBox>
       {/* table */}
-      <TableContainer
-        component={Paper}
-        sx={{ mt: "0.5rem", width: { xs: "100%", md: "73%" } }}
-      >
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Foss</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Grade</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Test Date</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={row.name}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="left">{row.calories}</TableCell>
-                <TableCell align="left">{row.fat}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TestScores />
+
       {/* phone alternate email box */}
       <Box
         sx={{
@@ -551,13 +510,11 @@ function StudentProfile() {
         </FormControl>
       </Box>
       {/* Add project box */}
-      <Alert
-        severity="info"
-        sx={{ mt: "2rem", width: { xs: "100%", md: "73%" } }}
-      >
-        Project Work & Experience (Max 5 projects can be added)
-      </Alert>
-
+      <AlertBox
+        alertMessage={"Project Work & Experience (Max 5 projects can be added)"}
+        alertType={"info"}
+        style={{ mt: "2rem", width: { xs: "100%", md: "73%" } }}
+      ></AlertBox>
       <AddProjectModal
         projects={projects}
         setProjects={setProjects}
@@ -700,12 +657,11 @@ function StudentProfile() {
           width: { xs: "100%", md: "73%" },
         }}
       >
-        <Alert
-          severity="info"
-          sx={{ mt: "0rem", width: { xs: "100%", md: "100%" } }}
-        >
-          Upload only (.pdf) file
-        </Alert>
+        <AlertBox
+          alertMessage={"Upload only (.pdf) file"}
+          alertType={"info"}
+          style={{ mt: "0rem", width: { xs: "100%", md: "100%" } }}
+        ></AlertBox>
 
         <Box
           sx={{
@@ -770,210 +726,7 @@ function StudentProfile() {
         </Box>
       </Box>
       {/* Education details box */}
-      <Box
-        sx={{
-          mt: "2.5rem",
-          display: "flex",
-          flexDirection: { xs: "column", md: "column" },
-          justifyContent: "flex-start",
-          width: { xs: "100%", md: "73%" },
-        }}
-      >
-        <Alert
-          severity="info"
-          sx={{ mt: "0rem", width: { xs: "100%", md: "100%" } }}
-        >
-          Educational Details
-        </Alert>
-        {/* institute name & type */}
-        <Box
-          sx={{
-            mt: "1rem",
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: "flex-start",
-            width: "100%",
-          }}
-        >
-          <TextField
-            id="studentInstituteName"
-            label="Institute Name"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="Lorem Ipsum"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-          <TextField
-            id="studentInstituteType"
-            label="Institute Type"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="Lorem Ipsum"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              ml: { xs: 0, md: "3rem" },
-              mt: { xs: "2rem", md: 0 },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-        </Box>
-        {/* universityName & Degree */}
-        <Box
-          sx={{
-            mt: "2.5rem",
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: "flex-start",
-            width: "100%",
-          }}
-        >
-          <TextField
-            id="studentUniversityName"
-            label="University Name"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="Indian Institute of Technology"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-          <TextField
-            id="studentDegree"
-            label="Degree"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="B.Tech"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              ml: { xs: 0, md: "3rem" },
-              mt: { xs: "2rem", md: 0 },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-        </Box>
-        {/* admission year, state & city */}
-        <Box
-          sx={{
-            mt: "2.5rem",
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: "flex-start",
-            width: "100%",
-          }}
-        >
-          <TextField
-            id="studentAdmissionYear"
-            label="Admission Year"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="2021"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-          <TextField
-            id="studentState"
-            label="State"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="Tamil Nadu"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              ml: { xs: 0, md: "3rem" },
-              mt: { xs: "2rem", md: 0 },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-          <TextField
-            id="studentCity"
-            label="City"
-            variant="outlined"
-            size="small"
-            InputProps={{
-              readOnly: true,
-            }}
-            value="Chennai"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-              ml: { xs: 0, md: "3rem" },
-              mt: { xs: "2rem", md: 0 },
-              width: { xs: "auto", md: "24rem" },
-            }}
-          />
-        </Box>
-      </Box>
+      <EducationalDetails />
       {/* update button */}
       <Button
         size="small"
