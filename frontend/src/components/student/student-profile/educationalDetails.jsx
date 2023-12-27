@@ -1,6 +1,6 @@
 import React from "react";
 import { Box } from "@mui/material";
-import AlertBox from "../common/alertBox";
+import AlertBox from "../../common/alertBox";
 import TextField from "@mui/material/TextField";
 function EducationalDetails() {
   return (

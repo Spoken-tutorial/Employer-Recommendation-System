@@ -1,0 +1,15 @@
+.css-1c2i806-MuiFormLabel-root-MuiInputLabel-root.Mui-focused {
+  color: #002648 !important;
+}
+.css-1c2i806-MuiFormLabel-root-MuiInputLabel-root {
+  color: gray !important;
+}
+.css-v4u5dn-MuiInputBase-root-MuiInput-root:after,
+.css-m5hdmq-MuiInputBase-root-MuiInput-root-MuiSelect-root:after,
+.css-m5hdmq-MuiInputBase-root-MuiInput-root-MuiSelect-root:after,
+.css-l4u8b9-MuiInputBase-root-MuiInput-root:after {
+  border-bottom-color: #002648 !important;
+}
+.css-1e6y48t-MuiButtonBase-root-MuiButton-root {
+  color: #002648 !important;
+}

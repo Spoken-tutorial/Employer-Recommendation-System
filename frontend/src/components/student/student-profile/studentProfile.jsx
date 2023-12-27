@@ -23,7 +23,7 @@ import AddProjectModal from "./addProjectModal";
 import UpdateProjectModal from "./updateProjectModal";
 import TestScores from "./testScores";
 import EducationalDetails from "./educationalDetails";
-import AlertBox from "../common/alertBox";
+import AlertBox from "../../common/alertBox";
 
 //for score table
 function StudentProfile() {
