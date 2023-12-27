@@ -10,6 +10,26 @@
 .css-l4u8b9-MuiInputBase-root-MuiInput-root:after {
   border-bottom-color: #002648 !important;
 }
-.css-1e6y48t-MuiButtonBase-root-MuiButton-root {
+.css-1e6y48t-MuiButtonBase-root-MuiButton-root,
+.css-1ujsas3 {
   color: #002648 !important;
+}
+.css-348fk2.Mui-focused {
+  color: #002648 !important;
+}
+.css-348fk2 {
+  color: gray !important;
+}
+.css-12rx5qu::after {
+  border-bottom-color: #002648 !important;
+  color: #002648;
+}
+.css-348fk2.Mui-focused {
+  color: #002648 !important;
+}
+
+.css-zrqpq1::after,
+.css-o3ukdw::after,
+.css-o3ukdw::after {
+  border-bottom-color: #002648 !important;
 }
