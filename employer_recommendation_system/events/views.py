@@ -13,6 +13,11 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic.base import View
 from spoken.models import SpokenStudent, StudentBatch, StudentMaster, TestAttendance, SpokenState, SpokenCity, FossCategory
 from emp.models import Degree, Discipline
+from rest_framework import viewsets, status
+from rest_framework import  status as rest_status
+from .serializers import EventSerializer
+from rest_framework.response import Response
+from .filters import EventFilter
 # Create your views here.
 # CBVs for event
 
@@ -216,3 +221,14 @@ def jobfair_data(request):
     
     
     return render(request,'events/jobfair_data.html',context)
+
+class EventViewSet(viewsets.ViewSet):
+    def list(self, request):
+        # http://127.0.0.1:8000/events/api/events?show_on_homepage=True&status=True
+        try:
+            queryset = Event.objects.all()
+            filtered_queryset = EventFilter(request.GET, queryset=queryset).qs
+            serializer = EventSerializer(filtered_queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=rest_status.HTTP_400_BAD_REQUEST)

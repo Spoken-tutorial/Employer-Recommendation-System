@@ -24,7 +24,7 @@ urlpatterns = [
     path('accounts/change-password/', change_password, name='change_password'),
 
     #API for registration data
-    path('accounts/api/registration/data/', RegistrationDataView.as_view(), name='register_api'),
+    path('accounts/api/registration', RegistrationDataView.as_view(), name='register_api'),
     path('accounts/api/validate_company_name/', validate_unique_data, name='validate_company_name'),
     path('accounts/api/store_otp/', store_otp, name='store_otp'),
     path('accounts/api/validate_otp/', validate_otp, name='validate_otp'),

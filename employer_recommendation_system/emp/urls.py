@@ -84,12 +84,14 @@ urlpatterns = [
 
     #Utils APi
     path('api/utils/cities/',get_cities_from_states,name='get-cities-from-state'),
-
+    
     #API for companies
-    path('api/companies/',CompanyView.as_view(),name='company'),
-    path('api/companies/<int:pk>',CompanyView.as_view(),name='company-patch'),
+    path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
+    path('api/companies/<int:pk>',CompanyViewSet.as_view({'get': 'retrieve'}),name='company-patch'),
 
     #API for jobs
     path('api/jobs/',JobView.as_view(),name='jobs'),
     path('api/jobs/<int:pk>',JobView.as_view(),name='jobs-patch'),
+
+    
 ]

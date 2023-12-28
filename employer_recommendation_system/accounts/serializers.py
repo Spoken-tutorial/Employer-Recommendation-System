@@ -4,6 +4,11 @@ from .models import Profile
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+# from emp.serializers import CompanyRegSerializer
+from emp.models import Company, CompanyManagers, Job, Skill, JobFoss, JobFilterState,JobFilterCity, Degree, Discipline, JobFilterYear, Domain
+from utilities.models import City                                          
+# from emp.serializers import SkillSerializer
+
 class RegistrationFormSerializer(serializers.Serializer):
     company_name = serializers.CharField(max_length=255)
 
@@ -58,3 +63,168 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
          token = super().get_token(user)
          token['username'] = user.username
          return token
+     
+
+
+
+class CompanyRegSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        # fields = ['id', 'name', 'website', 'date_created', 'is_agency', 'domain', 'managers']
+        fields = ['id', 'name', 'website', 'date_created', 'is_agency']
+        extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
+
+class UserRegSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # fields = ['id', 'name', 'website', 'date_created', 'is_agency', 'domain', 'managers']
+        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'username']
+        extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
+
+class SkillSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Skill
+        fields = ['id']
+        # fields = ['id', 'name']
+
+class DegreeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Degree
+        fields = ['id', 'name']
+
+class DisciplineSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Discipline
+        fields = ['id', 'name']
+    
+# class DynamicSkillsSerializer(serializers.Serializer):
+#     def to_representation(self, instance):
+#         if self.context['request'].method == 'GET':
+#             serializer = SkillSerializer(instance, many=True)
+#         else:
+#             serializer = SkillSerializer(instance, many=True, fields=['id'])
+#         return serializer.data
+
+class JobRegSerializer(serializers.ModelSerializer):
+    # skills = SkillSerializer(many=True)
+    # skills = serializers.ListField(child=serializers.IntegerField())
+    skills = SkillSerializer(many=True, read_only=True)
+    ws = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    degrees = DegreeSerializer(many=True, read_only=True)
+    wdeg = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    disciplines = DisciplineSerializer(many=True, read_only=True)
+    wdis = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    domain = serializers.IntegerField(write_only=True)
+    wjob_city = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    # comp = serializers.IntegerField(write_only=True)
+    # company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
+    class Meta:
+        model = Job
+        fields = ['id', 'designation', 'num_vacancies', 'salary_range_min', 'salary_range_max', 
+                  'description', 'key_job_responsibilities','requirements', 'domain', 'skills' ,'ws', 'degrees', 'disciplines',
+                  'wdis', 'wdeg', 'wjob_city']
+        # extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
+        # read_only_fields = ['id', 'date_created', 'skills']
+        read_only_fields = ['id', 'date_created']
+        # write_only_fields = ['ws']
+        
+    def create(self, validated_data):   
+        skills_data = validated_data.pop('ws')
+        degree_data = validated_data.pop('wdeg')
+        disp_data = validated_data.pop('wdis')
+        domain = validated_data.pop('domain')
+        job_city = validated_data.pop('wjob_city')
+        
+        try:
+            job = Job(**validated_data)
+            job.save()
+            skill_objs = Skill.objects.filter(id__in=skills_data)
+            job.skills.set(skill_objs)
+            degress_objs = Degree.objects.filter(id__in=degree_data)
+            job.degree.set(degress_objs)
+            disp_objs = Discipline.objects.filter(id__in=disp_data)
+            job.discipline.set(disp_objs)
+            job.domain_id = domain
+            job.save()
+            job_cities = City.objects.filter(id__in=job_city)
+            job.city_job.set(job_cities)
+        except Exception as e:
+            print(e)
+        return job
+
+class CompanyManagerSerializer(serializers.Serializer):
+    
+    class Meta:
+        model = CompanyManagers
+        fields = ['id', 'company', 'user', 'status', 'group', 'date_created', 'date_updated']
+        read_only_fields = ['id', 'date_created', 'date_updated']
+
+class CompanyRegistrationSerializer(serializers.Serializer):
+    company = CompanyRegSerializer()
+    user = UserRegSerializer()
+    job = JobRegSerializer()
+    mandatory_foss = serializers.ListField(child=serializers.IntegerField())
+    optional_foss = serializers.ListField(child=serializers.IntegerField())
+    filter_state = serializers.ListField(child=serializers.IntegerField())
+    filter_city = serializers.ListField(child=serializers.IntegerField())
+    years = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    # job_city = serializers.ListField(child=serializers.IntegerField(), write_only=True)
+    def create(self, validated_data):
+        print(f"\033[97m inside CompanyRegistrationSerializer \033[0m")
+        print(f"\033[94m validated_data : {validated_data} \033[0m")
+        company_data = validated_data.pop('company')
+        user_data = validated_data.pop('user')
+        job_data = validated_data.pop('job')
+        company_serializer = CompanyRegSerializer(data=company_data)
+        company_serializer.is_valid(raise_exception=True)
+        company = company_serializer.save()
+
+        print(f"\033[94m company : {company} \033[0m")
+        print(f"\033[94m type company : {type(company)} \033[0m")
+        
+        user_serializer = UserRegSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        print(f"\033[94m user : {user} \033[0m")
+        
+        # job_data['company'] = company
+        # print(f"\033[91m job_data['company_id'] : {job_data['company_id']} \033[0m")
+        print(f"\033[91m company id : {company.id} \033[0m")
+        print(f"\033[4m job_data : {job_data} \033[0m")
+        job_serializer = JobRegSerializer(data=job_data)
+        try:
+            job_serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            print(e)
+        job = job_serializer.save()
+        job.company = company
+        job.save()
+        
+        mandatory_foss = validated_data.pop('mandatory_foss')
+        optional_foss = validated_data.pop('optional_foss')
+        print(f"\033[94m mandatory_foss : {mandatory_foss} \033[0m")
+        JobFoss.objects.bulk_create([JobFoss(job=job, foss_id=foss_id, type='Mandatory') for foss_id in mandatory_foss])
+        JobFoss.objects.bulk_create([JobFoss(job=job, foss_id=foss_id, type='Optional') for foss_id in optional_foss])
+        print(f"\033[94m job 1: {job} \033[0m")
+
+        filter_state = validated_data.pop('filter_state')
+        filter_city = validated_data.pop('filter_city')
+        JobFilterState.objects.bulk_create([JobFilterState(job=job, state_id=state_id) for state_id in filter_state])
+        JobFilterCity.objects.bulk_create([JobFilterCity(job=job, city_id=city_id) for city_id in filter_city])
+        
+        years = validated_data.pop('years')
+        JobFilterYear.objects.bulk_create([JobFilterYear(job=job, year=year) for year in years])
+
+        
+        # filter_city = validated_data.pop('filter_city')
+
+        return {
+            'company': company,
+            'user': user,
+            'job': job,
+            'mandatory_foss': mandatory_foss,
+            'optional_foss': optional_foss,
+            'filter_state': filter_state,
+            'filter_city': filter_city
+        }
