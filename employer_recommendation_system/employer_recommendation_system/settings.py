@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'crispy_bootstrap4'
 
 ]
 
