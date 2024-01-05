@@ -8,6 +8,7 @@ import ViewAllCompanies from "../components/companiesSection/viewallCompanies";
 import ViewAllTestimonials from "../components/Testimonials/viewAllTestimonials";
 import StudentProfile from "../components/student/student-profile/studentProfile";
 import CompanyJobProfile from "../components/company/company-job-profile/companyJobProfile";
+import FossFilter from "../components/admin/foss-filter/FossFilter";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: "/testimonials/view-all", element: <ViewAllTestimonials /> },
       { path: "/student-profile", element: <StudentProfile /> },
       { path: "/company-job-profile", element: <CompanyJobProfile /> },
+      { path: "/foss-filter", element: <FossFilter /> },
     ],
   },
 ]);
