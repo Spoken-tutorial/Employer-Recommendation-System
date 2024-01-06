@@ -24,13 +24,6 @@ const router = createBrowserRouter([
       { path: "/company-job-profile", element: <CompanyJobProfile /> },
     ],
   },
-  {
-    path: "company/registration",
-    element: <CompanyRegistration />,
-    errorElement: <Error />,
-    action: compRegAction,
-    loader: compRegLoader,
-  },
 ]);
 
 export { router };
