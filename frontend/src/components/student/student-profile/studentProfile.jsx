@@ -75,7 +75,7 @@ function StudentProfile() {
     } = event;
     setSkillName(
       // On autofill we get a stringified value.
-      // eslint-disable-next-line prettier/prettier
+
       typeof value === "string" ? value.split(",") : value
     );
   };

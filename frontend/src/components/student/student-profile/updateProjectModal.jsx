@@ -39,7 +39,6 @@ export default function UpdateProjectModal({
 
   const [projectUrl, setProjectUrl] = useState(projects[index].url);
   const [projectDescription, setProjectDescription] = useState(
-    // eslint-disable-next-line prettier/prettier
     projects[index].description
   );
 
