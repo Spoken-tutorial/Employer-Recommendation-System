@@ -29,12 +29,12 @@ urlpatterns = [
     path('accounts/api/store_otp/', store_otp, name='store_otp'),
     path('accounts/api/validate_otp/', validate_otp, name='validate_otp'),
 
+    #----------------------------------- APIs V2 -----------------------------------#
     path('api/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-
-    
-    
+    path('api/logout/', LogoutView.as_view(), name='logout'),
+    path('api/password-reset/', PasswordResetView.as_view(), name='password-reset-confirm'),
+    path('api/password-change/', ChangePasswordView.as_view(), name='change-password'),
 
 ]
 

@@ -35,7 +35,7 @@ class Event(models.Model):
     status = models.BooleanField(default=True) # if inactive , it will not be made public
     show_on_homepage = models.BooleanField(default=True)
     description = RichTextField(null=True,blank=True,verbose_name="Event Description")
-
+    venue = models.CharField(max_length=255, default="")
     def get_absolute_url(self):
         print(" ****************** GETIING ABSOLUTE URL ****************** ")
         return reverse('event-detail', kwargs={'pk': self.id})
@@ -43,6 +43,8 @@ class Event(models.Model):
     def __str__(self):
         return self.name
     
+    class Meta:
+        ordering = ['-start_date']
 
 
 class Brochure(models.Model):
@@ -68,6 +70,8 @@ class Testimonial(models.Model):
         # return reverse('gallery-image-detail', kwargs={'pk': self.pk})
         return reverse('add_testimonial')
 
+    class Meta:
+        ordering = ['-date_created']
 class GalleryImage(models.Model):
     desc = models.TextField(null=True,blank=True,verbose_name='Description about image')
     location = models.FileField(upload_to=settings.GALLERY_IMAGES)    #spk

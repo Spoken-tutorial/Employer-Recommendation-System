@@ -1,14 +1,14 @@
-GET http://127.0.0.1:8000/accounts/api/registration/data/ HTTP/1.1
+GET {{baseUrl}}/accounts/api/registration/data/ HTTP/1.1
 
 ###
-POST http://127.0.0.1:8000/accounts/api/registration/data/ HTTP/1.1
+POST {{baseUrl}}/accounts/api/registration/data/ HTTP/1.1
 content-type: application/json
 
 {
 
     "company" : {
         "name": "sogo",
-        "website": "http://127.0.0.1:8000/admin/emp/company/add/"
+        "website": "{{baseUrl}}/admin/emp/company/add/"
     }
     
 
@@ -17,10 +17,10 @@ content-type: application/json
 
 
 ###
-GET http://127.0.0.1:8000/api/api/companies/1 HTTP/1.1
+GET {{baseUrl}}/api/api/companies/1 HTTP/1.1
 
 ###
-PATCH http://127.0.0.1:8000/api/api/companies/2/ HTTP/1.1
+PATCH {{baseUrl}}/api/api/companies/2/ HTTP/1.1
 Content-Type: application/json
 
 {
@@ -32,10 +32,10 @@ Content-Type: application/json
 
 
 ###
-DELETE http://127.0.0.1:8000/api/api/companies/2/ HTTP/1.1
+DELETE {{baseUrl}}/api/api/companies/2/ HTTP/1.1
 
 ###
-GET http://127.0.0.1:8000/api/api/companies?search= HTTP/1.1
+GET {{baseUrl}}/api/api/companies?search= HTTP/1.1
 
 
 

@@ -15,6 +15,12 @@ urlpatterns = [
     path('job-fair-students/', External.as_view(), name='job-fair-students'),
     path('data/', data_stats, name='data_stats'),
     path('details/', jobfair_data, name='jobfair_data'),
-    path('api/events', EventViewSet.as_view({'get':'list'}), name='jobfair_data'),
+    # path('api/events', EventViewSet.as_view({'get':'list'}), name='jobfair_data'),
+
+    #----------------------------------- APIs V2 -----------------------------------#
+    path('api/events', EventsView.as_view(), name='events'),
+    path('api/testimonials', TestimonialView.as_view(), name='events'),
+
+    
     
 ] 

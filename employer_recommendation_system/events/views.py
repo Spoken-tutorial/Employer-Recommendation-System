@@ -232,3 +232,46 @@ class EventViewSet(viewsets.ViewSet):
             return Response(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=rest_status.HTTP_400_BAD_REQUEST)
+        
+#----------------------------------- APIs V2 -----------------------------------#
+from rest_framework.views import APIView
+from rest_framework.pagination import PageNumberPagination
+from .filters import EventFilter, TestimonialFilter
+from django.db.models import Count, F
+from .serializers import TestimonialSerializer
+from emp.views import BaseListView
+class EventsView(BaseListView):
+    model = Event
+    serializer_class = EventSerializer
+    filter_class = EventFilter
+    queryset = Event.objects.filter(status=True)
+
+    # def get(self, request):
+    #     try:
+    #         queryset = Event.objects.filter(status=True)
+    #         filtered_queryset = EventFilter(request.GET, queryset=queryset).qs
+    #         paginator = PageNumberPagination()
+    #         paginator.page_size = 2
+    #         paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+    #         serializer = EventSerializer(paginated_queryset, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
+    #         # return Response(serializer.data)
+    #     except Exception as e:
+    #         return Response({'error': str(e)}, status=rest_status.HTTP_400_BAD_REQUEST)
+        
+class TestimonialView(BaseListView):
+    model = Testimonial
+    serializer_class = TestimonialSerializer
+    filter_class = TestimonialFilter
+    queryset = Testimonial.objects.filter(event__status=True)
+    # def get(self, request):
+    #     try:
+    #         queryset = Testimonial.objects.filter(event__status=True)
+    #         filtered_queryset = TestimonialFilter(request.GET, queryset=queryset).qs
+    #         paginator = PageNumberPagination()
+    #         paginator.page_size = 10
+    #         paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+    #         serializer = TestimonialSerializer(paginated_queryset, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
+    #     except Exception as e:
+    #         return Response({'error': str(e)}, status=rest_status.HTTP_400_BAD_REQUEST)

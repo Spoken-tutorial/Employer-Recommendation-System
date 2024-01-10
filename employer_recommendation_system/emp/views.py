@@ -1611,3 +1611,83 @@ class JobView(APIView):
             return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
 
+
+#----------------------------------- View V2 -----------------------------------#
+from .serializers import EventSerializer, CompanyDataSerializer
+from events.serializers import TestimonialSerializer, GalleryImageSerializer
+from events.models import Event, Testimonial, GalleryImage
+from random import sample
+from rest_framework.pagination import PageNumberPagination
+
+class HomepageView(APIView):
+    def get(self, request):
+        data = {
+            'past_events': self.get_past_events(),
+            'upcoming_events': self.get_upcoming_events(),
+            'companies': self.get_random_companies(),
+            'testimonials':self.get_testimonials(),
+            'gallery_images': self.get_gallery_images()
+        }
+        return Response(data, status=status.HTTP_200_OK)
+        
+    def get_past_events(self):
+        events = Event.objects.filter(show_on_homepage=True, end_date__lt=datetime.date.today())[:6]
+        return EventSerializer(events, many=True).data
+    
+    def get_upcoming_events(self):
+        upcoming_events = Event.objects.filter(end_date__gte=datetime.date.today(), show_on_homepage=True)
+        return EventSerializer(upcoming_events, many=True).data
+
+    def get_random_companies(self):
+        companies = Company.objects.filter(show_on_homepage=True).prefetch_related('domain')
+        companies = sample(list(companies), 6) #Random companies from the list
+        return CompanyDataSerializer(companies, many=True).data
+
+    def get_testimonials(self):
+        testimonials = Testimonial.objects.filter(display_on_homepage=True)[:4]
+        return TestimonialSerializer(testimonials, many=True).data
+
+    def get_gallery_images(self):
+        gallery_images = GalleryImage.objects.filter(display_on_homepage=True)[:8]
+        return GalleryImageSerializer(gallery_images, many=True).data
+
+class BaseListView(APIView):
+    model = None
+    serializer_class = None
+    filter_class = None
+    page_size = 2
+    queryset = None
+    
+
+    def get(self, request):
+        try:
+            # queryset = self.model.objects.all()
+            filtered_queryset = self.filter_class(request.GET, queryset=self.queryset).qs
+            paginator = PageNumberPagination()
+            paginator.page_size = self.page_size
+            paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+            serializer = self.serializer_class(paginated_queryset, many=True)
+            return paginator.get_paginated_response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class CompanyView(BaseListView):
+    model = Company
+    serializer_class = CompanyDataSerializer
+    filter_class = CompanyFilter
+    queryset = Company.objects.prefetch_related('domain').all()
+    
+    # def get(self, request):
+    #     try:
+    #         #ToDo Number of job postings for each company
+    #         queryset = Company.objects.prefetch_related('domain').all().order_by('-date_updated')
+    #         filtered_queryset = CompanyFilter(request.GET, queryset=queryset).qs
+    #         paginator = PageNumberPagination()
+    #         paginator.page_size = 2
+    #         paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+    #         serializer = CompanyDataSerializer(paginated_queryset, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
+
+    #     except Exception as e:
+    #         return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        

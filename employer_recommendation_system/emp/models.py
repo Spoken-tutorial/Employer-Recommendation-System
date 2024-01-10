@@ -258,6 +258,9 @@ class Company(models.Model):
     agency = models.ForeignKey('self',null=True,on_delete=models.SET_NULL, blank=True,related_name='client_companies')
     is_agency = models.BooleanField(default=False)
     show_on_homepage = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = [('-date_updated')]
     def __str__(self):
         return self.name
 
