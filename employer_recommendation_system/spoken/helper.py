@@ -17,14 +17,14 @@ def pwd_exists(email):
 def auth_jrs(email):
     pass
 
-def is_spk_user(email):
-    result = SpokenUser.objects.filter(email=email)
-    if not result:
-        return None
-    if len(result) > 1:
-        print("Found multiple users; mail web-team & the user .& display relevant message")
-    else:
-        return result[0]
+# def is_spk_user(email):
+#     result = SpokenUser.objects.filter(email=email)
+#     if not result:
+#         return None
+#     if len(result) > 1:
+#         print("Found multiple users; mail web-team & the user .& display relevant message")
+#     else:
+#         return result[0]
 
 def is_spk_student_role(sp_user):
     b = 'Student' in [role.group.name for role in sp_user.spokenusergroup_set.all()]

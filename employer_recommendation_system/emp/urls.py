@@ -33,7 +33,7 @@ urlpatterns = [
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
     path('check_mail_status/<int:id>/', views.check_mail_status, name='check_mail_status'),
-    path('logout', views.handlelogout, name='logout'),
+    path('logout1', views.handlelogout, name='logout'),
     path('<pk>/document', views.document_view, name='document_view'), #resume & cover_letter as 'type' query
     ################### Degree urls : currently only accessible to MANAGER Role : Set conditions via admin
     path('add_degree/', DegreeCreateView.as_view(), name='add_degree'),
@@ -77,7 +77,7 @@ urlpatterns = [
     # path('degree/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
     
     ################### public urls
-    path('companies',CompanyList.as_view(),name='companies'),
+    path('companies',CompanyList.as_view(),name='companies-list'),
 
     #API for registration
     path('api/register/',RegistrationView.as_view(),name='register'),
@@ -86,12 +86,14 @@ urlpatterns = [
     path('api/utils/cities/',get_cities_from_states,name='get-cities-from-state'),
     
     #API for companies
-    path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
+    # path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
     path('api/companies/<int:pk>',CompanyViewSet.as_view({'get': 'retrieve'}),name='company-patch'),
 
     #API for jobs
     path('api/jobs/',JobView.as_view(),name='jobs'),
     path('api/jobs/<int:pk>',JobView.as_view(),name='jobs-patch'),
 
-    
+    #----------------------------------- APIs V2 -----------------------------------#
+    path('api/homepage', HomepageView.as_view(), name='homepage'),
+    path('api/companies/',CompanyView.as_view(),name='companies'),
 ]
