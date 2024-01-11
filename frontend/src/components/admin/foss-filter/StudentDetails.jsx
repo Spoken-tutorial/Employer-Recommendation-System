@@ -26,7 +26,7 @@ function StudentDetails({
       <CardContent>
         {/* card description */}
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Select Student Details
+          Select Student Details like Graduation Year, Institute Type and more.
         </Typography>
         {/* student details input */}
         <Grid container spacing={2} sx={{ mt: "0.5rem" }}>
