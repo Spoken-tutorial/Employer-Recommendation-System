@@ -102,23 +102,26 @@ function FossFilterForm({ data, manipulateFossList }) {
                       label="Foss"
                       onChange={(e) => handleFossGradeChange(e, index)}
                     >
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=40 <=50"}>
-                        {">=40 && <=50"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"40"}>
+                        {"40"}
                       </MenuItem>
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=50 <=60"}>
-                        {">=50 && <=60"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"50"}>
+                        {"50"}
                       </MenuItem>
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=60 <=70"}>
-                        {">=60 && <=70"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"60"}>
+                        {"60"}
                       </MenuItem>
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=70 <=80"}>
-                        {">=70 && <=80"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"70"}>
+                        {"70"}
                       </MenuItem>
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=80 <=90"}>
-                        {">=80 && <=90"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"80"}>
+                        {"80"}
                       </MenuItem>
-                      <MenuItem sx={{ fontSize: "0.7rem" }} value={">=90"}>
-                        {">=90"}
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"90"}>
+                        {"90"}
+                      </MenuItem>
+                      <MenuItem sx={{ fontSize: "0.7rem" }} value={"100"}>
+                        {"100"}
                       </MenuItem>
                     </Select>
                   </FormControl>

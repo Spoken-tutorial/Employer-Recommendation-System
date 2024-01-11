@@ -1,17 +1,52 @@
+/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
+import MenuItem from "@mui/material/MenuItem";
 import MandatoryFoss from "./MandatoryFoss";
 import OptionalFoss from "./OptionalFoss";
+import StudentDetails from "./StudentDetails";
+
 function FossFilter() {
   //holds array of foss
   const [mandatoryFossList, setMandatoryFossList] = useState([]);
   const [optionalFossList, setOptionalFossList] = useState([]);
+  //for student details
+  const [instituteType, setInstituteType] = useState("");
+  const [graduationYear, setGraduationYear] = useState("");
+  const [studentState, setStudentState] = useState("");
+  const [studentCity, setStudentCity] = useState("");
+  const handleChangeInstituteType = (event) => {
+    setInstituteType(event.target.value);
+  };
+  const handleChangeGraduationYear = (event) => {
+    setGraduationYear(event.target.value);
+  };
+  const handleChangeStudentState = (event) => {
+    setStudentState(event.target.value);
+  };
+  const handleChangeStudentCity = (event) => {
+    setStudentCity(event.target.value);
+  };
+  const currentYear = new Date().getFullYear();
+  const GraduationYearOptions = [];
+  for (let i = currentYear - 2; i <= currentYear + 2; i++) {
+    GraduationYearOptions.push(
+      <MenuItem value={i} sx={{ fontSize: "0.7rem" }}>
+        {i}
+      </MenuItem>
+    );
+  }
+
   //for reset button
   const handleResetClick = () => {
     setMandatoryFossList([]);
     setOptionalFossList([]);
+    setInstituteType("");
+    setGraduationYear("");
+    setStudentState("");
+    setStudentCity("");
   };
   return (
     <>
@@ -33,6 +68,25 @@ function FossFilter() {
             mt: "0.3rem",
           }}
         ></Divider>
+        {/* student details  */}
+        <Typography
+          variant="subtitle1"
+          gutterBottom
+          sx={{ fontWeight: "bold", mt: "1.5rem" }}
+        >
+          Student Details
+        </Typography>
+        <StudentDetails
+          instituteType={instituteType}
+          graduationYear={graduationYear}
+          studentState={studentState}
+          studentCity={studentCity}
+          handleInstituteType={handleChangeInstituteType}
+          handleGraduationYear={handleChangeGraduationYear}
+          handleStudentState={handleChangeStudentState}
+          handleStudentCity={handleChangeStudentCity}
+          GraduationYearOptions={GraduationYearOptions}
+        ></StudentDetails>
         {/* mandatory foss */}
         <Typography
           variant="subtitle1"
