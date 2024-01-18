@@ -96,4 +96,15 @@ urlpatterns = [
     #----------------------------------- APIs V2 -----------------------------------#
     path('api/homepage', HomepageView.as_view(), name='homepage'),
     path('api/companies/',CompanyView.as_view(),name='companies'),
+    path('api/students/<int:pk>/dashboard',StudentHomepageView.as_view(),name='companies'),
+    path('api/students/<int:pk>/events',StudentJobView.as_view(),name='companies'),
+    path('api/students/<int:pk>/profile',StudentProfileView.as_view(),name='companies'),
+    path('api/companies/<int:pk>/jobs',CompanyJobView.as_view(),name='companies'),
+    path('api/admin/companies',AdminCompanyView.as_view(),name='companies'),
+    path('api/admin/jobs',AdminJobView.as_view(),name='companies'),
+    path('api/admin/students',AdminStudentView.as_view(),name='students'), # ToDo Later
+    path('api/admin/events',AdminEventsView.as_view(),name='companies'),
+
+    
+    
 ]
