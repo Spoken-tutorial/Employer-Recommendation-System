@@ -54,7 +54,8 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from django.db.models import Prefetch
 from accounts.models import Profile
-from .filters import CompanyFilter
+from .filters import CompanyFilter, JobFilter, StudentFilter
+from events.filters import EventFilter
 from .serializers import CompanySerializer, JobSerializer
 
 @check_user
@@ -1614,10 +1615,12 @@ class JobView(APIView):
 
 #----------------------------------- View V2 -----------------------------------#
 from .serializers import EventSerializer, CompanyDataSerializer
-from events.serializers import TestimonialSerializer, GalleryImageSerializer
+from events.serializers import TestimonialSerializer, GalleryImageSerializer, JobFairSerializer
 from events.models import Event, Testimonial, GalleryImage
 from random import sample
 from rest_framework.pagination import PageNumberPagination
+from .utility import StudentService
+from emp.serializers import StudentDetailSerializer, StudentSerializer
 
 class HomepageView(APIView):
     def get(self, request):
@@ -1655,7 +1658,7 @@ class BaseListView(APIView):
     model = None
     serializer_class = None
     filter_class = None
-    page_size = 2
+    page_size = 50 # Change to 50 before commit
     queryset = None
     
 
@@ -1691,3 +1694,77 @@ class CompanyView(BaseListView):
     #     except Exception as e:
     #         return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
         
+class StudentHomepageView(APIView):
+    def get(self, request, pk):
+        data = {
+            **StudentService.get_upcoming_events(),
+            'recommended_jobs': StudentService.get_recommended_jobs(pk)
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+class StudentJobView(APIView):
+    def get(self, request, pk):
+        data = {
+            **StudentService.get_student_events(pk)
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+class StudentProfileView(APIView):
+    def get(self, request, pk):
+        student = Student.objects.get(user_id=pk)
+        return Response(StudentDetailSerializer(student).data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, pk):
+        try:
+            print(f"\033[95m request.data : {request.data} \033[0m")
+            student = Student.objects.get(user_id=pk)
+            serializer = StudentDetailSerializer(student, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'Profile updated successfully.'}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+
+class CompanyJobView(APIView):
+    def get(self, request, pk):
+        try:
+            company = Company.objects.get(id=pk)
+            jobs = Job.objects.filter(company=company)
+            serializer = JobSerializer(jobs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Company.DoesNotExist:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminCompanyView(BaseListView):
+    model = Company
+    serializer_class = CompanyDataSerializer
+    filter_class = CompanyFilter
+    queryset = Company.objects.all().prefetch_related('domain').annotate(
+                num_jobs=Count('job')
+            ).order_by('-date_updated'
+            )
+    
+class AdminJobView(BaseListView):
+    model = Job
+    serializer_class = JobSerializer
+    filter_class = JobFilter
+    queryset = Job.objects.all().select_related('domain'
+                                                ).prefetch_related('company').prefetch_related('job_type'
+                                                ).prefetch_related('degree').prefetch_related('discipline'
+                                                ).prefetch_related('skills').order_by('-date_updated')
+
+
+class AdminStudentView(BaseListView):
+    model = Student
+    serializer_class = StudentSerializer
+    filter_class = StudentFilter
+    queryset = Student.objects.all().select_related('user')
+
+class AdminEventsView(BaseListView):
+    model = Event
+    serializer_class = EventSerializer
+    filter_class = EventFilter
+    queryset = Event.objects.all().order_by('-end_date')

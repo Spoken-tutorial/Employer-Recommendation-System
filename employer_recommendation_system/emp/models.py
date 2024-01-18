@@ -226,6 +226,9 @@ class Student(models.Model):
     def get_absolute_url(self):
         url = str(self.id)+'/'+'profile'
         return reverse('student_profile',kwargs={'pk':self.id}) 
+    
+    class Meta:
+        ordering = ('-date_created', '-date_updated')
 
 class Company(models.Model):
     STATUS_CHOICES = [
@@ -273,6 +276,9 @@ class Company(models.Model):
             obj = Company.objects.get(name=self.name,date_created=self.date_created)
             obj.slug = slugify(obj.id) 
             obj.save()
+
+    # def get_jobs_count(self):
+    #     return Job.objects.filter(company=self).count()
 
 class Foss(models.Model):
     foss = models.IntegerField(null=True,blank=True)  #spk foss id
@@ -335,7 +341,7 @@ class Job(models.Model):
     job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     
     def __str__(self):
-        return self.designation
+        return self.title
 
     def get_absolute_url(self):
         return reverse('job-detail', kwargs={'slug': self.slug})
@@ -347,12 +353,21 @@ class Job(models.Model):
             obj.slug = slugify(obj.id) 
             obj.save()
 
+    def get_applicants_count(self):
+        return JobShortlist.objects.filter(job=self).count()
+
     class Meta:
         ordering = [('-date_updated')]
 
 
 class JobShortlist(models.Model): #Record is created when a student applies for a job, with status 0.The status changes to 1 when HR further shortlists it.
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
+    APPLICATION_STATUS = [
+        ('Applied', 'Applied'),
+        ('Shortlisted', 'Shortlisted'),
+        ('Rejected', 'Rejected'),
+        ('Selected', 'Selected'),
+    ]
     spk_user=models.IntegerField(null=True)  #spk
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
@@ -361,6 +376,7 @@ class JobShortlist(models.Model): #Record is created when a student applies for 
     #0 : student has applied but not yet shortlisted by HR Manager
     #1 : student has applied & shortlisted by HR Manager
     status = models.IntegerField(null=True,blank=True)
+    app_status = models.CharField(max_length=20, choices=APPLICATION_STATUS, default='Applied')
 
     def __str__(self):
         return str(self.spk_user)+'-'+self.job.title
@@ -440,6 +456,7 @@ class JobFoss(models.Model):
     foss = models.ForeignKey(FossCategory,on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=CHOICES, default='Mandatory')
     status = models.BooleanField(default=True)
+    grade = models.IntegerField(null=True,blank=True, default=60)
 
     def __str__(self):
         return str(self.job)+'-'+str(self.foss)
