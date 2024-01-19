@@ -8,183 +8,193 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import CardActions from "@mui/material/CardActions";
+import Button from "@mui/material/Button";
+import { useTheme } from "@mui/material/styles";
+import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
-import { state, citiesOfState } from "../../../utils/stateCities";
+import StateAndCityInput from "./StateAndCityInput";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+const names = [
+  "University",
+  "Autonomous College",
+  "Affiliated College",
+  "Deemed University",
+];
+
+function getStyles(name, instituteType, theme) {
+  return {
+    fontWeight:
+      instituteType.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
 function StudentDetails({
   instituteType,
   graduationYear,
-  studentState,
-  studentCity,
   handleInstituteType,
   handleGraduationYear,
-  handleStudentState,
-  handleStudentCity,
   GraduationYearOptions,
+  studentLocationList,
+  handleStudentLocationList,
 }) {
+  const theme = useTheme();
+  //to add new state & city option in card
+  const handleAddNewStateCity = () => {
+    const newStudentLocationList = [
+      ...studentLocationList,
+      { state: "", city: [] },
+    ];
+    handleStudentLocationList(newStudentLocationList);
+  };
+
   const card = (
     <>
       <CardContent>
         {/* card description */}
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-          Select Student Details like Graduation Year, Institute Type and more.
+          Select Student Details like Graduation Year, Institute Type, Student
+          State & City.
         </Typography>
         {/* student details input */}
         <Grid container spacing={2} sx={{ mt: "0.5rem" }}>
           {/* institution type */}
           <Grid item sx={{ width: "20rem" }}>
-            <FormControl
-              variant="standard"
-              sx={{
-                m: 1,
-                minWidth: { xs: "14rem", md: "18rem" },
-                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  { borderColor: "#054C77" },
-              }}
-              size="small"
-            >
-              <InputLabel
-                id="demo-simple-select-standard-label"
-                sx={{ fontSize: "0.7rem" }}
-              >
+            <FormControl sx={{ width: "100%" }} size="small">
+              <InputLabel id="studentInstituteType" sx={{ fontSize: "0.9rem" }}>
                 Institute Type
               </InputLabel>
               <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
+                labelId="studentInstituteType"
+                id="studentInstituteType"
+                multiple
                 value={instituteType}
                 onChange={handleInstituteType}
-                label="institute-type"
-                sx={{ fontSize: "0.8rem" }}
+                sx={{ height: "auto" }}
+                input={
+                  <OutlinedInput
+                    id="studentInstituteType"
+                    label="Institute Type"
+                  />
+                }
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        sx={{
+                          backgroundColor: "#002648",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
               >
-                <MenuItem value={10} sx={{ fontSize: "0.7rem" }}>
-                  University
-                </MenuItem>
-                <MenuItem value={20} sx={{ fontSize: "0.7rem" }}>
-                  Autonomous College
-                </MenuItem>
-                <MenuItem value={30} sx={{ fontSize: "0.7rem" }}>
-                  Affiliated College
-                </MenuItem>
-                <MenuItem value={30} sx={{ fontSize: "0.7rem" }}>
-                  Deemed University
-                </MenuItem>
+                {names.map((name) => (
+                  <MenuItem
+                    key={name}
+                    value={name}
+                    sx={{ fontSize: "0.7rem" }}
+                    style={getStyles(name, instituteType, theme)}
+                  >
+                    {name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
           {/* graduation year */}
           <Grid item sx={{ width: "20rem" }}>
             <FormControl
-              variant="standard"
               sx={{
-                m: 1,
-                minWidth: { xs: "14rem", md: "18rem" },
-                ml: { sm: "0", md: "1rem" },
-                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  { borderColor: "#054C77" },
+                mt: { xs: "1rem", sm: "0rem", md: 0, lg: "0rem" },
+                width: "100%",
               }}
               size="small"
             >
               <InputLabel
-                id="demo-simple-select-standard-label"
-                sx={{ fontSize: "0.7rem" }}
+                id="studentGraduationYear"
+                sx={{ fontSize: "0.9rem" }}
               >
-                Graduate Year
+                Graduation Year
               </InputLabel>
               <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
+                labelId="studentGraduationYear"
+                id="studentGraduationYear"
+                multiple
                 value={graduationYear}
                 onChange={handleGraduationYear}
-                label="graduation-year"
-                sx={{ fontSize: "0.8rem" }}
+                sx={{ height: "auto" }}
+                input={
+                  <OutlinedInput
+                    id="studentGraduationYear"
+                    label="Graduation Year"
+                  />
+                }
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        sx={{
+                          backgroundColor: "#002648",
+                          color: "#ffffff",
+                          fontSize: "0.7rem",
+                        }}
+                      />
+                    ))}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
               >
-                {GraduationYearOptions}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-        <Grid container spacing={2} sx={{ mt: "0.5rem" }}>
-          {/* student state */}
-          <Grid item sx={{ width: "20rem" }}>
-            <FormControl
-              variant="standard"
-              sx={{
-                m: 1,
-                minWidth: { xs: "14rem", md: "18rem" },
-                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  { borderColor: "#054C77" },
-              }}
-              size="small"
-            >
-              <InputLabel
-                id="demo-simple-select-standard-label"
-                sx={{ fontSize: "0.7rem" }}
-              >
-                Student State
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={studentState}
-                onChange={handleStudentState}
-                sx={{ fontSize: "0.8rem" }}
-                label="institute-type"
-              >
-                {state.map((stateName, index) => (
+                {GraduationYearOptions.map((name) => (
                   <MenuItem
-                    key={index}
-                    value={stateName}
+                    key={name}
                     sx={{ fontSize: "0.7rem" }}
+                    value={name}
+                    style={getStyles(name, instituteType, theme)}
                   >
-                    {stateName}
+                    {name}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
           </Grid>
-          <Grid item sx={{ width: "20rem" }}>
-            <FormControl
-              variant="standard"
-              sx={{
-                m: 1,
-                minWidth: { xs: "14rem", md: "18rem" },
-                ml: { sm: "0", md: "1rem" },
-                "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-                  { borderColor: "#054C77" },
-              }}
-              size="small"
-            >
-              <InputLabel
-                id="demo-simple-select-standard-label"
-                sx={{ fontSize: "0.7rem" }}
-              >
-                Student City
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                value={studentCity}
-                onChange={handleStudentCity}
-                disabled={studentState == "" ? true : false}
-                label="graduation-year"
-                sx={{ fontSize: "0.8rem" }}
-              >
-                {studentState != ""
-                  ? citiesOfState[studentState].map((stateName, index) => (
-                      <MenuItem
-                        key={index}
-                        value={stateName}
-                        sx={{ fontSize: "0.7rem" }}
-                      >
-                        {stateName}
-                      </MenuItem>
-                    ))
-                  : null}
-              </Select>
-            </FormControl>
-          </Grid>
         </Grid>
+        {/* state & city */}
+        <StateAndCityInput
+          data={studentLocationList}
+          manipulateStudentLocationList={handleStudentLocationList}
+        ></StateAndCityInput>
       </CardContent>
+      <CardActions>
+        <Button
+          size="small"
+          sx={{ fontSize: "0.8rem", ml: "0.5rem" }}
+          onClick={handleAddNewStateCity}
+        >
+          + Add State & City Filter
+        </Button>
+      </CardActions>
     </>
   );
   return (
