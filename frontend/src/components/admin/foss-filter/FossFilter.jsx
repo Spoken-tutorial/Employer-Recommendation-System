@@ -1,9 +1,7 @@
-/* eslint-disable prettier/prettier */
 import React, { useState } from "react";
 import { Box, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
-import MenuItem from "@mui/material/MenuItem";
 import MandatoryFoss from "./MandatoryFoss";
 import OptionalFoss from "./OptionalFoss";
 import StudentDetails from "./StudentDetails";
@@ -13,41 +11,39 @@ function FossFilter() {
   const [mandatoryFossList, setMandatoryFossList] = useState([]);
   const [optionalFossList, setOptionalFossList] = useState([]);
   //for student details
-  const [instituteType, setInstituteType] = useState("");
-  const [graduationYear, setGraduationYear] = useState("");
-  const [studentState, setStudentState] = useState("");
-  const [studentCity, setStudentCity] = useState("");
+  const [instituteType, setInstituteType] = useState([]);
+  const [graduationYear, setGraduationYear] = useState([]);
+  //holds array of state and city
+  const [studentLocationList, setStudentLocationList] = useState([]);
+
   const handleChangeInstituteType = (event) => {
-    setInstituteType(event.target.value);
+    const {
+      target: { value },
+    } = event;
+    setInstituteType(typeof value === "string" ? value.split(",") : value);
   };
   const handleChangeGraduationYear = (event) => {
-    setGraduationYear(event.target.value);
+    const {
+      target: { value },
+    } = event;
+    setGraduationYear(typeof value === "string" ? value.split(",") : value);
   };
-  const handleChangeStudentState = (event) => {
-    setStudentState(event.target.value);
-  };
-  const handleChangeStudentCity = (event) => {
-    setStudentCity(event.target.value);
-  };
+
   const currentYear = new Date().getFullYear();
   const GraduationYearOptions = [];
   for (let i = currentYear - 2; i <= currentYear + 2; i++) {
-    GraduationYearOptions.push(
-      <MenuItem value={i} sx={{ fontSize: "0.7rem" }}>
-        {i}
-      </MenuItem>
-    );
+    GraduationYearOptions.push(i);
   }
 
   //for reset button
   const handleResetClick = () => {
     setMandatoryFossList([]);
     setOptionalFossList([]);
-    setInstituteType("");
-    setGraduationYear("");
-    setStudentState("");
-    setStudentCity("");
+    setInstituteType([]);
+    setGraduationYear([]);
+    setStudentLocationList([]);
   };
+
   return (
     <>
       <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "6rem" }}>
@@ -79,13 +75,11 @@ function FossFilter() {
         <StudentDetails
           instituteType={instituteType}
           graduationYear={graduationYear}
-          studentState={studentState}
-          studentCity={studentCity}
           handleInstituteType={handleChangeInstituteType}
           handleGraduationYear={handleChangeGraduationYear}
-          handleStudentState={handleChangeStudentState}
-          handleStudentCity={handleChangeStudentCity}
           GraduationYearOptions={GraduationYearOptions}
+          studentLocationList={studentLocationList}
+          handleStudentLocationList={setStudentLocationList}
         ></StudentDetails>
         {/* mandatory foss */}
         <Typography
