@@ -5,6 +5,7 @@ import Error from "../pages/Error";
 import LoginPage from "../pages/Login";
 import ViewAllEvents from "../components/eventsSection/viewAllEvents";
 import ViewAllCompanies from "../components/companiesSection/viewallCompanies";
+import ViewAllGallery from "../components/gallerySection/viewAllGallery";
 import ViewAllTestimonials from "../components/Testimonials/viewAllTestimonials";
 import StudentProfile from "../components/student/student-profile/studentProfile";
 import CompanyJobProfile from "../components/company/company-job-profile/companyJobProfile";
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <LoginPage /> },
       { path: "/events/view-all", element: <ViewAllEvents /> },
       { path: "/companies/view-all", element: <ViewAllCompanies /> },
+      { path: "/gallery/view-all", element: <ViewAllGallery /> },
       { path: "/testimonials/view-all", element: <ViewAllTestimonials /> },
       { path: "/student-profile", element: <StudentProfile /> },
       { path: "/company-job-profile", element: <CompanyJobProfile /> },
