@@ -1,12 +1,12 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import TestimonialsSection from "./testimonials";
-import { testimonialList1 } from "../../constants/testimonials";
 import TitleAndVideo from "./title&video";
 
-function FeaturedTestimonialsVideos() {
+function FeaturedTestimonialsVideos(props) {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -16,17 +16,14 @@ function FeaturedTestimonialsVideos() {
           </Button>
         </Link>
       </Box>
-      <TitleAndVideo
-        data={testimonialList1}
-        defaultExpand={true}
-      ></TitleAndVideo>
+      <TitleAndVideo data={props.data} defaultExpand={true}></TitleAndVideo>
     </>
   );
 }
-function FeaturedTestimonials() {
+function FeaturedTestimonials(props) {
   return (
     <TestimonialsSection
-      Component={<FeaturedTestimonialsVideos />}
+      Component={<FeaturedTestimonialsVideos data={props.data} />}
     ></TestimonialsSection>
   );
 }

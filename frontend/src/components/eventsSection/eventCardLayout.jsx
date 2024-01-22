@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import Grid from "@mui/material/Grid";
 import CalendarMonthTwoToneIcon from "@mui/icons-material/CalendarMonthTwoTone";
-import LocationOnTwoToneIcon from "@mui/icons-material/LocationOnTwoTone";
+//import LocationOnTwoToneIcon from "@mui/icons-material/LocationOnTwoTone";
 import EventModal from "./eventModal";
 
 function EventLayout({ data }) {
@@ -41,7 +41,7 @@ function EventLayout({ data }) {
               mt: "0.5rem",
             }}
           >
-            {data.eventName}
+            {data.name}
           </Typography>
 
           <Divider sx={{ backgroundColor: "#000000", height: "0.05rem" }}>
@@ -68,7 +68,7 @@ function EventLayout({ data }) {
                   mt: "0.1rem",
                 }}
               >
-                {data.status}
+                {"Over"}
               </Typography>
             ) : null}
           </Divider>
@@ -86,11 +86,24 @@ function EventLayout({ data }) {
                 gutterBottom
                 sx={{ color: "#000000", mt: "0.7rem", ml: "0.5rem" }}
               >
-                {data.startDate}
+                {data.formatted_start_date}
+              </Typography>
+            </Grid>
+            <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
+              <CalendarMonthTwoToneIcon
+                sx={{ color: "#000000", ml: "0.5rem", mt: "0.5rem" }}
+              ></CalendarMonthTwoToneIcon>
+              <Typography
+                variant="body2"
+                display="block"
+                gutterBottom
+                sx={{ color: "#000000", mt: "0.7rem", ml: "0.5rem" }}
+              >
+                {data.formatted_end_date}
               </Typography>
             </Grid>
 
-            <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
+            {/* <Grid item xs={10} sx={{ display: "flex", flexDirection: "row" }}>
               <LocationOnTwoToneIcon
                 sx={{ color: "#FFA500CC", ml: "0.5rem", mt: "0.3rem" }}
               ></LocationOnTwoToneIcon>
@@ -105,9 +118,9 @@ function EventLayout({ data }) {
                   pb: "0.2rem",
                 }}
               >
-                {data.location}
+                {data.formatted_start_date}
               </Typography>
-            </Grid>
+            </Grid> */}
             <Grid
               item
               xs={2}

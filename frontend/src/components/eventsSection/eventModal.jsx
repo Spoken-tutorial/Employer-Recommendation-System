@@ -54,7 +54,7 @@ export default function EventModal({ data }) {
             component="h2"
             sx={{ fontWeight: "bold" }}
           >
-            {data.eventName}
+            {data.name}
           </Typography>
           <Divider
             sx={{ backgroundColor: "#000000", height: "0.05rem", mt: "0.8rem" }}
@@ -69,19 +69,25 @@ export default function EventModal({ data }) {
           >
             <Grid item sx={{ display: "flex", mt: "0.5rem" }}>
               <Typography sx={{ fontWeight: "bold" }}>Start Date: </Typography>
-              <Typography sx={{ ml: "0.5rem" }}>{data.startDate}</Typography>
+              <Typography sx={{ ml: "0.5rem" }}>
+                {data.formatted_start_date}
+              </Typography>
             </Grid>
             <Grid item sx={{ display: "flex" }}>
               <Typography sx={{ fontWeight: "bold" }}>End Date:</Typography>
-              <Typography sx={{ ml: "0.5rem" }}>{data.endDate}</Typography>
+              <Typography sx={{ ml: "0.5rem" }}>
+                {data.formatted_end_date}
+              </Typography>
             </Grid>
-            <Grid item sx={{ display: "flex" }}>
+            {/* <Grid item sx={{ display: "flex" }}>
               <Typography sx={{ fontWeight: "bold" }}>Location:</Typography>
-              <Typography sx={{ ml: "0.5rem" }}>{data.location}</Typography>
-            </Grid>
+              <Typography sx={{ ml: "0.5rem" }}>
+                {data.formatted_end_date}
+              </Typography>
+            </Grid> */}
             <Grid item sx={{ display: "flex", mb: "0.5rem" }}>
               <Typography sx={{ fontWeight: "bold" }}>Status:</Typography>
-              <Typography sx={{ ml: "0.5rem" }}>{data.status}</Typography>
+              <Typography sx={{ ml: "0.5rem" }}>Over</Typography>
             </Grid>
           </Grid>
           <Divider

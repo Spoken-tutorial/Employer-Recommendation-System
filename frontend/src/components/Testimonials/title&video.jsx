@@ -50,7 +50,7 @@ function TitleAndVideo({ data, defaultExpand }) {
               },
             }}
           >
-            {data.title}: {data.date}
+            {data[0].event}: {data[0].date}
           </Typography>
         </Box>
         {/* Expand button */}
@@ -87,7 +87,7 @@ function TitleAndVideo({ data, defaultExpand }) {
               overflow: "hidden",
             }}
           >
-            {data.videos.map((obj, index) => (
+            {data.map((obj, index) => (
               <Grid
                 item
                 xs={12}

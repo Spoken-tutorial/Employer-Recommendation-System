@@ -3,6 +3,7 @@ import React from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 function TestimonialLayout({ data }) {
+  const baseUrl = "https://jrs.spoken-tutorial.org";
   return (
     <Box
       sx={{
@@ -29,7 +30,7 @@ function TestimonialLayout({ data }) {
                 borderRadius: "0.3rem",
               }}
             >
-              <source src={data.url} type="video/mp4"></source>
+              <source src={baseUrl + data.location} type="video/mp4"></source>
               Your browser does not support the video player.
             </video>
           </Box>

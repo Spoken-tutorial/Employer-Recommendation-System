@@ -1,12 +1,12 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
 import { Link } from "react-router-dom";
-import { featuredEventList } from "../../constants/featuredEvents";
 import EventSection from "./eventSectionLayout";
-function FeaturedEventsCards() {
+function FeaturedEventsCards(props) {
   return (
     <Box
       sx={{
@@ -31,7 +31,7 @@ function FeaturedEventsCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {featuredEventList.map((obj, index) => (
+        {props.data.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -48,7 +48,11 @@ function FeaturedEventsCards() {
     </Box>
   );
 }
-function FeaturedEvents() {
-  return <EventSection Component={<FeaturedEventsCards />}></EventSection>;
+function FeaturedEvents(props) {
+  return (
+    <EventSection
+      Component={<FeaturedEventsCards data={props.data} />}
+    ></EventSection>
+  );
 }
 export default FeaturedEvents;
