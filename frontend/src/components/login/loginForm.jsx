@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import AlertTitle from "@mui/material/AlertTitle";
 import Alert from "@mui/material/Alert";
 import { Link } from "react-router-dom";
+import { scrollToTop } from "../../utils/scrollToTop";
 
 function LoginForm() {
   const [emailError, setEmailErro] = useState(false);
@@ -20,6 +21,9 @@ function LoginForm() {
     setPasswordError(true);
     setPasswordHelperText("Incorrect Password");
   }
+  useEffect(() => {
+    scrollToTop();
+  }, []);
 
   return (
     <>

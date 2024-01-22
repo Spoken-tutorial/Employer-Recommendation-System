@@ -11,7 +11,8 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
-import { NavLink } from "react-router-dom";
+import { NavHashLink } from "react-router-hash-link";
+import scrollWithOffset from "../../utils/hashScrollwithOffset";
 
 export default function LeftDrawer() {
   const [state, setState] = React.useState({
@@ -49,21 +50,25 @@ export default function LeftDrawer() {
       {/*Nav menu*/}
       <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
         {navItems.map((obj, index) => (
-          <NavLink to={obj.url} key={index} style={{ textDecoration: "none" }}>
-            {({ isActive }) => (
-              <ListItem key={index} disablePadding>
-                <ListItemButton>
-                  <ListItemText
-                    primary={obj.text}
-                    sx={{
-                      color: isActive ? "#FFA500CC" : "#ffffff",
-                      marginTop: "0.5rem",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            )}
-          </NavLink>
+          <NavHashLink
+            smooth
+            to={obj.url}
+            key={index}
+            activeStyle={{ color: "red" }}
+            style={{ textDecoration: "none", color: "#ffffff" }}
+            scroll={(el) => scrollWithOffset(el)}
+          >
+            <ListItem key={index} disablePadding>
+              <ListItemButton>
+                <ListItemText
+                  primary={obj.text}
+                  sx={{
+                    marginTop: "0.5rem",
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+          </NavHashLink>
         ))}
       </List>
     </Box>

@@ -3,16 +3,12 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
 
-function CompaniesSection(props) {
+function GallerySectionLayout(props) {
   return (
     <>
       <Box
-        sx={{
-          marginTop: "2rem",
-          p: "1rem",
-          marginBottom: "3.5rem",
-        }}
-        id="companies"
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}
+        id="gallery"
       >
         <Typography
           variant="h3"
@@ -23,7 +19,7 @@ function CompaniesSection(props) {
             fontSize: { xs: "2rem" },
           }}
         >
-          Companies
+          Gallery
         </Typography>
         <Divider
           sx={{
@@ -37,4 +33,4 @@ function CompaniesSection(props) {
   );
 }
 
-export default CompaniesSection;
+export default GallerySectionLayout;

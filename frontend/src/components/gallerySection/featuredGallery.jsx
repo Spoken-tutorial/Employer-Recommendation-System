@@ -1,22 +1,17 @@
 import React from "react";
 import { Box } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
-import EventLayout from "./eventCardLayout";
+import Grid from "@mui/material/Grid";
+import { featuredGalleryList } from "../../constants/featuredGallery";
 import { Link } from "react-router-dom";
-import { featuredEventList } from "../../constants/featuredEvents";
-import EventSection from "./eventSectionLayout";
-function FeaturedEventsCards() {
+import GallerySectionLayout from "./gallerySectionLayout";
+import GalleryCardLayout from "./galleryCardLayout";
+
+function FeaturedGalleryCards() {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100%",
-      }}
-    >
+    <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="events/view-all" style={{ textDecoration: "none" }}>
+        <Link to="gallery/view-all" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>
@@ -31,7 +26,7 @@ function FeaturedEventsCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {featuredEventList.map((obj, index) => (
+        {featuredGalleryList.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -41,14 +36,19 @@ function FeaturedEventsCards() {
             key={index}
             sx={{ display: "flex", justifyContent: "center" }}
           >
-            <EventLayout data={obj}></EventLayout>
+            <GalleryCardLayout data={obj}></GalleryCardLayout>
           </Grid>
         ))}
       </Grid>
-    </Box>
+    </>
   );
 }
-function FeaturedEvents() {
-  return <EventSection Component={<FeaturedEventsCards />}></EventSection>;
+function FeaturedGallery() {
+  return (
+    <GallerySectionLayout
+      Component={<FeaturedGalleryCards />}
+    ></GallerySectionLayout>
+  );
 }
-export default FeaturedEvents;
+
+export default FeaturedGallery;

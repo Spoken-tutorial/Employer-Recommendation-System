@@ -1,67 +1,32 @@
 import { createBrowserRouter } from "react-router-dom";
 import Homepage from "../pages/Homepage";
+import Layout from "../pages/Layout";
 import Error from "../pages/Error";
-import Hero from "../views/heroSection/hero";
-import About from "../views/aboutSection/about";
-import Events from "../views/eventsSection/events";
-import Companies from "../views/companiesSection/companies";
-import Testimonials from "../views/testimonialsSection/testimonials";
-import Login from "../views/login/login";
-import FeaturedEvents from "../components/eventsSection/featuredEvents";
+import LoginPage from "../pages/Login";
 import ViewAllEvents from "../components/eventsSection/viewAllEvents";
-import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
-import ViewallCompanies from "../components/companiesSection/viewallCompanies";
+import ViewAllCompanies from "../components/companiesSection/viewallCompanies";
+import ViewAllGallery from "../components/gallerySection/viewAllGallery";
+import ViewAllTestimonials from "../components/Testimonials/viewAllTestimonials";
+import StudentProfile from "../components/student/student-profile/studentProfile";
+import CompanyJobProfile from "../components/company/company-job-profile/companyJobProfile";
+import FossFilter from "../components/admin/foss-filter/FossFilter";
 
-import CompanyRegistration, {
-  action as compRegAction,
-  loader as compRegLoader,
-} from "../pages/CompanyRegistration";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Homepage />,
+    element: <Layout />,
     errorElement: <Error />,
     children: [
-      {
-        path: "/",
-        element: <Hero />,
-      },
-      {
-        path: "/about",
-        element: <About />,
-      },
-      {
-        path: "/events",
-        element: <Events />,
-        children: [
-          { path: "", element: <FeaturedEvents /> },
-          { path: "view-all", element: <ViewAllEvents /> },
-        ],
-      },
-      {
-        path: "/companies",
-        element: <Companies />,
-        children: [
-          { path: "", element: <FeaturedCompanies /> },
-          { path: "view-all", element: <ViewallCompanies /> },
-        ],
-      },
-      {
-        path: "/testimonials",
-        element: <Testimonials />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
+      { path: "/", element: <Homepage /> },
+      { path: "/login", element: <LoginPage /> },
+      { path: "/events/view-all", element: <ViewAllEvents /> },
+      { path: "/companies/view-all", element: <ViewAllCompanies /> },
+      { path: "/gallery/view-all", element: <ViewAllGallery /> },
+      { path: "/testimonials/view-all", element: <ViewAllTestimonials /> },
+      { path: "/student-profile", element: <StudentProfile /> },
+      { path: "/company-job-profile", element: <CompanyJobProfile /> },
+      { path: "/foss-filter", element: <FossFilter /> },
     ],
-  },
-  {
-    path: "company/registration",
-    element: <CompanyRegistration />,
-    errorElement: <Error />,
-    action: compRegAction,
-    loader: compRegLoader,
   },
 ]);
 

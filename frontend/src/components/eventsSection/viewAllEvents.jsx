@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
-import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import { viewAllEventList } from "../../constants/viewAllEvents";
-function ViewAllEvents() {
+import scrollWithOffset from "../../utils/hashScrollwithOffset";
+import EventSection from "./eventSectionLayout";
+import { scrollToTop } from "../../utils/scrollToTop";
+
+function ViewAllEventsCards() {
+  useEffect(() => {
+    scrollToTop();
+  }, []);
+
   return (
     <Box
       sx={{
@@ -15,11 +23,15 @@ function ViewAllEvents() {
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="../" style={{ textDecoration: "none" }}>
+        <HashLink
+          to="/#events"
+          style={{ textDecoration: "none" }}
+          scroll={(el) => scrollWithOffset(el)}
+        >
           <Button size="small" variant="text">
             Go Back
           </Button>
-        </Link>
+        </HashLink>
       </Box>
       <Grid
         container
@@ -37,7 +49,6 @@ function ViewAllEvents() {
             sm={12}
             md={6}
             lg={4}
-            xl={3}
             key={index}
             sx={{ display: "flex", justifyContent: "center" }}
           >
@@ -48,5 +59,7 @@ function ViewAllEvents() {
     </Box>
   );
 }
-
+function ViewAllEvents() {
+  return <EventSection Component={<ViewAllEventsCards />}></EventSection>;
+}
 export default ViewAllEvents;

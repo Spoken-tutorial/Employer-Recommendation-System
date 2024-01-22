@@ -11,12 +11,13 @@ import Container from "@mui/material/Container";
 import LeftDrawer from "./leftDrawer";
 import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
-import { NavLink } from "react-router-dom";
+import { NavHashLink, HashLink } from "react-router-hash-link";
+import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import Avatar from "@mui/material/Avatar";
 
 function NavbarMain() {
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#002648" }}>
+    <AppBar position="fixed" sx={{ backgroundColor: "#002648" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Avatar
@@ -29,58 +30,68 @@ function NavbarMain() {
             alt="IIT Bombay"
             src="https://jrs.spoken-tutorial.org/static/images/st-logo.png"
           />
-          <Typography
-            variant="h6"
-            noWrap
-            component="a"
-            href="#"
-            sx={{
-              mr: 2,
-              display: { xs: "none", md: "flex" },
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".05rem",
-              color: "#ffffff",
-              textDecoration: "none",
-            }}
-          >
-            Spoken Tutorial JRS
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+          <HashLink to="/" style={{ textDecoration: "none" }}>
+            <Typography
+              variant="h6"
+              noWrap
+              component="a"
+              sx={{
+                mr: 2,
+                display: { xs: "none", md: "flex" },
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".05rem",
+                color: "#ffffff",
+                textDecoration: "none",
+              }}
+            >
+              Spoken Tutorial JRS
+            </Typography>
+          </HashLink>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
             <LeftDrawer></LeftDrawer>
           </Box>
-          <Avatar
+          <Box
             sx={{
-              backgroundColor: "#ffffff",
-              mr: "0.5rem",
-              width: { xs: "1.5rem", sm: "1.8rem" },
-              height: { xs: "1.5rem", sm: "1.8rem" },
-              display: { xs: "flex", md: "none" },
-            }}
-            alt="IIT Bombay"
-            src="https://jrs.spoken-tutorial.org/static/images/st-logo.png"
-          />
-          {/*Mobile Screen*/}
-          <Typography
-            variant="h5"
-            noWrap
-            component="a"
-            href="#app-bar-with-responsive-menu"
-            sx={{
-              mr: 2,
-              display: { xs: "flex", md: "none" },
-              flexGrow: 1,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".05rem",
-              color: "inherit",
-              fontSize: { xs: "0.9rem", sm: "1.2rem" },
-              textDecoration: "none",
+              width: "100%",
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
             }}
           >
-            Spoken Tutorial JRS
-          </Typography>
+            <Avatar
+              sx={{
+                backgroundColor: "#ffffff",
+                mr: "0.5rem",
+                width: { xs: "1.5rem", sm: "1.8rem" },
+                height: { xs: "1.5rem", sm: "1.8rem" },
+                display: { xs: "flex", md: "none" },
+              }}
+              alt="IIT Bombay"
+              src="https://jrs.spoken-tutorial.org/static/images/st-logo.png"
+            />
+            {/*Mobile Screen*/}
+            <HashLink to="/" style={{ textDecoration: "none" }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  mr: 2,
+                  display: { xs: "flex", md: "none" },
+                  flexGrow: 1,
+                  fontFamily: "monospace",
+                  fontWeight: 700,
+                  letterSpacing: ".05rem",
+                  color: "#ffffff",
+                  fontSize: { xs: "0.9rem", sm: "1.2rem" },
+                  textDecoration: "none",
+                  textAlign: "center",
+                }}
+              >
+                Spoken Tutorial JRS
+              </Typography>
+            </HashLink>
+          </Box>
+
           {/*Nav Items lg*/}
           <Box
             sx={{
@@ -92,22 +103,19 @@ function NavbarMain() {
           >
             <List sx={{ display: "flex" }}>
               {navItems.map((obj, index) => (
-                <NavLink
+                <NavHashLink
+                  smooth
                   to={obj.url}
                   key={index}
-                  style={{ textDecoration: "none" }}
+                  style={{ textDecoration: "none", color: "#ffffff" }}
+                  scroll={(el) => scrollWithOffset(el)}
                 >
-                  {({ isActive }) => (
-                    <ListItem disablePadding>
-                      <ListItemButton>
-                        <ListItemText
-                          primary={obj.text}
-                          sx={{ color: isActive ? "#FFA500CC" : "#ffffff" }}
-                        />
-                      </ListItemButton>
-                    </ListItem>
-                  )}
-                </NavLink>
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemText primary={obj.text} />
+                    </ListItemButton>
+                  </ListItem>
+                </NavHashLink>
               ))}
             </List>
           </Box>

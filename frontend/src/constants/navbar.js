@@ -1,8 +1,9 @@
 const navItems = [
-  { text: "Home", url: "" },
-  { text: "About", url: "about" },
-  { text: "Events", url: "events" },
-  { text: "Companies", url: "Companies" },
-  { text: "Testimonials", url: "testimonials" },
+  { text: "Home", url: "/#home" },
+  { text: "About", url: "/#about-us", scroll: "about-us" },
+  { text: "Events", url: "/#events" },
+  { text: "Companies", url: "/#companies" },
+  { text: "Gallery", url: "/#gallery" },
+  { text: "Testimonials", url: "/#testimonials" },
 ];
 export { navItems };
