@@ -1,6 +1,7 @@
 import Navbar from "../views/navbar/navbar";
 import Hero from "../views/heroSection/hero";
 import About from "../views/aboutSection/about";
+import UpcomingEvents from "../components/upcomingEvents/upcomingEvents";
 import FeaturedEvents from "../components/eventsSection/featuredEvents";
 import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
 import FeaturedGallery from "../components/gallerySection/featuredGallery";
@@ -14,6 +15,7 @@ const Homepage = () => {
     <>
       <Navbar></Navbar>
       <Hero></Hero>
+      <UpcomingEvents data={homepageDate.upcoming_events}></UpcomingEvents>
       <About></About>
       <FeaturedEvents data={homepageDate.past_events}></FeaturedEvents>
       <FeaturedCompanies data={homepageDate.companies}></FeaturedCompanies>

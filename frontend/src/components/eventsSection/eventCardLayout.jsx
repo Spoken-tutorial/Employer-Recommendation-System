@@ -7,7 +7,7 @@ import CalendarMonthTwoToneIcon from "@mui/icons-material/CalendarMonthTwoTone";
 //import LocationOnTwoToneIcon from "@mui/icons-material/LocationOnTwoTone";
 import EventModal from "./eventModal";
 
-function EventLayout({ data }) {
+function EventLayout({ data, category }) {
   return (
     <Box
       sx={{
@@ -45,7 +45,7 @@ function EventLayout({ data }) {
           </Typography>
 
           <Divider sx={{ backgroundColor: "#000000", height: "0.05rem" }}>
-            {data.status === "Upcoming" ? (
+            {category === "upcoming" ? (
               <Typography
                 variant="caption"
                 sx={{
@@ -68,7 +68,7 @@ function EventLayout({ data }) {
                   mt: "0.1rem",
                 }}
               >
-                {"Over"}
+                {category == "upcoming" ? "Upcoming" : "Over"}
               </Typography>
             ) : null}
           </Divider>
@@ -126,7 +126,7 @@ function EventLayout({ data }) {
               xs={2}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <EventModal data={data}></EventModal>
+              <EventModal data={data} category={category}></EventModal>
             </Grid>
           </Grid>
         </Grid>

@@ -41,7 +41,7 @@ function FeaturedEventsCards(props) {
             key={index}
             sx={{ display: "flex", justifyContent: "center" }}
           >
-            <EventLayout data={obj}></EventLayout>
+            <EventLayout data={obj} category={"past"}></EventLayout>
           </Grid>
         ))}
       </Grid>

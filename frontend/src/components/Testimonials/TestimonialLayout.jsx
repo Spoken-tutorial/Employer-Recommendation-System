@@ -15,7 +15,7 @@ function TestimonialLayout({ data }) {
         "&:hover": {
           transform: "scale(1.04)",
         },
-        marginBottom: "2rem",
+        marginBottom: "3.5rem",
       }}
     >
       <Grid container>

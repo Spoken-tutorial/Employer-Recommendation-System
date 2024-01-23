@@ -23,7 +23,7 @@ const style = {
 };
 
 // eslint-disable-next-line react/prop-types
-export default function EventModal({ data }) {
+export default function EventModal({ data, category }) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -87,7 +87,9 @@ export default function EventModal({ data }) {
             </Grid> */}
             <Grid item sx={{ display: "flex", mb: "0.5rem" }}>
               <Typography sx={{ fontWeight: "bold" }}>Status:</Typography>
-              <Typography sx={{ ml: "0.5rem" }}>Over</Typography>
+              <Typography sx={{ ml: "0.5rem" }}>
+                {category == "upcoming" ? "Upcoming" : "Over"}
+              </Typography>
             </Grid>
           </Grid>
           <Divider
