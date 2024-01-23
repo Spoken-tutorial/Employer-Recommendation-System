@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
-import Homepage from "../pages/Homepage";
+import Homepage, { loader as HomePageLoader } from "../pages/Homepage";
 import Layout from "../pages/Layout";
 import Error from "../pages/Error";
 import LoginPage from "../pages/Login";
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     errorElement: <Error />,
     children: [
-      { path: "/", element: <Homepage /> },
+      { path: "/", element: <Homepage />, loader: HomePageLoader },
       { path: "/login", element: <LoginPage /> },
       { path: "/events/view-all", element: <ViewAllEvents /> },
       { path: "/companies/view-all", element: <ViewAllCompanies /> },

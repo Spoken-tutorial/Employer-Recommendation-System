@@ -1,13 +1,13 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import CompanyLayout from "./companyCardLayout";
-import { featuredCompanyList } from "../../constants/featuredCompanies";
 import { Link } from "react-router-dom";
 import CompaniesSection from "./companies";
 
-function FeaturedCompaniesCards() {
+function FeaturedCompaniesCards(props) {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -26,7 +26,7 @@ function FeaturedCompaniesCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {featuredCompanyList.map((obj, index) => (
+        {props.data.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -43,9 +43,11 @@ function FeaturedCompaniesCards() {
     </>
   );
 }
-function FeaturedCompanies() {
+function FeaturedCompanies(props) {
   return (
-    <CompaniesSection Component={<FeaturedCompaniesCards />}></CompaniesSection>
+    <CompaniesSection
+      Component={<FeaturedCompaniesCards data={props.data} />}
+    ></CompaniesSection>
   );
 }
 

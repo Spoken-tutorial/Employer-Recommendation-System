@@ -13,6 +13,7 @@ function GalleryCardLayout({ data }) {
   const handleOpen = () => {
     setOpen(true);
   };
+  const baseUrl = "https://jrs.spoken-tutorial.org";
   return (
     <>
       <Box
@@ -35,7 +36,7 @@ function GalleryCardLayout({ data }) {
             <Avatar
               alt="JRS Gallery"
               variant="square"
-              src={data.url}
+              src={baseUrl + data.location}
               sx={{
                 width: { xs: "17rem", sm: "18rem", md: "20rem", lg: "19rem" },
                 height: { xs: "8rem", sm: "9.5rem" },
@@ -55,7 +56,7 @@ function GalleryCardLayout({ data }) {
         open={open}
         onClick={handleClose}
       >
-        <ImageViewModal url={data.url}></ImageViewModal>
+        <ImageViewModal url={baseUrl + data.location}></ImageViewModal>
       </Backdrop>
     </>
   );

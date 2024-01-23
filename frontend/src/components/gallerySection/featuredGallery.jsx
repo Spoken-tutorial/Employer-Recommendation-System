@@ -1,13 +1,14 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import { featuredGalleryList } from "../../constants/featuredGallery";
 import { Link } from "react-router-dom";
 import GallerySectionLayout from "./gallerySectionLayout";
 import GalleryCardLayout from "./galleryCardLayout";
 
-function FeaturedGalleryCards() {
+function FeaturedGalleryCards(props) {
+
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
@@ -26,7 +27,7 @@ function FeaturedGalleryCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {featuredGalleryList.map((obj, index) => (
+        {props.data.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -43,10 +44,10 @@ function FeaturedGalleryCards() {
     </>
   );
 }
-function FeaturedGallery() {
+function FeaturedGallery(props) {
   return (
     <GallerySectionLayout
-      Component={<FeaturedGalleryCards />}
+      Component={<FeaturedGalleryCards data={props.data} />}
     ></GallerySectionLayout>
   );
 }
