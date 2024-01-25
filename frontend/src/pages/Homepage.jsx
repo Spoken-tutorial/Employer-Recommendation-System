@@ -6,7 +6,7 @@ import FeaturedEvents from "../components/eventsSection/featuredEvents";
 import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
 import FeaturedGallery from "../components/gallerySection/featuredGallery";
 import FeaturedTestimonials from "../components/Testimonials/featuredTestimonials";
-import { getHomePage } from "../utils/api/home";
+import { getHomePage } from "../utils/api/homepage/homePage";
 import { useLoaderData } from "react-router-dom";
 
 const Homepage = () => {

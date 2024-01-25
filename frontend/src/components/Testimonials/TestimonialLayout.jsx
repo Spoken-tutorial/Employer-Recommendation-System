@@ -2,8 +2,10 @@
 import React from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
+
 function TestimonialLayout({ data }) {
   const baseUrl = "https://jrs.spoken-tutorial.org";
+
   return (
     <Box
       sx={{
@@ -11,6 +13,7 @@ function TestimonialLayout({ data }) {
         height: { xs: "8rem", sm: "9.5rem" },
         display: "flex",
         alignItems: "center",
+        justifyContent: "center",
         boxShadow: "4px 12px 5px rgba(0, 0, 0, 0.3)",
         "&:hover": {
           transform: "scale(1.04)",
@@ -18,10 +21,14 @@ function TestimonialLayout({ data }) {
         marginBottom: "3.5rem",
       }}
     >
-      <Grid container>
-        <Grid item>
+      <Grid
+        container
+        sx={{ height: "auto", display: "flex", justifyContent: "center" }}
+      >
+        <Grid item sx={{ display: "flex", justifyContent: "center" }}>
           <Box>
             <video
+              key={data.location}
               controls
               style={{
                 width: "100%",

@@ -4,15 +4,19 @@ import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
 import { HashLink } from "react-router-hash-link";
-import { viewAllEventList } from "../../constants/viewAllEvents";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import EventSection from "./eventSectionLayout";
 import { scrollToTop } from "../../utils/scrollToTop";
+import { useLoaderData } from "react-router-dom";
+import PagePagination from "../common/pagination";
+import { getViewAllEvents } from "../../utils/api/homepage/viewAllOptions";
 
 function ViewAllEventsCards() {
   useEffect(() => {
     scrollToTop();
   }, []);
+
+  const eventsData = useLoaderData();
 
   return (
     <Box
@@ -42,7 +46,7 @@ function ViewAllEventsCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {viewAllEventList.map((obj, index) => (
+        {eventsData.results.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -56,6 +60,10 @@ function ViewAllEventsCards() {
           </Grid>
         ))}
       </Grid>
+      <PagePagination
+        baseUrl={"/events/view-all/"}
+        count={Math.ceil(eventsData.count / 2)}
+      ></PagePagination>
     </Box>
   );
 }
@@ -63,3 +71,8 @@ function ViewAllEvents() {
   return <EventSection Component={<ViewAllEventsCards />}></EventSection>;
 }
 export default ViewAllEvents;
+
+export function loader({ params }) {
+  const pageNum = params.pageNum;
+  return getViewAllEvents(pageNum);
+}

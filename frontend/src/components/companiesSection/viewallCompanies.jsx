@@ -3,16 +3,20 @@ import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import CompanyLayout from "./companyCardLayout";
-import { viewAllCompanyList } from "../../constants/viewAllCompanies";
-import { HashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import CompaniesSection from "./companies";
+import PagePagination from "../common/pagination";
 import { scrollToTop } from "../../utils/scrollToTop";
+import { useLoaderData } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
+import { getViewAllCompanies } from "../../utils/api/homepage/viewAllOptions";
 
 function ViewAllCompaniesCards() {
   useEffect(() => {
     scrollToTop();
   }, []);
+
+  const companiesData = useLoaderData();
 
   return (
     <>
@@ -36,7 +40,7 @@ function ViewAllCompaniesCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {viewAllCompanyList.map((obj, index) => (
+        {companiesData.results.map((obj, index) => (
           <Grid
             item
             xs={12}
@@ -50,6 +54,10 @@ function ViewAllCompaniesCards() {
           </Grid>
         ))}
       </Grid>
+      <PagePagination
+        baseUrl={"/companies/view-all/"}
+        count={Math.ceil(companiesData.count / 2)}
+      ></PagePagination>
     </>
   );
 }
@@ -60,3 +68,8 @@ function ViewAllCompanies() {
 }
 
 export default ViewAllCompanies;
+
+export function loader({ params }) {
+  const pageNum = params.pageNum;
+  return getViewAllCompanies(pageNum);
+}

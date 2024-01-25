@@ -16,7 +16,7 @@ function FeaturedEventsCards(props) {
       }}
     >
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="events/view-all" style={{ textDecoration: "none" }}>
+        <Link to="events/view-all/1" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>

@@ -12,7 +12,7 @@ function EventLayout({ data, category }) {
     <Box
       sx={{
         width: { xs: "17rem", sm: "18rem", md: "20rem", lg: "19rem" },
-        height: "8.5rem",
+        height: "12rem",
         display: "flex",
         alignItems: "center",
         borderStyle: "solid",
@@ -20,6 +20,7 @@ function EventLayout({ data, category }) {
         borderRadius: "0.3rem",
         borderColor: "#ffffff",
         backgroundColor: "#F9F9F9",
+        p: 1,
         boxShadow: "4px 5px 8px rgba(0, 0, 0, 0.3)",
         "&:hover": {
           borderColor: "#FFA500CC",

@@ -44,7 +44,7 @@ function CompanyLayout({ data }) {
           />
         </Grid>
         <Grid item xs={8}>
-          <Grid container>
+          <Grid container sx={{ width: "90%" }}>
             <Grid item xs={12}>
               <Typography
                 variant="body"

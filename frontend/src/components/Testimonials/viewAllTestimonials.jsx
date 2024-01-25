@@ -5,20 +5,21 @@ import { HashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import TestimonialsSection from "./testimonials";
 import TitleAndVideo from "./title&video";
-import {
-  testimonialList1,
-  testimonialList2,
-} from "../../constants/testimonials";
 import { scrollToTop } from "../../utils/scrollToTop";
+import { getViewAllTestimonials } from "../../utils/api/homepage/viewAllOptions";
+import { useLoaderData } from "react-router-dom";
+import PagePagination from "../common/pagination";
 
 function ViewAllTestimonialsVideos() {
   useEffect(() => {
     scrollToTop();
   }, []);
 
+  const testimonialsData = useLoaderData();
+
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "2rem" }}>
         <HashLink
           to="/#testimonials"
           style={{ textDecoration: "none" }}
@@ -30,13 +31,13 @@ function ViewAllTestimonialsVideos() {
         </HashLink>
       </Box>
       <TitleAndVideo
-        data={testimonialList1}
+        data={testimonialsData.results}
         defaultExpand={true}
       ></TitleAndVideo>
-      <TitleAndVideo
-        data={testimonialList2}
-        defaultExpand={false}
-      ></TitleAndVideo>
+      <PagePagination
+        baseUrl={"/testimonials/view-all/"}
+        count={Math.ceil(testimonialsData.count / 2)}
+      ></PagePagination>
     </>
   );
 }
@@ -49,3 +50,8 @@ function ViewAllTestimonials() {
 }
 
 export default ViewAllTestimonials;
+
+export function loader({ params }) {
+  const pageNum = params.pageNum;
+  return getViewAllTestimonials(pageNum);
+}
