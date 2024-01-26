@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -7,16 +7,17 @@ import { HashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import EventSection from "./eventSectionLayout";
 import { scrollToTop } from "../../utils/scrollToTop";
-import { useLoaderData } from "react-router-dom";
+import { defer, useLoaderData, Await } from "react-router-dom";
 import PagePagination from "../common/pagination";
 import { getViewAllEvents } from "../../utils/api/homepage/viewAllOptions";
+import Spinner from "../common/Spinner";
 
 function ViewAllEventsCards() {
   useEffect(() => {
     scrollToTop();
   }, []);
 
-  const eventsData = useLoaderData();
+  const { viewAllEvents } = useLoaderData();
 
   return (
     <Box
@@ -46,24 +47,42 @@ function ViewAllEventsCards() {
         rowSpacing={4}
         sx={{ marginTop: "-1rem" }}
       >
-        {eventsData.results.map((obj, index) => (
-          <Grid
-            item
-            xs={12}
-            sm={12}
-            md={6}
-            lg={4}
-            key={index}
-            sx={{ display: "flex", justifyContent: "center" }}
-          >
-            <EventLayout data={obj} category={"past"}></EventLayout>
-          </Grid>
-        ))}
+        <Suspense
+          fallback={
+            <Box sx={{ height: "10rem" }}>
+              <Spinner></Spinner>
+            </Box>
+          }
+        >
+          <Await resolve={viewAllEvents}>
+            {(data) =>
+              data.results.map((obj, index) => (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={6}
+                  lg={4}
+                  key={index}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  <EventLayout data={obj} category={"past"}></EventLayout>
+                </Grid>
+              ))
+            }
+          </Await>
+        </Suspense>
       </Grid>
-      <PagePagination
-        baseUrl={"/events/view-all/"}
-        count={Math.ceil(eventsData.count / 2)}
-      ></PagePagination>
+      <Suspense fallback={<></>}>
+        <Await resolve={viewAllEvents}>
+          {(data) => (
+            <PagePagination
+              baseUrl={"/events/view-all/"}
+              count={Math.ceil(data.count / 2)}
+            ></PagePagination>
+          )}
+        </Await>
+      </Suspense>
     </Box>
   );
 }
@@ -74,5 +93,5 @@ export default ViewAllEvents;
 
 export function loader({ params }) {
   const pageNum = params.pageNum;
-  return getViewAllEvents(pageNum);
+  return defer({ viewAllEvents: getViewAllEvents(pageNum) });
 }

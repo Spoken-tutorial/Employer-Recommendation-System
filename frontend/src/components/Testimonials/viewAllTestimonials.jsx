@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect } from "react";
 import { Box } from "@mui/material";
 import Button from "@mui/material/Button";
 import { HashLink } from "react-router-hash-link";
@@ -7,15 +7,16 @@ import TestimonialsSection from "./testimonials";
 import TitleAndVideo from "./title&video";
 import { scrollToTop } from "../../utils/scrollToTop";
 import { getViewAllTestimonials } from "../../utils/api/homepage/viewAllOptions";
-import { useLoaderData } from "react-router-dom";
+import { Await, defer, useLoaderData } from "react-router-dom";
 import PagePagination from "../common/pagination";
+import Spinner from "../common/Spinner";
 
 function ViewAllTestimonialsVideos() {
   useEffect(() => {
     scrollToTop();
   }, []);
 
-  const testimonialsData = useLoaderData();
+  const { viewAllTestimonials } = useLoaderData();
 
   return (
     <>
@@ -30,14 +31,32 @@ function ViewAllTestimonialsVideos() {
           </Button>
         </HashLink>
       </Box>
-      <TitleAndVideo
-        data={testimonialsData.results}
-        defaultExpand={true}
-      ></TitleAndVideo>
-      <PagePagination
-        baseUrl={"/testimonials/view-all/"}
-        count={Math.ceil(testimonialsData.count / 2)}
-      ></PagePagination>
+      <Suspense
+        fallback={
+          <Box sx={{ height: "10rem" }}>
+            <Spinner></Spinner>
+          </Box>
+        }
+      >
+        <Await resolve={viewAllTestimonials}>
+          {(data) => (
+            <TitleAndVideo
+              data={data.results}
+              defaultExpand={true}
+            ></TitleAndVideo>
+          )}
+        </Await>
+      </Suspense>
+      <Suspense fallback={<></>}>
+        <Await resolve={viewAllTestimonials}>
+          {(data) => (
+            <PagePagination
+              baseUrl={"/testimonials/view-all/"}
+              count={Math.ceil(data.count / 2)}
+            ></PagePagination>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 }
@@ -53,5 +72,5 @@ export default ViewAllTestimonials;
 
 export function loader({ params }) {
   const pageNum = params.pageNum;
-  return getViewAllTestimonials(pageNum);
+  return defer({ viewAllTestimonials: getViewAllTestimonials(pageNum) });
 }

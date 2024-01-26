@@ -5,6 +5,6 @@ export async function getHomePage() {
   if (!response.ok) {
     throw { message: "Failed to fetch homepage", status: 500 };
   }
-  const resp = await response.json();
-  return resp;
+  const jsonData = await response.json();
+  return jsonData;
 }

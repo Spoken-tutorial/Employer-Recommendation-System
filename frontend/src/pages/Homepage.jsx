@@ -7,22 +7,41 @@ import FeaturedCompanies from "../components/companiesSection/featuredCompanies"
 import FeaturedGallery from "../components/gallerySection/featuredGallery";
 import FeaturedTestimonials from "../components/Testimonials/featuredTestimonials";
 import { getHomePage } from "../utils/api/homepage/homePage";
-import { useLoaderData } from "react-router-dom";
+import { Await, defer, useLoaderData } from "react-router-dom";
+import { Suspense } from "react";
+import Spinner from "../components/common/Spinner";
 
 const Homepage = () => {
-  const homepageDate = useLoaderData();
+  const { homePageData } = useLoaderData();
+
   return (
     <>
       <Navbar></Navbar>
       <Hero></Hero>
-      <UpcomingEvents data={homepageDate.upcoming_events}></UpcomingEvents>
+      <Suspense fallback={<Spinner></Spinner>}>
+        <Await resolve={homePageData}>
+          {(data) => (
+            <>
+              <UpcomingEvents data={data.upcoming_events}></UpcomingEvents>
+            </>
+          )}
+        </Await>
+      </Suspense>
       <About></About>
-      <FeaturedEvents data={homepageDate.past_events}></FeaturedEvents>
-      <FeaturedCompanies data={homepageDate.companies}></FeaturedCompanies>
-      <FeaturedGallery data={homepageDate.gallery_images}></FeaturedGallery>
-      <FeaturedTestimonials
-        data={homepageDate.testimonials}
-      ></FeaturedTestimonials>
+      <Suspense fallback={<Spinner></Spinner>}>
+        <Await resolve={homePageData}>
+          {(data) => (
+            <>
+              <FeaturedEvents data={data.past_events}></FeaturedEvents>
+              <FeaturedCompanies data={data.companies}></FeaturedCompanies>
+              <FeaturedGallery data={data.gallery_images}></FeaturedGallery>
+              <FeaturedTestimonials
+                data={data.testimonials}
+              ></FeaturedTestimonials>
+            </>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 };
@@ -30,5 +49,5 @@ const Homepage = () => {
 export default Homepage;
 
 export function loader() {
-  return getHomePage();
+  return defer({ homePageData: getHomePage() });
 }
