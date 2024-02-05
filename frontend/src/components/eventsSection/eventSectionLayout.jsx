@@ -7,7 +7,7 @@ function EventSectionLayout(props) {
   return (
     <>
       <Box
-        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "3.5rem" }}
         id="events"
       >
         <Typography
@@ -19,7 +19,7 @@ function EventSectionLayout(props) {
             fontSize: { xs: "2rem" },
           }}
         >
-          Events
+          Past Events
         </Typography>
         <Divider
           sx={{

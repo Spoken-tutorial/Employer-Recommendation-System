@@ -11,7 +11,7 @@ function CompanyLayout({ data }) {
     <Box
       sx={{
         width: { xs: "17rem", sm: "18rem", md: "20rem", lg: "19rem" },
-        height: "7rem",
+        height: "10rem",
         display: "flex",
         alignItems: "center",
         borderStyle: "solid",
@@ -40,11 +40,11 @@ function CompanyLayout({ data }) {
           <Avatar
             alt="Company Logo"
             src={baseUrl + data.logo}
-            sx={{ width: "5rem", height: "3rem" }}
+            sx={{ width: "4rem", height: "3rem" }}
           />
         </Grid>
         <Grid item xs={8}>
-          <Grid container>
+          <Grid container sx={{ width: "90%" }}>
             <Grid item xs={12}>
               <Typography
                 variant="body"

@@ -7,12 +7,12 @@ import CalendarMonthTwoToneIcon from "@mui/icons-material/CalendarMonthTwoTone";
 //import LocationOnTwoToneIcon from "@mui/icons-material/LocationOnTwoTone";
 import EventModal from "./eventModal";
 
-function EventLayout({ data }) {
+function EventLayout({ data, category }) {
   return (
     <Box
       sx={{
         width: { xs: "17rem", sm: "18rem", md: "20rem", lg: "19rem" },
-        height: "8.5rem",
+        height: "12rem",
         display: "flex",
         alignItems: "center",
         borderStyle: "solid",
@@ -20,6 +20,7 @@ function EventLayout({ data }) {
         borderRadius: "0.3rem",
         borderColor: "#ffffff",
         backgroundColor: "#F9F9F9",
+        p: 1,
         boxShadow: "4px 5px 8px rgba(0, 0, 0, 0.3)",
         "&:hover": {
           borderColor: "#FFA500CC",
@@ -45,7 +46,7 @@ function EventLayout({ data }) {
           </Typography>
 
           <Divider sx={{ backgroundColor: "#000000", height: "0.05rem" }}>
-            {data.status === "Upcoming" ? (
+            {category === "upcoming" ? (
               <Typography
                 variant="caption"
                 sx={{
@@ -68,7 +69,7 @@ function EventLayout({ data }) {
                   mt: "0.1rem",
                 }}
               >
-                {"Over"}
+                {category == "upcoming" ? "Upcoming" : "Over"}
               </Typography>
             ) : null}
           </Divider>
@@ -126,7 +127,7 @@ function EventLayout({ data }) {
               xs={2}
               sx={{ display: "flex", justifyContent: "center" }}
             >
-              <EventModal data={data}></EventModal>
+              <EventModal data={data} category={category}></EventModal>
             </Grid>
           </Grid>
         </Grid>

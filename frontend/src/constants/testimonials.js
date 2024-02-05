@@ -1,13 +1,19 @@
-const testimonialList1 = {
-  title: " NASSCOM Job Fair ",
-  date: "Jan 31, 2020 - Jan, 31, 2020",
-  videos: [
-    { url: "https://jrs.spoken-tutorial.org/media/testimonial/Feedback_1.mp4" },
-    { url: "https://jrs.spoken-tutorial.org/media/testimonial/Feedback_2.mp4" },
-    { url: "https://jrs.spoken-tutorial.org/media/testimonial/Feedback_3.mp4" },
-    { url: "https://jrs.spoken-tutorial.org/media/testimonial/Feedback_4.mp4" },
-  ],
-};
+const testimonialList1 = [
+  {
+    id: 10,
+    event:
+      "FOSSEE Summer Fellowship 2018 - Spoken Tutorial Web Development work",
+    location: "/media/testimonial/Pratik.mp4",
+    date: "21 May - 02 Jul 2018",
+  },
+  {
+    id: 10,
+    event:
+      "FOSSEE Summer Fellowship 2018 - Spoken Tutorial Web Development work",
+    location: "/media/testimonial/Pratik.mp4",
+    date: "21 May - 02 Jul 2018",
+  },
+];
 
 const testimonialList2 = {
   title: "FOSSEE Summer Fellowship 2018 - Spoken Tutorial Web Development Work",

@@ -11,7 +11,7 @@ function FeaturedCompaniesCards(props) {
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="companies/view-all" style={{ textDecoration: "none" }}>
+        <Link to="companies/view-all/1" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>

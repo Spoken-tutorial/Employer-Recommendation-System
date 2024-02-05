@@ -1,108 +1,105 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React from "react";
 import { Box, Typography } from "@mui/material";
 import TestimonialLayout from "./TestimonialLayout";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
-import IconButton from "@mui/material/IconButton";
+import Divider from "@mui/material/Divider";
+
 import Grid from "@mui/material/Grid";
-import Grow from "@mui/material/Grow";
 
-function TitleAndVideo({ data, defaultExpand }) {
-  const [expandEvent, setExpandEvent] = useState(defaultExpand ? true : false);
-
-  function handleExpandEvent() {
-    if (!defaultExpand) setExpandEvent(!expandEvent);
-  }
+function TitleAndVideo({ data }) {
   return (
     <>
-      {/* Event title and button */}
-      <Box
+      {/* Event videos title and date */}
+      <Grid
+        container
+        spacing={3}
+        rowSpacing={10}
         sx={{
-          backgroundColor: "#E5F6FD",
+          marginTop: "-1rem",
+          transition: "max-height 0.5s ease-in-out",
+          overflow: "hidden",
           display: "flex",
-          alignItems: "center",
-          padding: "0.2rem",
-          marginTop: "1.5rem",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          height: "auto",
+          justifyContent: "center",
         }}
       >
-        {/* Date & title */}
-        <Box>
-          <CalendarMonthIcon
-            sx={{
-              fontSize: { xs: "1.1rem", md: "1.3rem", lg: "1.6rem" },
-              mt: "-0.1rem",
-            }}
-          ></CalendarMonthIcon>
-          <Typography
-            variant="overline"
-            gutterBottom
-            sx={{
-              ml: { xs: "0.2rem", sm: "0.2rem", md: "0.4rem" },
-              fontSize: {
-                xs: "0.5rem",
-                sm: "0.7rem",
-                md: "0.8rem",
-              },
-            }}
-          >
-            {data[0].event}: {data[0].date}
-          </Typography>
-        </Box>
-        {/* Expand button */}
-        <Box>
-          {defaultExpand ? null : (
-            <IconButton
-              aria-label="delete"
-              size="small"
-              onClick={handleExpandEvent}
-            >
-              {expandEvent ? (
-                <ExpandLessIcon></ExpandLessIcon>
-              ) : (
-                <ExpandMoreIcon></ExpandMoreIcon>
-              )}
-            </IconButton>
-          )}
-        </Box>
-      </Box>
-      {/* Event videos */}
-      {expandEvent ? (
-        <Grow in={expandEvent}>
-          <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            spacing={3}
-            rowSpacing={10}
-            sx={{
-              marginTop: "-1rem",
-              transition: "max-height 0.5s ease-in-out",
-              maxHeight: expandEvent ? "1000px" : "0",
-              overflow: "hidden",
-            }}
-          >
-            {data.map((obj, index) => (
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={6}
-                lg={4}
-                key={index}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
+        {data.map((obj, index) => (
+          <>
+            <Box sx={{ m: 3, height: "auto" }}>
+              <Grid item xs={12} sm={12} md={6} lg={4} key={index}>
                 <TestimonialLayout data={obj}></TestimonialLayout>
+                <Divider
+                  sx={{
+                    height: "0.1rem",
+                    backgroundColor: "#000000",
+                    mt: "0.1rem",
+                    width: {
+                      xs: "17rem",
+                      sm: "18rem",
+                      md: "20rem",
+                      lg: "19rem",
+                    },
+                    position: "relative",
+                    bottom: "1rem",
+                    opacity: "5%",
+                  }}
+                ></Divider>
+                <Typography
+                  variant="caption"
+                  display="block"
+                  gutterBottom
+                  sx={{
+                    fontSize: "0.8rem",
+                    mt: "-0.5rem",
+                    lineHeight: "1.4rem",
+                    width: {
+                      xs: "17rem",
+                      sm: "18rem",
+                      md: "20rem",
+                      lg: "19rem",
+                    },
+                    textAlign: "center",
+                    opacity: "90%",
+                  }}
+                >
+                  {obj.event}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  display="block"
+                  gutterBottom
+                  sx={{
+                    fontSize: "0.8rem",
+                    lineHeight: "1.4rem",
+                    width: {
+                      xs: "17rem",
+                      sm: "18rem",
+                      md: "20rem",
+                      lg: "19rem",
+                    },
+                    textAlign: "center",
+                    opacity: "80%",
+                  }}
+                >
+                  {obj.date}
+                </Typography>
+                <Divider
+                  sx={{
+                    height: "0.1rem",
+                    backgroundColor: "#000000",
+                    width: {
+                      xs: "17rem",
+                      sm: "18rem",
+                      md: "20rem",
+                      lg: "19rem",
+                    },
+                    opacity: "5%",
+                  }}
+                ></Divider>
               </Grid>
-            ))}
-          </Grid>
-        </Grow>
-      ) : null}
+            </Box>
+          </>
+        ))}
+      </Grid>
     </>
   );
 }

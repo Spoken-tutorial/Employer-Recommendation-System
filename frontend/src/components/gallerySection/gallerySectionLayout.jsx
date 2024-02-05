@@ -7,7 +7,7 @@ function GallerySectionLayout(props) {
   return (
     <>
       <Box
-        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "2rem" }}
+        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "3.5rem" }}
         id="gallery"
       >
         <Typography

@@ -9,8 +9,8 @@ import TitleAndVideo from "./title&video";
 function FeaturedTestimonialsVideos(props) {
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="testimonials/view-all" style={{ textDecoration: "none" }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: "2rem" }}>
+        <Link to="testimonials/view-all/1" style={{ textDecoration: "none" }}>
           <Button size="small" variant="text">
             View all
           </Button>
