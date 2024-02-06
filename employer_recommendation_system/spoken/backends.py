@@ -34,7 +34,8 @@ class SpokenStudentBackend(ModelBackend):
                 is_ilw = Participant.objects.filter(user_id=sp_user.id)
                 if is_student_role or is_student_record or is_ilw:
                     jrs_user = self.create_jrs_user(sp_user)
-                    self.create_student(sp_user,jrs_user,is_student_role,is_student_record,is_ilw)
+                    spk_student_record = SpokenStudent.objects.filter(user_id=sp_user.id)[0]
+                    self.create_student(sp_user,jrs_user,is_student_role,spk_student_record,is_ilw)
                     return jrs_user
             return None
         except JRSPasswordDoesNotExist:
@@ -53,7 +54,7 @@ class SpokenStudentBackend(ModelBackend):
             return check_password(password, sp_user.password)
         return None
     
-    def create_jrs_user(sp_user):
+    def create_jrs_user(self,sp_user):
         try:
             user = User(username=sp_user.email,email=sp_user.email,first_name=sp_user.first_name,last_name=sp_user.last_name,is_active=sp_user.is_active)
             user.save()
@@ -62,7 +63,7 @@ class SpokenStudentBackend(ModelBackend):
             return None
         return user
     
-    def create_student(sp_user,jrs_user,is_student_role,spk_student_record,is_ilw):
+    def create_student(self,sp_user,jrs_user,is_student_role,spk_student_record,is_ilw):
         Student.objects.create(user=jrs_user,spk_usr_id=sp_user.id)
         jrs_student = Student.objects.get(user=jrs_user)
         if is_student_role or spk_student_record:
