@@ -1,4 +1,3 @@
-import Navbar from "../views/navbar/navbar";
 import Hero from "../views/heroSection/hero";
 import About from "../views/aboutSection/about";
 import UpcomingEvents from "../components/upcomingEvents/upcomingEvents";
@@ -16,7 +15,6 @@ const Homepage = () => {
 
   return (
     <>
-      <Navbar></Navbar>
       <Hero></Hero>
       <Suspense fallback={<Spinner></Spinner>}>
         <Await resolve={homePageData}>
