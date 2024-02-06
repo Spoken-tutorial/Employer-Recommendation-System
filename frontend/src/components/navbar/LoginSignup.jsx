@@ -1,12 +1,29 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types"; // Import PropTypes
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { NavLink } from "react-router-dom";
+import { isTokenExpired } from "../../utils/auth/tokenExpiryCheck";
 
 function LoginSigup({ type }) {
+  const refresh = localStorage.getItem("refresh");
+  const [isLoggedIn, setIsLoggedIn] = useState();
+
+  useEffect(() => {
+    if (refresh == undefined || null) {
+      setIsLoggedIn(false);
+    } else {
+      //check expiry of refresh token
+      if (isTokenExpired(refresh)) {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
+      }
+    }
+  }, [refresh]);
+
   return (
     <Box
       sx={{
@@ -36,7 +53,7 @@ function LoginSigup({ type }) {
                     mt: "0.3rem",
                   }}
                 >
-                  Login
+                  {isLoggedIn ? "Dashboard" : "Login"}
                 </Typography>
               </Button>
             )}
