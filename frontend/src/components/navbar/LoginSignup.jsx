@@ -5,6 +5,7 @@ import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { NavLink } from "react-router-dom";
+import { isTokenExpired } from "../../utils/auth/tokenExpiryCheck";
 
 function LoginSigup({ type }) {
   return (
@@ -36,7 +37,10 @@ function LoginSigup({ type }) {
                     mt: "0.3rem",
                   }}
                 >
-                  Login
+                  {localStorage.getItem("refresh") != undefined &&
+                  isTokenExpired(localStorage.getItem("referesh"))
+                    ? "Dashboard"
+                    : "Login"}
                 </Typography>
               </Button>
             )}

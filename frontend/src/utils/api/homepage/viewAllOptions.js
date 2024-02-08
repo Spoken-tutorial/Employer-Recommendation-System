@@ -1,6 +1,9 @@
+/* eslint-disable no-undef */
 export async function getViewAllCompanies(pageNum) {
   const response = await fetch(
-    "https://ers.spoken-tutorial.org/api/companies/?format=json&page=" + pageNum
+    process.env.REACT_APP_API_LINK +
+      "/api/companies/?format=json&page=" +
+      pageNum
   );
   if (!response.ok) {
     throw { message: "Failed to fetch homepage", status: 500 };
@@ -11,7 +14,8 @@ export async function getViewAllCompanies(pageNum) {
 
 export async function getViewAllEvents(pageNum) {
   const response = await fetch(
-    "https://ers.spoken-tutorial.org/events/api/events?format=json&page=" +
+    process.env.REACT_APP_API_LINK +
+      "/events/api/events?format=json&page=" +
       pageNum
   );
   if (!response.ok) {
@@ -23,7 +27,8 @@ export async function getViewAllEvents(pageNum) {
 
 export async function getViewAllTestimonials(pageNum) {
   const response = await fetch(
-    "https://ers.spoken-tutorial.org/events/api/testimonials?format=json&page=" +
+    process.env.REACT_APP_API_LINK +
+      "/events/api/testimonials?format=json&page=" +
       pageNum
   );
   if (!response.ok) {
@@ -32,4 +37,3 @@ export async function getViewAllTestimonials(pageNum) {
   const resp = await response.json();
   return resp;
 }
-

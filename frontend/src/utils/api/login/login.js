@@ -1,5 +1,6 @@
+/* eslint-disable no-undef */
 export async function loginUser(username, password) {
-  const url = "https://ers.spoken-tutorial.org/api/token/";
+  const url = process.env.REACT_APP_API_LINK + "/api/token/";
 
   const requestOptions = {
     method: "POST",
