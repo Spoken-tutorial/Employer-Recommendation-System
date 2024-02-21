@@ -19,9 +19,15 @@ import FossFilter from "../components/admin/foss-filter/FossFilter";
 import Layout from "../pages/Layout";
 import Error from "../pages/Error";
 import ProtectedRoute from "../components/common/protectedRoute";
-import StudentLayout, { action as LogoutAction } from "../pages/StudentLayout";
-import ManagerLayout from "../pages/ManagerLayout";
-import EmployerLayout from "../pages/EmployerLayout";
+import StudentLayout, {
+  action as StudentLogoutAction,
+} from "../pages/StudentLayout";
+import ManagerLayout, {
+  action as ManagerLogoutAction,
+} from "../pages/ManagerLayout";
+import EmployerLayout, {
+  action as EmployerLogoutAction,
+} from "../pages/EmployerLayout";
 import UnderDevelopmentInfo from "../components/common/underDevelopment";
 
 const router = createBrowserRouter([
@@ -69,7 +75,7 @@ const router = createBrowserRouter([
         <StudentLayout />
       </ProtectedRoute>
     ),
-    action: LogoutAction,
+    action: StudentLogoutAction,
     children: [
       { path: "", element: <UnderDevelopmentInfo /> },
       { path: "profile", element: <StudentProfile /> },
@@ -84,6 +90,7 @@ const router = createBrowserRouter([
         <ManagerLayout />
       </ProtectedRoute>
     ),
+    action: ManagerLogoutAction,
     children: [{ path: "", element: <UnderDevelopmentInfo /> }],
   },
   {
@@ -94,6 +101,7 @@ const router = createBrowserRouter([
         <EmployerLayout />
       </ProtectedRoute>
     ),
+    action: EmployerLogoutAction,
     children: [
       { path: "", element: <UnderDevelopmentInfo /> },
       { path: "jobs", element: <CompanyJobProfile /> },
