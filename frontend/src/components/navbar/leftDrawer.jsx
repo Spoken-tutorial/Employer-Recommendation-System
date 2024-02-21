@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import * as React from "react";
 import Box from "@mui/material/Box";
 import SwipeableDrawer from "@mui/material/SwipeableDrawer";
@@ -9,12 +10,11 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
 import { NavHashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 
-export default function LeftDrawer() {
+export default function LeftDrawer(props) {
   const [state, setState] = React.useState({
     left: false,
   });
@@ -49,7 +49,7 @@ export default function LeftDrawer() {
       <Divider sx={{ backgroundColor: "#ffffff", mt: "0.3rem" }}></Divider>
       {/*Nav menu*/}
       <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
-        {navItems.map((obj, index) => (
+        {props.navItems.map((obj, index) => (
           <NavHashLink
             smooth
             to={obj.url}

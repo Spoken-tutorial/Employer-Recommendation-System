@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -9,13 +10,12 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import Container from "@mui/material/Container";
 import LeftDrawer from "./leftDrawer";
-import { navItems } from "../../constants/navbar";
 import LoginSigup from "./LoginSignup";
 import { NavHashLink, HashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import Avatar from "@mui/material/Avatar";
 
-function NavbarMain() {
+function NavbarMain(props) {
   return (
     <AppBar position="fixed" sx={{ backgroundColor: "#002648" }}>
       <Container maxWidth="xl">
@@ -49,7 +49,7 @@ function NavbarMain() {
             </Typography>
           </HashLink>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <LeftDrawer></LeftDrawer>
+            <LeftDrawer navItems={props.navItems}></LeftDrawer>
           </Box>
           <Box
             sx={{
@@ -102,7 +102,7 @@ function NavbarMain() {
             }}
           >
             <List sx={{ display: "flex" }}>
-              {navItems.map((obj, index) => (
+              {props.navItems.map((obj, index) => (
                 <NavHashLink
                   smooth
                   to={obj.url}
@@ -120,7 +120,7 @@ function NavbarMain() {
             </List>
           </Box>
           {/* login signup button */}
-          <LoginSigup type="lg"></LoginSigup>
+          <LoginSigup type="lg" homepage={props.homepage}></LoginSigup>
         </Toolbar>
       </Container>
     </AppBar>

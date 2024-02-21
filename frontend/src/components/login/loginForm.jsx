@@ -17,6 +17,7 @@ import { scrollToTop } from "../../utils/scrollToTop";
 import { Form } from "react-router-dom";
 import { loginUser } from "../../utils/api/login/login";
 import { newLoginLocalStorage } from "../../utils/auth/localStorage";
+import { jwtDecode } from "jwt-decode";
 
 function LoginForm() {
   const [passwordError, setPasswordError] = useState(false);
@@ -36,8 +37,10 @@ function LoginForm() {
         setPasswordError(false);
         setEmailError(false);
         setPasswordHelperText("");
+        const decoded = jwtDecode(actionData.access);
+        const role = decoded.roles[0];
         //needs to be changed based on role
-        navigate("/loginDashboard");
+        navigate("/auth/" + role);
       } else {
         setPasswordError(true);
         setEmailError(true);
