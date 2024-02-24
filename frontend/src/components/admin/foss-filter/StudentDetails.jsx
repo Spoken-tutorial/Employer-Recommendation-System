@@ -14,7 +14,7 @@ import Button from "@mui/material/Button";
 import { useTheme } from "@mui/material/styles";
 import Chip from "@mui/material/Chip";
 import Grid from "@mui/material/Grid";
-import StateAndCityInput from "./StateAndCityInput";
+import StateAndCityMultipleInput from "../../common/StateAndCityMultipleInput";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -53,6 +53,7 @@ function StudentDetails({
   handleStudentLocationList,
 }) {
   const theme = useTheme();
+
   //to add new state & city option in card
   const handleAddNewStateCity = () => {
     const newStudentLocationList = [
@@ -181,10 +182,10 @@ function StudentDetails({
           </Grid>
         </Grid>
         {/* state & city */}
-        <StateAndCityInput
+        <StateAndCityMultipleInput
           data={studentLocationList}
           manipulateStudentLocationList={handleStudentLocationList}
-        ></StateAndCityInput>
+        ></StateAndCityMultipleInput>
       </CardContent>
       <CardActions>
         <Button
@@ -203,5 +204,4 @@ function StudentDetails({
     </Box>
   );
 }
-
 export default StudentDetails;

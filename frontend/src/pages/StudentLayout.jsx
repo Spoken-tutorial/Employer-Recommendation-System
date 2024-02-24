@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import NavbarMain from "../components/navbar/navbarMain";
+import Box from "@mui/material/Box";
 import { navItemsStudent } from "../constants/navbar";
 import Footer from "../views/footer/footer";
 import Container from "@mui/material/Container";
@@ -33,7 +34,22 @@ function StudentLayout() {
     <>
       <NavbarMain navItems={navItemsStudent} homepage={false}></NavbarMain>
       <Container sx={{ marginTop: "8rem", mb: "4rem" }}>
-        {navigation.state === "submitting" ? <Spinner /> : <Outlet></Outlet>}
+        {navigation.state === "submitting" ? (
+          <Box
+            sx={{
+              height: "100vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              justifyItems: "center",
+              alignContent: "center",
+            }}
+          >
+            <Spinner />
+          </Box>
+        ) : (
+          <Outlet></Outlet>
+        )}
       </Container>
       <Footer></Footer>
     </>

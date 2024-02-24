@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import NavbarMain from "../components/navbar/navbarMain";
 import { navItemsManager } from "../constants/navbar";
 import Footer from "../views/footer/footer";
+import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import {
   Outlet,
@@ -32,7 +33,22 @@ function ManagerLayout() {
     <>
       <NavbarMain navItems={navItemsManager} homepage={false}></NavbarMain>
       <Container sx={{ marginTop: "8rem", mb: "4rem" }}>
-        {navigation.state === "submitting" ? <Spinner /> : <Outlet></Outlet>}
+        {navigation.state === "submitting" ? (
+          <Box
+            sx={{
+              height: "100vh",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              justifyItems: "center",
+              alignContent: "center",
+            }}
+          >
+            <Spinner />
+          </Box>
+        ) : (
+          <Outlet></Outlet>
+        )}
       </Container>
       <Footer></Footer>
     </>
