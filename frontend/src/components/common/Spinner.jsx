@@ -12,6 +12,7 @@ function Spinner(props) {
         height: "100%",
         m: "1rem",
         p: "1rem",
+        zIndex: 99,
       }}
     >
       <TailSpin

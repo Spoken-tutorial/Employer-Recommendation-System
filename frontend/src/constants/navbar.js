@@ -1,4 +1,4 @@
-const navItems = [
+const navItemsHomepage = [
   { text: "Home", url: "/#home" },
   { text: "About", url: "/#about-us", scroll: "about-us" },
   { text: "Events", url: "/#events" },
@@ -6,4 +6,17 @@ const navItems = [
   { text: "Gallery", url: "/#gallery" },
   { text: "Testimonials", url: "/#testimonials" },
 ];
-export { navItems };
+
+const navItemsStudent = [
+  { text: "Dashboard", url: "" },
+  { text: "Jobs", url: "jobs" },
+  { text: "Profile", url: "profile" },
+];
+const navItemsManager = [];
+const navItemsEmployer = [
+  { text: "Dashboard", url: "" },
+  { text: "Jobs", url: "jobs" },
+  { text: "Profile", url: "profile" },
+];
+
+export { navItemsHomepage, navItemsEmployer, navItemsManager, navItemsStudent };

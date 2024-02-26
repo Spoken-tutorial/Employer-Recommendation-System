@@ -18,17 +18,26 @@ import CompanyJobProfile from "../components/company/company-job-profile/company
 import FossFilter from "../components/admin/foss-filter/FossFilter";
 import Layout from "../pages/Layout";
 import Error from "../pages/Error";
-import LoginDashboard from "../components/testingPurpose/testing";
 import ProtectedRoute from "../components/common/protectedRoute";
+import StudentLayout, {
+  action as StudentLogoutAction,
+} from "../pages/StudentLayout";
+import ManagerLayout, {
+  action as ManagerLogoutAction,
+} from "../pages/ManagerLayout";
+import EmployerLayout, {
+  action as EmployerLogoutAction,
+} from "../pages/EmployerLayout";
+import UnderDevelopmentInfo from "../components/common/underDevelopment";
 
 const router = createBrowserRouter([
   {
+    //common without auth routes
     path: "/",
     element: <Layout />,
     errorElement: <Error />,
     children: [
       { path: "/", element: <Homepage />, loader: HomePageLoader },
-
       {
         path: "/events/view-all/:pageNum",
         element: <ViewAllEvents />,
@@ -45,8 +54,7 @@ const router = createBrowserRouter([
         element: <ViewAllTestimonials />,
         loader: ViewAllTestimonialsLoader,
       },
-      { path: "/student-profile", element: <StudentProfile /> },
-      { path: "/company-job-profile", element: <CompanyJobProfile /> },
+
       { path: "/foss-filter", element: <FossFilter /> },
       {
         path: "/login",
@@ -57,14 +65,47 @@ const router = createBrowserRouter([
         ),
         action: LoginAction,
       },
-      {
-        path: "/loginDashboard",
-        element: (
-          <ProtectedRoute accessBy={"auth"}>
-            <LoginDashboard></LoginDashboard>
-          </ProtectedRoute>
-        ),
-      },
+    ],
+  },
+  {
+    //student related auth routes
+    path: "/auth/STUDENT",
+    element: (
+      <ProtectedRoute accessBy={"auth"}>
+        <StudentLayout />
+      </ProtectedRoute>
+    ),
+    action: StudentLogoutAction,
+    children: [
+      { path: "", element: <UnderDevelopmentInfo /> },
+      { path: "profile", element: <StudentProfile /> },
+      { path: "jobs", element: <UnderDevelopmentInfo /> },
+    ],
+  },
+  {
+    //manager related auth routes
+    path: "/auth/MANAGER",
+    element: (
+      <ProtectedRoute accessBy={"auth"}>
+        <ManagerLayout />
+      </ProtectedRoute>
+    ),
+    action: ManagerLogoutAction,
+    children: [{ path: "", element: <UnderDevelopmentInfo /> }],
+  },
+  {
+    //employer related auth routes
+    path: "/auth/EMPLOYER",
+    element: (
+      <ProtectedRoute accessBy={"auth"}>
+        <EmployerLayout />
+      </ProtectedRoute>
+    ),
+    action: EmployerLogoutAction,
+    children: [
+      { path: "", element: <UnderDevelopmentInfo /> },
+      { path: "jobs", element: <CompanyJobProfile /> },
+      { path: "profile", element: <UnderDevelopmentInfo /> },
     ],
   },
 ]);

@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import Button from "@mui/material/Button";
 import Divider from "@mui/material/Divider";
 import JobListTable from "./jobListTable";
+import AddNewJob from "./AddNewJobDailog/AddNewJob";
 function CompanyJobProfile() {
   return (
     <>
@@ -39,16 +39,7 @@ function CompanyJobProfile() {
               A list of all the jobs posted by your company including their
               designation, status, creation date and action.
             </Typography>
-            <Button
-              size="small"
-              variant="text"
-              sx={{
-                mt: { xs: "0.8rem", sm: "1rem", md: "0.2rem" },
-                height: "1.5rem",
-              }}
-            >
-              New Job +
-            </Button>
+            <AddNewJob></AddNewJob>
           </Box>
         </Box>
         {/* data grid */}

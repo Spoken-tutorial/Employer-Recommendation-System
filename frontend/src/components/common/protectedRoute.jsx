@@ -7,6 +7,7 @@ import { isTokenExpired } from "../../utils/auth/tokenExpiryCheck";
 function ProtectedRoute({ children, accessBy }) {
   const navigate = useNavigate();
   const [authenticated, setAuthenticated] = useState(false);
+  const [role, setRole] = useState("");
 
   useEffect(() => {
     const refresh = localStorage.getItem("refresh");
@@ -17,6 +18,7 @@ function ProtectedRoute({ children, accessBy }) {
     } else {
       const decoded = jwtDecode(refresh);
       const tokenExpired = isTokenExpired(decoded.exp);
+      setRole(decoded.roles[0]);
 
       if (tokenExpired) {
         localStorage.clear();
@@ -33,10 +35,8 @@ function ProtectedRoute({ children, accessBy }) {
   ) {
     return children;
   } else {
-
-    navigate(accessBy === "auth" ? "/login" : "/loginDashboard");
-    return null; 
+    navigate(accessBy === "auth" ? "/login" : "/auth/" + role);
+    return null;
   }
 }
-
 export default ProtectedRoute;
