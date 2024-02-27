@@ -40,7 +40,7 @@ function LoginForm() {
         const decoded = jwtDecode(actionData.access);
         const role = decoded.roles[0];
         //needs to be changed based on role
-        navigate("/auth/" + role);
+        navigate("/auth/" + role + "/dashboard");
       } else {
         setPasswordError(true);
         setEmailError(true);

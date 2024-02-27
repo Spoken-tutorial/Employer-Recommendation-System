@@ -35,7 +35,7 @@ function ProtectedRoute({ children, accessBy }) {
   ) {
     return children;
   } else {
-    navigate(accessBy === "auth" ? "/login" : "/auth/" + role);
+    navigate(accessBy === "auth" ? "/login" : "/auth/" + role + "/dashboard");
     return null;
   }
 }

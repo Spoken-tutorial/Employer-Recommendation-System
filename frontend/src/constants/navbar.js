@@ -8,13 +8,13 @@ const navItemsHomepage = [
 ];
 
 const navItemsStudent = [
-  { text: "Dashboard", url: "" },
+  { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },
   { text: "Profile", url: "profile" },
 ];
 const navItemsManager = [];
 const navItemsEmployer = [
-  { text: "Dashboard", url: "" },
+  { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },
   { text: "Profile", url: "profile" },
 ];

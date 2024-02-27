@@ -11,6 +11,7 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ClearIcon from "@mui/icons-material/Clear";
 import { state, citiesOfState } from "../../utils/stateCities";
 
 const ITEM_HEIGHT = 48;
@@ -55,6 +56,11 @@ function StateAndCityMultipleInput({ data, manipulateStudentLocationList }) {
     setcityName(typeof value === "string" ? value.split(",") : value);
     const newData = [...data];
     newData[index].city = typeof value === "string" ? value.split(",") : value;
+    manipulateStudentLocationList(newData);
+  };
+  const handleCityDelete = (index, value) => {
+    const newData = [...data];
+    newData[index].city = newData[index].city.filter((item) => item !== value);
     manipulateStudentLocationList(newData);
   };
 
@@ -126,6 +132,20 @@ function StateAndCityMultipleInput({ data, manipulateStudentLocationList }) {
                                 color: "#ffffff",
                                 fontSize: "0.7rem",
                               }}
+                              onDelete={() => handleCityDelete(index, value)}
+                              deleteIcon={
+                                <ClearIcon
+                                  onMouseDown={(event) =>
+                                    event.stopPropagation()
+                                  }
+                                  sx={{
+                                    color: "#ffffff!important",
+                                    "&:hover": {
+                                      scale: "1.1",
+                                    },
+                                  }}
+                                />
+                              }
                             />
                           ))}
                         </Box>
