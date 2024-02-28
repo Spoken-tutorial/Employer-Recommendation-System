@@ -764,7 +764,6 @@ def job_app_details(request,id):
     context['mass_mail']=settings.MASS_MAIL
 
     #stats
-    
     return render(request,'emp/job_app_status_detail.html',context)
 
 
@@ -1768,3 +1767,22 @@ class AdminEventsView(BaseListView):
     serializer_class = EventSerializer
     filter_class = EventFilter
     queryset = Event.objects.all().order_by('-end_date')
+
+################### v2 APIs ###################
+from utilities.models import FossCategory, State
+import datetime
+# This endpoint provides data to prepopulate the create job form page with initial data.
+class JobFormData(APIView):
+    def get(self, request):
+        current_year = datetime.datetime.now().year
+        data = {
+            'domains': Domain.objects.all().values('id', 'name'),
+            'job_types': JobType.objects.all().values('id', 'jobtype'),
+            'disciplines': Discipline.objects.all().values('id', 'name'),
+            'degrees': Degree.objects.all().values('id', 'name'),
+            'skills': Skill.objects.all().values('id', 'name'),
+            'states': State.objects.all().values('id', 'name'),
+            'graduation_years': list(range(current_year-2, current_year+3)),
+            'foss': FossCategory.objects.filter(is_learners_allowed=True).values('id', 'foss')
+        }
+        return Response(data, status=status.HTTP_200_OK)
