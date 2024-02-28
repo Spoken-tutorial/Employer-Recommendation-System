@@ -27,6 +27,7 @@ urlpatterns = [
     path('',include('emp.urls')),
     path('',include('moodle.urls')),
     path('',include('accounts.urls')),
+    path('',include('utilities.urls')),
     
     
     # ]

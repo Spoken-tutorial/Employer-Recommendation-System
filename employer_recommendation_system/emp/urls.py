@@ -105,6 +105,6 @@ urlpatterns = [
     path('api/admin/students',AdminStudentView.as_view(),name='students'), # ToDo Later
     path('api/admin/events',AdminEventsView.as_view(),name='companies'),
 
-    
-    
+    ################### v2 APIs ###################
+    path('api/job-data/',JobFormData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
 ]
