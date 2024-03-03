@@ -38,6 +38,7 @@ function StateAndCityMultipleInput({ data, manipulateStudentLocationList }) {
   const handleStudentState = (event, index) => {
     const newData = [...data];
     newData[index].state = event.target.value;
+    newData[index].city = [];
     manipulateStudentLocationList(newData);
   };
 

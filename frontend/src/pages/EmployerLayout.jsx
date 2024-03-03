@@ -38,10 +38,8 @@ function EmployerLayout() {
             sx={{
               height: "100vh",
               display: "flex",
+              flexDirection: "column",
               justifyContent: "center",
-              alignItems: "center",
-              justifyItems: "center",
-              alignContent: "center",
             }}
           >
             <Spinner />

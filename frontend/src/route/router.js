@@ -69,7 +69,7 @@ const router = createBrowserRouter([
   },
   {
     //student related auth routes
-    path: "/auth/STUDENT",
+    path: "/auth/student",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <StudentLayout />
@@ -84,7 +84,7 @@ const router = createBrowserRouter([
   },
   {
     //manager related auth routes
-    path: "/auth/MANAGER/dashboard",
+    path: "/auth/manager/dashboard",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <ManagerLayout />
@@ -95,7 +95,7 @@ const router = createBrowserRouter([
   },
   {
     //employer related auth routes
-    path: "/auth/EMPLOYER",
+    path: "/auth/employer",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <EmployerLayout />

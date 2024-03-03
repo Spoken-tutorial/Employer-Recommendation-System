@@ -43,7 +43,7 @@ function MultipleSelectInput(props) {
     <>
       <FormControl
         sx={{
-          width: { xs: "auto", md: "100%" },
+          width: { xs: "100%", md: "100%" },
         }}
       >
         <Typography sx={{ mt: "", mb: "0.5rem", opacity: "60%" }}>

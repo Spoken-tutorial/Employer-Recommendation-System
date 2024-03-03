@@ -45,7 +45,7 @@ export default function LeftDrawer(props) {
     >
       {/*Login signup*/}
       <Box sx={{ marginTop: "4rem", marginLeft: "1.3rem" }}>
-        <LoginSigup type="sm"></LoginSigup>
+        <LoginSigup type="sm" homepage={props.homepage}></LoginSigup>
       </Box>
       <Divider sx={{ backgroundColor: "#ffffff", mt: "0.3rem" }}></Divider>
       {/*Nav menu*/}
@@ -54,7 +54,7 @@ export default function LeftDrawer(props) {
           {props.navItems.map((obj, index) => (
             <NavHashLink
               smooth
-              to={obj.url}
+              to={obj.url}npm
               key={index}
               activeStyle={{ color: "red" }}
               style={{ textDecoration: "none", color: "#ffffff" }}

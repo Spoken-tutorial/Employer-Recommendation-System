@@ -1,0 +1,10 @@
+.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-blurred {
+  height: 10rem;
+  width: "100%";
+  margin-bottom: 2rem;
+}
+.ck.ck-content.ck-editor__editable.ck-rounded-corners.ck-editor__editable_inline.ck-focused {
+  height: 10rem;
+  width: "100%";
+  margin-bottom: 2rem;
+}
