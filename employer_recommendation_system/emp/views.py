@@ -1657,7 +1657,7 @@ class BaseListView(APIView):
     model = None
     serializer_class = None
     filter_class = None
-    page_size = 50 # Change to 50 before commit
+    page_size = 10 # Change to 50 before commit
     queryset = None
     
 
@@ -1669,7 +1669,9 @@ class BaseListView(APIView):
             paginator.page_size = self.page_size
             paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
             serializer = self.serializer_class(paginated_queryset, many=True)
-            return paginator.get_paginated_response(serializer.data)
+            paginated_response = paginator.get_paginated_response(serializer.data)
+            paginated_response.data['total_page_numbers'] = paginator.page.paginator.num_pages
+            return paginated_response
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
