@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import Chip from "@mui/material/Chip";
@@ -137,12 +138,46 @@ function JobListTable() {
       renderCell: () => {
         return (
           <Box>
-            <IconButton>
-              <EditOutlinedIcon sx={{ fontSize: "large" }} />
-            </IconButton>
-            <IconButton>
-              <DeleteOutlineOutlinedIcon sx={{ fontSize: "large" }} />
-            </IconButton>
+            <Tooltip
+              title="Edit"
+              placement="left"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -16],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton>
+                <EditOutlinedIcon sx={{ fontSize: "large" }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title="Delete"
+              placement="right"
+              slotProps={{
+                popper: {
+                  modifiers: [
+                    {
+                      name: "offset",
+                      options: {
+                        offset: [0, -16],
+                      },
+                    },
+                  ],
+                },
+              }}
+            >
+              <IconButton>
+                <DeleteOutlineOutlinedIcon sx={{ fontSize: "large" }} />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },
@@ -164,11 +199,11 @@ function JobListTable() {
         initialState={{
           pagination: {
             paginationModel: {
-              pageSize: 5,
+              pageSize: 50,
             },
           },
         }}
-        pageSizeOptions={[5]}
+        pageSizeOptions={[5, 10, 50]}
       />
     </Box>
   );

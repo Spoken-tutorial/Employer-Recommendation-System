@@ -12,6 +12,7 @@ import Container from "@mui/material/Container";
 import LeftDrawer from "./leftDrawer";
 import LoginSigup from "./LoginSignup";
 import { NavHashLink, HashLink } from "react-router-hash-link";
+import { NavLink } from "react-router-dom";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import Avatar from "@mui/material/Avatar";
 
@@ -49,7 +50,10 @@ function NavbarMain(props) {
             </Typography>
           </HashLink>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <LeftDrawer navItems={props.navItems}></LeftDrawer>
+            <LeftDrawer
+              navItems={props.navItems}
+              homepage={props.homepage}
+            ></LeftDrawer>
           </Box>
           <Box
             sx={{
@@ -101,23 +105,48 @@ function NavbarMain(props) {
               marginLeft: "1rem",
             }}
           >
-            <List sx={{ display: "flex" }}>
-              {props.navItems.map((obj, index) => (
-                <NavHashLink
-                  smooth
-                  to={obj.url}
-                  key={index}
-                  style={{ textDecoration: "none", color: "#ffffff" }}
-                  scroll={(el) => scrollWithOffset(el)}
-                >
-                  <ListItem disablePadding>
-                    <ListItemButton>
-                      <ListItemText primary={obj.text} />
-                    </ListItemButton>
-                  </ListItem>
-                </NavHashLink>
-              ))}
-            </List>
+            {props.homepage ? (
+              <List sx={{ display: "flex" }}>
+                {props.navItems.map((obj, index) => (
+                  <NavHashLink
+                    smooth
+                    to={obj.url}
+                    key={index}
+                    style={{ textDecoration: "none", color: "#ffffff" }}
+                    scroll={(el) => scrollWithOffset(el)}
+                  >
+                    <ListItem disablePadding>
+                      <ListItemButton>
+                        <ListItemText primary={obj.text} />
+                      </ListItemButton>
+                    </ListItem>
+                  </NavHashLink>
+                ))}
+              </List>
+            ) : (
+              // after login highlighted active nav item
+              props.navItems.map((obj) => (
+                <>
+                  <List sx={{ display: "flex" }}>
+                    <NavLink to={obj.url} style={{ textDecoration: "none" }}>
+                      {({ isActive }) => (
+                        <ListItem disablePadding>
+                          <ListItemButton>
+                            <ListItemText
+                              primary={obj.text}
+                              sx={{
+                                color: isActive ? "#FFA500CC" : "#ffffff",
+                                mt: "0.3rem",
+                              }}
+                            />
+                          </ListItemButton>
+                        </ListItem>
+                      )}
+                    </NavLink>
+                  </List>
+                </>
+              ))
+            )}
           </Box>
           {/* login signup button */}
           <LoginSigup type="lg" homepage={props.homepage}></LoginSigup>

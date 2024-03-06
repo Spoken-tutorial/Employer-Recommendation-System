@@ -38,9 +38,9 @@ function LoginForm() {
         setEmailError(false);
         setPasswordHelperText("");
         const decoded = jwtDecode(actionData.access);
-        const role = decoded.roles[0];
+        const role = decoded.roles[0].toLowerCase();
         //needs to be changed based on role
-        navigate("/auth/" + role);
+        navigate("/auth/" + role + "/dashboard");
       } else {
         setPasswordError(true);
         setEmailError(true);

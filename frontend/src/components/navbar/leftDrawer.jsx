@@ -11,6 +11,7 @@ import ListItemText from "@mui/material/ListItemText";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import LoginSigup from "./LoginSignup";
+import { NavLink } from "react-router-dom";
 import { NavHashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 
@@ -44,33 +45,59 @@ export default function LeftDrawer(props) {
     >
       {/*Login signup*/}
       <Box sx={{ marginTop: "4rem", marginLeft: "1.3rem" }}>
-        <LoginSigup type="sm"></LoginSigup>
+        <LoginSigup type="sm" homepage={props.homepage}></LoginSigup>
       </Box>
       <Divider sx={{ backgroundColor: "#ffffff", mt: "0.3rem" }}></Divider>
       {/*Nav menu*/}
-      <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
-        {props.navItems.map((obj, index) => (
-          <NavHashLink
-            smooth
-            to={obj.url}
-            key={index}
-            activeStyle={{ color: "red" }}
-            style={{ textDecoration: "none", color: "#ffffff" }}
-            scroll={(el) => scrollWithOffset(el)}
-          >
-            <ListItem key={index} disablePadding>
-              <ListItemButton>
-                <ListItemText
-                  primary={obj.text}
-                  sx={{
-                    marginTop: "0.5rem",
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-          </NavHashLink>
-        ))}
-      </List>
+      {props.homepage ? (
+        <List sx={{ marginTop: "-0.5rem", marginLeft: "1rem" }}>
+          {props.navItems.map((obj, index) => (
+            <NavHashLink
+              smooth
+              to={obj.url}npm
+              key={index}
+              activeStyle={{ color: "red" }}
+              style={{ textDecoration: "none", color: "#ffffff" }}
+              scroll={(el) => scrollWithOffset(el)}
+            >
+              <ListItem key={index} disablePadding>
+                <ListItemButton>
+                  <ListItemText
+                    primary={obj.text}
+                    sx={{
+                      marginTop: "0.5rem",
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </NavHashLink>
+          ))}
+        </List>
+      ) : (
+        // after login highlighted active nav item
+        props.navItems.map((obj) => (
+          <>
+            <List sx={{ display: "flex" }}>
+              <NavLink to={obj.url} style={{ textDecoration: "none" }}>
+                {({ isActive }) => (
+                  <ListItem disablePadding>
+                    <ListItemButton>
+                      <ListItemText
+                        primary={obj.text}
+                        sx={{
+                          color: isActive ? "#FFA500CC" : "#ffffff",
+                          mt: "0.1rem",
+                          ml: "0.5rem",
+                        }}
+                      />
+                    </ListItemButton>
+                  </ListItem>
+                )}
+              </NavLink>
+            </List>
+          </>
+        ))
+      )}
     </Box>
   );
 

@@ -3,6 +3,7 @@ import React from "react";
 import FormControl from "@mui/material/FormControl";
 import { Box, Typography } from "@mui/material";
 import Chip from "@mui/material/Chip";
+import ClearIcon from "@mui/icons-material/Clear";
 import Select from "@mui/material/Select";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import MenuItem from "@mui/material/MenuItem";
@@ -42,7 +43,7 @@ function MultipleSelectInput(props) {
     <>
       <FormControl
         sx={{
-          width: { xs: "auto", md: "100%" },
+          width: { xs: "100%", md: "100%" },
         }}
       >
         <Typography sx={{ mt: "", mb: "0.5rem", opacity: "60%" }}>
@@ -62,11 +63,26 @@ function MultipleSelectInput(props) {
                 <Chip
                   key={value}
                   label={value}
+                  onMouseDown={(event) => event.stopPropagation()}
+                  onDelete={() =>
+                    props.setValue(props.value.filter((item) => item !== value))
+                  }
                   sx={{
                     backgroundColor: "#002648",
                     color: "#ffffff",
                     fontSize: "0.8rem",
                   }}
+                  deleteIcon={
+                    <ClearIcon
+                      onMouseDown={(event) => event.stopPropagation()}
+                      sx={{
+                        color: "#ffffff!important",
+                        "&:hover": {
+                          scale: "1.1",
+                        },
+                      }}
+                    />
+                  }
                 />
               ))}
             </Box>

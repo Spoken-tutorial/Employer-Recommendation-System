@@ -11,34 +11,19 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Select from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
 import FormGroup from "@mui/material/FormGroup";
-import { useTheme } from "@mui/material/styles";
-import OutlinedInput from "@mui/material/OutlinedInput";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import AddProjectModal from "./addProjectModal";
 import UpdateProjectModal from "./updateProjectModal";
 import TestScores from "./testScores";
 import EducationalDetails from "./educationalDetails";
+import MultipleSelectInput from "../../common/MultipleSelectInput";
 import AlertBox from "../../common/alertBox";
+import CKEditorBox from "../../common/CKEditor";
 
 //for score table
 function StudentProfile() {
-  //for multi select skills
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250,
-      },
-    },
-  };
-
   const skillsList = [
     "Frontend",
     "Backend",
@@ -58,30 +43,12 @@ function StudentProfile() {
     width: 1,
   });
 
-  function getStyles(name, skillName, theme) {
-    return {
-      fontWeight:
-        skillName.indexOf(name) === -1
-          ? theme.typography.fontWeightRegular
-          : theme.typography.fontWeightMedium,
-    };
-  }
-  const theme = useTheme();
   const [skillName, setSkillName] = React.useState([]);
 
-  const handleSkillChange = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setSkillName(
-      // On autofill we get a stringified value.
-
-      typeof value === "string" ? value.split(",") : value
-    );
-  };
   //for projects
   const [projects, setProjects] = useState([]);
   const [projectEdit, setProjectEdit] = useState(false);
+  const [about, setAbout] = React.useState("");
   const [projectEditIndex, setProjectEditIndex] = useState(-1);
 
   const handleProjectDelete = (index) => {
@@ -267,37 +234,23 @@ function StudentProfile() {
       {/* aboutyourself box */}
       <Box
         sx={{
-          mt: "2rem",
+          mt: "-1rem",
           display: "flex",
-          flexDirection: { xs: "column", md: "row" },
+          flexDirection: { xs: "column", md: "column" },
           justifyContent: "flex-start",
           width: { xs: "100%", md: "73%" },
         }}
       >
-        <TextField
-          id="studentAbout"
+        <CKEditorBox
           label="About Yourself"
-          variant="outlined"
-          size="small"
-          fullWidth
-          multiline
-          rows={4}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused fieldset": {
-                borderColor: "#002648",
-              },
-            },
-            "& label.Mui-focused": {
-              color: "#002648",
-            },
-          }}
-        />
+          data={about}
+          setData={setAbout}
+        ></CKEditorBox>
       </Box>
       {/* mcq box1 */}
       <Box
         sx={{
-          mt: "2rem",
+          mt: "-0.5rem",
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
           justifyContent: "flex-start",
@@ -467,48 +420,18 @@ function StudentProfile() {
       </Box>
       {/* multiselect skills box */}
       <Box
-        sx={{
-          mt: "2rem",
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          justifyContent: "flex-start",
-          width: { xs: "100%", md: "73%" },
-        }}
+        sx={{ width: { xs: "100%", md: "44.5rem", lg: "51rem" }, mt: "2rem" }}
       >
-        <FormControl sx={{ width: "100%" }}>
-          <InputLabel id="studentSkills">Skills</InputLabel>
-          <Select
-            labelId="studentSkills"
-            id="studentSkillsSelect"
-            multiple
-            value={skillName}
-            onChange={handleSkillChange}
-            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={value}
-                    sx={{ backgroundColor: "#002648", color: "#ffffff" }}
-                  />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            {skillsList.map((name) => (
-              <MenuItem
-                key={name}
-                value={name}
-                style={getStyles(name, skillName, theme)}
-              >
-                {name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <MultipleSelectInput
+          value={skillName}
+          setValue={setSkillName}
+          options={skillsList}
+          id="studentSkills"
+          label="Skills"
+          size="medium"
+        ></MultipleSelectInput>
       </Box>
+
       {/* Add project box */}
       <AlertBox
         alertMessage={"Project Work & Experience (Max 5 projects can be added)"}

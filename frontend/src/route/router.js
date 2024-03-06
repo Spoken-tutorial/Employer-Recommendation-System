@@ -69,7 +69,7 @@ const router = createBrowserRouter([
   },
   {
     //student related auth routes
-    path: "/auth/STUDENT",
+    path: "/auth/student",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <StudentLayout />
@@ -77,14 +77,14 @@ const router = createBrowserRouter([
     ),
     action: StudentLogoutAction,
     children: [
-      { path: "", element: <UnderDevelopmentInfo /> },
+      { path: "dashboard", element: <UnderDevelopmentInfo /> },
       { path: "profile", element: <StudentProfile /> },
       { path: "jobs", element: <UnderDevelopmentInfo /> },
     ],
   },
   {
     //manager related auth routes
-    path: "/auth/MANAGER",
+    path: "/auth/manager/dashboard",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <ManagerLayout />
@@ -95,7 +95,7 @@ const router = createBrowserRouter([
   },
   {
     //employer related auth routes
-    path: "/auth/EMPLOYER",
+    path: "/auth/employer",
     element: (
       <ProtectedRoute accessBy={"auth"}>
         <EmployerLayout />
@@ -103,7 +103,7 @@ const router = createBrowserRouter([
     ),
     action: EmployerLogoutAction,
     children: [
-      { path: "", element: <UnderDevelopmentInfo /> },
+      { path: "dashboard", element: <UnderDevelopmentInfo /> },
       { path: "jobs", element: <CompanyJobProfile /> },
       { path: "profile", element: <UnderDevelopmentInfo /> },
     ],

@@ -1,17 +1,9 @@
 import React, { useEffect } from "react";
-import NavbarMain from "../components/navbar/navbarMain";
-import { navItemsManager } from "../constants/navbar";
-import Footer from "../views/footer/footer";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import {
-  Outlet,
-  useActionData,
-  useNavigate,
-  useNavigation,
-} from "react-router-dom";
+import { useActionData, useNavigate, useNavigation } from "react-router-dom";
 import { logoutUser } from "../utils/api/logout/logout";
 import Spinner from "../components/common/Spinner";
+import LeftNavbar from "../components/admin/leftNavbar/LeftNavbar";
 
 function ManagerLayout() {
   const navigate = useNavigate();
@@ -31,26 +23,22 @@ function ManagerLayout() {
 
   return (
     <>
-      <NavbarMain navItems={navItemsManager} homepage={false}></NavbarMain>
-      <Container sx={{ marginTop: "8rem", mb: "4rem" }}>
-        {navigation.state === "submitting" ? (
-          <Box
-            sx={{
-              height: "100vh",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              justifyItems: "center",
-              alignContent: "center",
-            }}
-          >
-            <Spinner />
-          </Box>
-        ) : (
-          <Outlet></Outlet>
-        )}
-      </Container>
-      <Footer></Footer>
+      {navigation.state === "submitting" ? (
+        <Box
+          sx={{
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <Spinner />
+        </Box>
+      ) : (
+        <>
+          <LeftNavbar></LeftNavbar>
+        </>
+      )}
     </>
   );
 }

@@ -5,6 +5,7 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import { Box, Typography } from "@mui/material";
 import Select from "@mui/material/Select";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import Divider from "@mui/material/Divider";
 import {
   jobSectorOptions,
@@ -18,7 +19,8 @@ import StateAndCityInput from "../../../common/StateAndCityInput";
 import StateAndCityMultipleInput from "../../../common/StateAndCityMultipleInput";
 import Button from "@mui/material/Button";
 import MultipleSelectInput from "../../../common/MultipleSelectInput";
-import { DateField } from "@mui/x-date-pickers/DateField";
+import "./style.css";
+import CKEditorBox from "../../../common/CKEditor";
 
 function JobDetails() {
   const currentYear = new Date().getFullYear();
@@ -28,14 +30,19 @@ function JobDetails() {
   }
 
   const [jobDesignation, setJobDesignation] = React.useState("");
+  const [maxSalaryHelperText, setMaxSalaryHelperText] = React.useState("");
+  const [maxSalaryError, setMaxSalaryError] = React.useState(false);
   const [minSalary, setMinSalary] = React.useState("");
   const [maxSalary, setMaxSalary] = React.useState("");
-  const [jobSector, setJobSector] = React.useState("");
+  const [jobDomain, setJobDomain] = React.useState("");
   const [jobType, setJobType] = React.useState("");
   const [gender, setGender] = React.useState("");
   const [officeState, setOfficeState] = React.useState("");
   const [officeCity, setOfficeCity] = React.useState("");
   const [skillName, setSkillName] = React.useState([]);
+  const [jobDescription, setJobDescription] = React.useState("");
+  const [keyResponsibilities, setKeyResponsibilities] = React.useState("");
+  const [Qualifications, setQualification] = React.useState("");
   const [applicationDate, setApplicationDate] = React.useState();
   const [graduationYears, setGraduationYears] = React.useState([]);
   const [mandatorySkills, setMandatorySkills] = React.useState([]);
@@ -51,10 +58,24 @@ function JobDetails() {
     setMinSalary(event.target.value);
   };
   const handleMaxSalaryChange = (event) => {
-    setMaxSalary(event.target.value);
+    const newMaxSalary = event.target.value;
+
+    if (
+      newMaxSalary !== "" &&
+      minSalary !== "" &&
+      parseInt(newMaxSalary, 10) < parseInt(minSalary, 10)
+    ) {
+      setMaxSalaryError(true);
+      setMaxSalaryHelperText("Max Salary must be greater than Min Salary");
+    } else {
+      setMaxSalaryError(false);
+      setMaxSalaryHelperText("");
+    }
+    // Always update the maxSalary state
+    setMaxSalary(newMaxSalary);
   };
-  const handleJobSectorChange = (event) => {
-    setJobSector(event.target.value);
+  const handleJobDomainChange = (event) => {
+    setJobDomain(event.target.value);
   };
   const handleJobTypeChange = (event) => {
     setJobType(event.target.value);
@@ -76,7 +97,12 @@ function JobDetails() {
     <>
       {/* parent box */}
       <Box
-        sx={{ marginTop: "1rem", p: "1rem", marginBottom: "2rem", ml: "1rem" }}
+        sx={{
+          marginTop: "1rem",
+          p: "1rem",
+          marginBottom: "2rem",
+          ml: "1rem",
+        }}
         id="student-profile"
       >
         {/* page title */}
@@ -133,19 +159,19 @@ function JobDetails() {
             }}
           />
 
-          {/* job sector */}
+          {/* job domain */}
           <FormControl
             sx={{
               width: { xs: "auto", md: "24rem" },
             }}
           >
-            <InputLabel id="jobSector">Job Sector</InputLabel>
+            <InputLabel id="jobDomain">Job Domain</InputLabel>
             <Select
-              labelId="Job Sector"
-              id="jobSector"
-              value={jobSector}
-              label="Job Sector"
-              onChange={handleJobSectorChange}
+              labelId="Job Domain"
+              id="jobDomain"
+              value={jobDomain}
+              label="Job Domain"
+              onChange={handleJobDomainChange}
               size="small"
             >
               {jobSectorOptions.map((opt) => (
@@ -271,6 +297,7 @@ function JobDetails() {
           <TextField
             id="annualSalaryMin"
             label="Annual Salary (Min)"
+            type="number"
             variant="outlined"
             size="small"
             value={minSalary}
@@ -293,6 +320,9 @@ function JobDetails() {
           {/* max salary */}
           <TextField
             id="annualSalaryMax"
+            error={maxSalaryError}
+            helperText={maxSalaryHelperText}
+            type="number"
             label="Annual Salary (Max)"
             variant="outlined"
             size="small"
@@ -315,100 +345,58 @@ function JobDetails() {
         {/* job description box */}
         <Box
           sx={{
-            mt: "2rem",
+            mt: "-1rem",
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "column", md: "column" },
             justifyContent: "flex-start",
             width: { xs: "100%", md: "44.5rem", lg: "51rem" },
           }}
         >
-          <TextField
-            id="jobDescription"
+          <CKEditorBox
             label="Job Description"
-            variant="outlined"
-            size="small"
-            fullWidth
-            multiline
-            rows={4}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-            }}
-          />
+            data={jobDescription}
+            setData={setJobDescription}
+          ></CKEditorBox>
         </Box>
 
         {/* key responsibilites box */}
         <Box
           sx={{
-            mt: "2rem",
+            mt: "-3rem",
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "column", md: "column" },
             justifyContent: "flex-start",
             width: { xs: "100%", md: "44.5rem", lg: "51rem" },
           }}
         >
-          <TextField
-            id="keyResponsibilities"
-            label="Key Responsibilities "
-            variant="outlined"
-            size="small"
-            fullWidth
-            multiline
-            rows={4}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-            }}
-          />
+          <CKEditorBox
+            label="Key Responsibilities"
+            data={keyResponsibilities}
+            setData={setKeyResponsibilities}
+          ></CKEditorBox>
         </Box>
 
         {/* Qualifications skills box */}
         <Box
           sx={{
-            mt: "2rem",
+            mt: "-3rem",
             display: "flex",
-            flexDirection: { xs: "column", md: "row" },
+            flexDirection: { xs: "column", md: "column" },
             justifyContent: "flex-start",
             width: { xs: "100%", md: "44.5rem", lg: "51rem" },
           }}
         >
-          <TextField
-            id="qualificationsReq"
-            label="Qaulification/Skills Required "
-            variant="outlined"
-            size="small"
-            fullWidth
-            multiline
-            rows={4}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
-                color: "#002648",
-              },
-            }}
-          />
+          <CKEditorBox
+            label="Qualifications/Skills Required"
+            data={Qualifications}
+            setData={setQualification}
+          ></CKEditorBox>
         </Box>
 
         {/* application date */}
-        <DateField
-          label="Last Application Date"
+        <DatePicker
           value={applicationDate}
+          label="Last Application Date"
           onChange={(newValue) => setApplicationDate(newValue)}
           sx={{
             "& .MuiOutlinedInput-root": {
@@ -420,9 +408,10 @@ function JobDetails() {
               color: "#002648",
             },
             width: { xs: "100%", md: "22rem" },
-            mt: "2rem",
+            mt: "1rem",
           }}
         />
+
         {/* Student Eligibity Criteria */}
 
         {/* title */}
