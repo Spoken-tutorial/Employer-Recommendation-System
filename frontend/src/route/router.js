@@ -1,4 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
+
+import Layout from "../pages/Layout";
+
+//essentials
+import Error from "../pages/Error";
+import ProtectedRoute from "../components/common/protectedRoute";
+import UnderDevelopmentInfo from "../components/common/underDevelopment";
+
+//unauth common
 import Homepage, { loader as HomePageLoader } from "../pages/Homepage";
 import ViewAllEvents, {
   loader as ViewAllEventsLoader,
@@ -9,26 +18,36 @@ import ViewAllCompanies, {
 import ViewAllTestimonials, {
   loader as ViewAllTestimonialsLoader,
 } from "../components/Testimonials/viewAllTestimonials";
+import ViewAllGallery from "../components/gallerySection/viewAllGallery";
 import LoginForm, {
   action as LoginAction,
 } from "../components/login/loginForm";
-import ViewAllGallery from "../components/gallerySection/viewAllGallery";
-import StudentProfile from "../components/student/student-profile/studentProfile";
-import CompanyJobProfile from "../components/company/company-job-profile/companyJobProfile";
-import FossFilter from "../components/admin/foss-filter/FossFilter";
-import Layout from "../pages/Layout";
-import Error from "../pages/Error";
-import ProtectedRoute from "../components/common/protectedRoute";
+
+//student
 import StudentLayout, {
   action as StudentLogoutAction,
 } from "../pages/StudentLayout";
-import ManagerLayout, {
-  action as ManagerLogoutAction,
-} from "../pages/ManagerLayout";
+import StudentProfile from "../components/student/student-profile/studentProfile";
+
+//company
 import EmployerLayout, {
   action as EmployerLogoutAction,
 } from "../pages/EmployerLayout";
-import UnderDevelopmentInfo from "../components/common/underDevelopment";
+import CompanyJobProfile, {
+  loader as jobListLoader,
+} from "../components/company/company-job-profile/companyJobProfile";
+import AddNewJob, {
+  loader as initialFormDataLoader,
+} from "../components/company/company-job-profile/AddNewJobDailog/AddNewJob";
+import EditJobDialog, {
+  loader as EditJobInitialDataLoader,
+} from "../components/company/company-job-profile/EditJobDailog/EditJobDialog";
+
+//manager
+import ManagerLayout, {
+  action as ManagerLogoutAction,
+} from "../pages/ManagerLayout";
+import FossFilter from "../components/admin/foss-filter/FossFilter";
 
 const router = createBrowserRouter([
   {
@@ -59,7 +78,7 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: (
-          <ProtectedRoute accessBy={"unauth"}>
+          <ProtectedRoute accessBy={"unauth"} roleAllowed={null}>
             <LoginForm />
           </ProtectedRoute>
         ),
@@ -67,11 +86,12 @@ const router = createBrowserRouter([
       },
     ],
   },
+
   {
     //student related auth routes
     path: "/auth/student",
     element: (
-      <ProtectedRoute accessBy={"auth"}>
+      <ProtectedRoute accessBy={"auth"} roleAllowed={["STUDENT"]}>
         <StudentLayout />
       </ProtectedRoute>
     ),
@@ -82,31 +102,51 @@ const router = createBrowserRouter([
       { path: "jobs", element: <UnderDevelopmentInfo /> },
     ],
   },
+
   {
     //manager related auth routes
     path: "/auth/manager/dashboard",
     element: (
-      <ProtectedRoute accessBy={"auth"}>
+      <ProtectedRoute accessBy={"auth"} roleAllowed={["MANAGER"]}>
         <ManagerLayout />
       </ProtectedRoute>
     ),
     action: ManagerLogoutAction,
     children: [{ path: "", element: <UnderDevelopmentInfo /> }],
   },
+
   {
     //employer related auth routes
     path: "/auth/employer",
     element: (
-      <ProtectedRoute accessBy={"auth"}>
+      <ProtectedRoute accessBy={"auth"} roleAllowed={["EMPLOYER"]}>
         <EmployerLayout />
       </ProtectedRoute>
     ),
     action: EmployerLogoutAction,
     children: [
       { path: "dashboard", element: <UnderDevelopmentInfo /> },
-      { path: "jobs", element: <CompanyJobProfile /> },
+      { path: "jobs", element: <CompanyJobProfile />, loader: jobListLoader },
       { path: "profile", element: <UnderDevelopmentInfo /> },
     ],
+  },
+  {
+    path: "/auth/employer/jobs/addNewJob",
+    element: (
+      <ProtectedRoute accessBy={"auth"} roleAllowed={"EMPLOYER"}>
+        <AddNewJob />
+      </ProtectedRoute>
+    ),
+    loader: initialFormDataLoader,
+  },
+  {
+    path: "/auth/employer/jobs/editJob",
+    element: (
+      <ProtectedRoute accessBy={"auth"} roleAllowed={["EMPLOYER"]}>
+        <EditJobDialog />
+      </ProtectedRoute>
+    ),
+    loader: EditJobInitialDataLoader,
   },
 ]);
 

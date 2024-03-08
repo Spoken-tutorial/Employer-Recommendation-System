@@ -25,10 +25,10 @@ import CKEditorBox from "../../common/CKEditor";
 //for score table
 function StudentProfile() {
   const skillsList = [
-    "Frontend",
-    "Backend",
-    "Graphics/Animation",
-    "Content Writing",
+    { id: 1, name: "Frontend" },
+    { id: 1, name: "Backend" },
+    { id: 1, name: "Graphics/Animation" },
+    { id: 1, name: "Content Writing" },
   ];
   //for upload button
   const VisuallyHiddenInput = styled("input")({

@@ -3,8 +3,15 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import JobListTable from "./jobListTable";
-import AddNewJob from "./AddNewJobDailog/AddNewJob";
+import { Link, defer, useLoaderData, Await } from "react-router-dom";
+import { getJobsByUserId } from "../../../utils/api/company/jobs";
+import { jwtDecode } from "jwt-decode";
+import { Suspense } from "react";
+import Spinner from "../../common/Spinner";
+
 function CompanyJobProfile() {
+  const { jobListData } = useLoaderData();
+
   return (
     <>
       <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "6rem" }}>
@@ -39,14 +46,36 @@ function CompanyJobProfile() {
               A list of all the jobs posted by your company including their
               designation, status, creation date and action.
             </Typography>
-            <AddNewJob></AddNewJob>
+            {/* add new job action button */}
+            <Link to="addNewJob" style={{ textDecoration: "none" }}>
+              New Job +
+            </Link>
           </Box>
         </Box>
         {/* data grid */}
-        <JobListTable />
+        <Suspense
+          fallback={
+            <Box sx={{ height: "100vh" }}>
+              <Spinner></Spinner>
+            </Box>
+          }
+        >
+          <Await resolve={jobListData}>
+            {(data) => (
+              <>
+                <JobListTable jobList={data} />
+              </>
+            )}
+          </Await>
+        </Suspense>
       </Box>
     </>
   );
 }
 
 export default CompanyJobProfile;
+export function loader() {
+  const token = localStorage.getItem("access");
+  const decodedInfo = jwtDecode(token);
+  return defer({ jobListData: getJobsByUserId(decodedInfo.user_id) });
+}

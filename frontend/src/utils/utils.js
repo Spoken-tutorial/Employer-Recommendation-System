@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { redirect } from "react-router-dom";
 import axios from "axios";
 const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -34,7 +35,6 @@ export async function handleCityDropdownOpen(states, setCity) {
   } catch (error) {
     console.log("error", error);
   }
-
   console.log("handleCityDropdownOpen");
   console.log("states", states);
 }
