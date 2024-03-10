@@ -42,6 +42,9 @@ import AddNewJob, {
 import EditJobDialog, {
   loader as EditJobInitialDataLoader,
 } from "../components/company/company-job-profile/EditJobDailog/EditJobDialog";
+import AddNewCompany, {
+  loader as initialCompanyFormDatLoader,
+} from "../components/company/company-registration/AddNewCompany";
 
 //manager
 import ManagerLayout, {
@@ -73,8 +76,12 @@ const router = createBrowserRouter([
         element: <ViewAllTestimonials />,
         loader: ViewAllTestimonialsLoader,
       },
-
       { path: "/foss-filter", element: <FossFilter /> },
+      {
+        path: "/company-registration",
+        element: <AddNewCompany />,
+        loader: initialCompanyFormDatLoader,
+      },
       {
         path: "/login",
         element: (

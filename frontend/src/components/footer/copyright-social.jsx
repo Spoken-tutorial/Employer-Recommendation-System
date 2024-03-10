@@ -8,6 +8,7 @@ import YouTubeIcon from "@mui/icons-material/YouTube";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import { Link } from "react-router-dom";
+
 function BottomEnd() {
   const currentYear = new Date().getFullYear();
   return (

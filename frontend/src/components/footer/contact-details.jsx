@@ -12,6 +12,8 @@ function ContactDetails() {
         display: "flex",
         direction: "col",
         flexDirection: { xs: "row", md: "column" },
+        justifyContent: "center",
+        width: "100%",
       }}
     >
       <Grid container spacing={2} justifyContent="center">
@@ -20,12 +22,12 @@ function ContactDetails() {
             sx={{ display: "flex", direction: "row", justifyContent: "center" }}
           >
             <LocationOnRoundedIcon
-              sx={{ color: "#ffffff" }}
+              sx={{ color: "#ffffff", ml: { xs: "0.5rem", md: 0 } }}
             ></LocationOnRoundedIcon>
             <Typography
               variant="caption"
               gutterBottom
-              sx={{ color: "#ffffff" }}
+              sx={{ color: "#ffffff", ml: { xs: "0.5rem", md: "0" } }}
             >
               Spoken Tutorial Project, TCS Lab,Behind CAD Centre, IIT Bombay,
               Powai, Mumbai - 400076
