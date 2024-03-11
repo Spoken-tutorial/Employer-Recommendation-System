@@ -78,7 +78,7 @@ function ViewAllEventsCards() {
           {(data) => (
             <PagePagination
               baseUrl={"/events/view-all/"}
-              count={Math.ceil(data.count / 2)}
+              count={data.total_page_numbers}
             ></PagePagination>
           )}
         </Await>

@@ -1,12 +1,19 @@
+/* eslint-disable react/prop-types */
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
-import JobDetails from "./JobDetails";
+import EditJobDetails from "./EditJobDetails";
 import Avatar from "@mui/material/Avatar";
-import { Link, defer, useLoaderData, Await } from "react-router-dom";
+import {
+  Link,
+  defer,
+  useLoaderData,
+  Await,
+  useLocation,
+} from "react-router-dom";
 import { getJobFormInitialData } from "../../../../utils/api/company/jobs";
 import { Suspense } from "react";
 import Spinner from "../../../common/Spinner";
@@ -15,8 +22,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AddNewJob() {
+export default function EditJobDialog() {
   const { initialFormData } = useLoaderData();
+  
+  //getting job data from previour route
+  let { state } = useLocation();
 
   return (
     <React.Fragment>
@@ -83,7 +93,7 @@ export default function AddNewJob() {
                   mr: "1rem",
                 }}
               >
-                Add
+                Update
               </Typography>
             </Link>
           </Box>
@@ -104,7 +114,7 @@ export default function AddNewJob() {
           <Await resolve={initialFormData}>
             {(data) => (
               <>
-                <JobDetails
+                <EditJobDetails
                   skills={data.skills}
                   domains={data.domains}
                   states={data.states}
@@ -113,7 +123,8 @@ export default function AddNewJob() {
                   degrees={data.degrees}
                   graduationYears={data.graduation_years}
                   foss={data.foss}
-                ></JobDetails>
+                  data={state}
+                ></EditJobDetails>
               </>
             )}
           </Await>

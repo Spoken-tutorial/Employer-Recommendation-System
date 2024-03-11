@@ -1,58 +1,60 @@
 /* eslint-disable react/prop-types */
 import React from "react";
 import TextField from "@mui/material/TextField";
+import TextFieldInput from "../../common/TextFieldInput";
+import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import { Box, Typography } from "@mui/material";
+import StateAndCityInput from "../../common/StateAndCityInput";
 import Select from "@mui/material/Select";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
-import {
-  genderOptions,
-} from "../../../../constants/AddNewJob";
-import StateAndCityInput from "../../../common/StateAndCityInput";
-import StateAndCityMultipleInput from "../../../common/StateAndCityMultipleInput";
+import StateAndCityMultipleInput from "../../common/StateAndCityMultipleInput";
 import Button from "@mui/material/Button";
-import MultipleSelectInput from "../../../common/MultipleSelectInput";
-import "./style.css";
-import CKEditorBox from "../../../common/CKEditor";
+import MultipleSelectInput from "../../common/MultipleSelectInput";
+import "../company-job-profile/AddNewJobDailog/style.css";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import FormLabel from "@mui/material/FormLabel";
+import CKEditorBox from "../../common/CKEditor";
 
-function JobDetails({
+function CompanyDetails({
   domains,
-  jobTypes,
   disciplines,
   graduationYears,
   degrees,
   skills,
   foss,
 }) {
-
-  const [jobDesignation, setJobDesignation] = React.useState("");
+  const [companyName, setCompanyName] = React.useState("");
   const [maxSalaryHelperText, setMaxSalaryHelperText] = React.useState("");
+  const [jobSector, setJobSector] = React.useState("");
+  const [jobState, setJobState] = React.useState("");
+  const [jobCity, setJobCity] = React.useState("");
   const [maxSalaryError, setMaxSalaryError] = React.useState(false);
   const [minSalary, setMinSalary] = React.useState("");
   const [maxSalary, setMaxSalary] = React.useState("");
-  const [jobDomain, setJobDomain] = React.useState("");
-  const [jobType, setJobType] = React.useState("");
-  const [gender, setGender] = React.useState("");
-  const [officeState, setOfficeState] = React.useState("");
-  const [officeCity, setOfficeCity] = React.useState("");
-  const [skillName, setSkillName] = React.useState([]);
+  const [companyWebsite, setCompanyWebsite] = React.useState("");
+  const [accManagerFirstName, setAccManagerFirstName] = React.useState("");
+  const [accManagerLastName, setAccManagerLastName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [accManagerPhone, setAccManagerPhone] = React.useState("");
+  const [jobTitle, setJobTitle] = React.useState("");
+  const [vacancy, setVacancy] = React.useState("");
   const [jobDescription, setJobDescription] = React.useState("");
   const [keyResponsibilities, setKeyResponsibilities] = React.useState("");
   const [Qualifications, setQualification] = React.useState("");
-  const [applicationDate, setApplicationDate] = React.useState();
   const [gradYears, setGradYears] = React.useState([]);
+  const [studentSkills, setStudentSkills] = React.useState([]);
   const [mandatorySkills, setMandatorySkills] = React.useState([]);
   const [optionalSkills, setOptionalSkills] = React.useState([]);
   const [degree, setDegree] = React.useState([]);
   const [discipline, setDiscipline] = React.useState([]);
   const [studentLocation, setStudentLocation] = React.useState([]);
 
-  const handleJobDesignationChange = (event) => {
-    setJobDesignation(event.target.value);
-  };
   const handleMinSalaryChange = (event) => {
     setMinSalary(event.target.value);
   };
@@ -73,15 +75,6 @@ function JobDetails({
     // Always update the maxSalary state
     setMaxSalary(newMaxSalary);
   };
-  const handleJobDomainChange = (event) => {
-    setJobDomain(event.target.value);
-  };
-  const handleJobTypeChange = (event) => {
-    setJobType(event.target.value);
-  };
-  const handleGenderChange = (event) => {
-    setGender(event.target.value);
-  };
 
   //to add new state & city option for student state and city
   const handleAddNewStateCity = () => {
@@ -90,6 +83,9 @@ function JobDetails({
       { state: "", city: [] },
     ];
     setStudentLocation(newStudentLocationList);
+  };
+  const handleJobSector = (event) => {
+    setJobSector(event.target.value);
   };
 
   return (
@@ -102,7 +98,7 @@ function JobDetails({
           marginBottom: "2rem",
           ml: "1rem",
         }}
-        id="student-profile"
+        id="company-profile"
       >
         {/* page title */}
         <Typography
@@ -115,7 +111,7 @@ function JobDetails({
             mt: "1rem",
           }}
         >
-          Add New Job
+          Register Your Company
         </Typography>
         <Divider
           sx={{
@@ -125,38 +121,224 @@ function JobDetails({
           }}
         ></Divider>
 
-        {/* designation job sector box */}
+        {/* comapny name company website box */}
+        <Typography
+          gutterBottom
+          sx={{
+            mt: "2rem",
+            mb: "0rem",
+            opacity: "60%",
+            color: "#002648",
+          }}
+        >
+          Company Details
+        </Typography>
         <Box
           sx={{
-            mt: "3rem",
+            mt: "1rem",
             display: "flex",
             flexDirection: { xs: "column", md: "row" },
             justifyContent: "flex-start",
             width: { xs: "100%", md: "73%" },
           }}
         >
-          {/* designation */}
-          <TextField
-            id="jobDesignation"
-            label="Job Designation"
-            variant="outlined"
-            size="small"
-            value={jobDesignation}
-            onChange={handleJobDesignationChange}
+          {/* comapny name */}
+          <TextFieldInput
+            id={"companyName"}
+            label={"Company Name"}
+            value={companyName}
+            setValue={setCompanyName}
+          ></TextFieldInput>
+
+          {/* comapny website */}
+          <TextFieldInput
+            id={"companyWebsite"}
+            label={"Company Website"}
+            value={companyWebsite}
+            setValue={setCompanyWebsite}
+          ></TextFieldInput>
+        </Box>
+
+        {/* account manager details */}
+        <Typography
+          gutterBottom
+          sx={{
+            mt: "2rem",
+            mb: "0rem",
+            opacity: "60%",
+            color: "#002648",
+          }}
+        >
+          Account Manager Details
+        </Typography>
+        <Box
+          sx={{
+            mt: "1rem",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "flex-start",
+            width: { xs: "100%", md: "73%" },
+          }}
+        >
+          {/* account manager first name */}
+          <TextFieldInput
+            id={"accManagerFirstName"}
+            label={"First Name"}
+            value={accManagerFirstName}
+            setValue={setAccManagerFirstName}
+          ></TextFieldInput>
+
+          {/* account manager last name */}
+          <TextFieldInput
+            id={"accManagerLastName"}
+            label={"Last Name"}
+            value={accManagerLastName}
+            setValue={setAccManagerLastName}
+          ></TextFieldInput>
+
+          {/* account manager phone*/}
+          <TextFieldInput
+            id={"accManagerPhone"}
+            label={"Phone Number"}
+            value={accManagerPhone}
+            type={"number"}
+            setValue={setAccManagerPhone}
+          ></TextFieldInput>
+        </Box>
+
+        {/* login credentials */}
+        <Typography
+          gutterBottom
+          sx={{
+            mt: "2rem",
+            mb: "0rem",
+            opacity: "60%",
+            color: "#002648",
+          }}
+        >
+          Login Credentials
+        </Typography>
+        <Box
+          sx={{
+            mt: "1rem",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "flex-start",
+            width: { xs: "100%", md: "73%" },
+          }}
+        >
+          {/* email */}
+          <TextFieldInput
+            id={"email"}
+            label={"Email"}
+            value={email}
+            type={"email"}
+            setValue={setEmail}
+          ></TextFieldInput>
+
+          {/* password*/}
+          <TextFieldInput
+            id={"password"}
+            type={"password"}
+            label={"Password"}
+            value={password}
+            setValue={setPassword}
+          ></TextFieldInput>
+
+          {/* confirm password */}
+          <TextFieldInput
+            id={"confirmPassword"}
+            label={"Confirm Password"}
+            type={"password"}
+            value={confirmPassword}
+            setValue={setConfirmPassword}
+          ></TextFieldInput>
+        </Box>
+
+        {/* hiring agency */}
+        <FormControl>
+          <FormLabel
+            htmlFor="hiringAgency"
             sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#002648",
-                },
-              },
-              "& label.Mui-focused": {
+              "&.Mui-focused": {
                 color: "#002648",
               },
-              width: { xs: "auto", md: "24rem" },
-              mr: { xs: 0, md: "3rem" },
-              mb: { xs: "1.5rem", md: 0 },
+              mt: "2rem",
             }}
-          />
+          >
+            Are you from hiring agency?
+          </FormLabel>
+          <RadioGroup
+            aria-labelledby="demo-radio-buttons-group-label"
+            defaultValue="no"
+            name="radio-buttons-group"
+          >
+            <FormControlLabel
+              value="yes"
+              control={
+                <Radio
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "#002648",
+                    },
+                  }}
+                />
+              }
+              label="Yes"
+            />
+            <FormControlLabel
+              value="no"
+              control={
+                <Radio
+                  sx={{
+                    "&.Mui-checked": {
+                      color: "#002648",
+                    },
+                  }}
+                />
+              }
+              label="No"
+            />
+          </RadioGroup>
+        </FormControl>
+
+        {/* job details */}
+        <Typography
+          gutterBottom
+          sx={{
+            mt: "2rem",
+            mb: "0rem",
+            opacity: "60%",
+            color: "#002648",
+          }}
+        >
+          Job Details
+        </Typography>
+        <Box
+          sx={{
+            mt: "1rem",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "flex-start",
+            width: { xs: "100%", md: "73%" },
+          }}
+        >
+          {/* job title */}
+          <TextFieldInput
+            id={"jobTitle"}
+            label={"Job Title"}
+            value={jobTitle}
+            setValue={setJobTitle}
+          ></TextFieldInput>
+
+          {/* vaccancies*/}
+          <TextFieldInput
+            id={"vacancies"}
+            label={"No. of Vacancy"}
+            value={vacancy}
+            type={"number"}
+            setValue={setVacancy}
+          ></TextFieldInput>
 
           {/* job domain */}
           <FormControl
@@ -168,9 +350,9 @@ function JobDetails({
             <Select
               labelId="Job Domain"
               id="jobDomain"
-              value={jobDomain}
+              value={jobSector}
               label="Job Domain"
-              onChange={handleJobDomainChange}
+              onChange={handleJobSector}
               size="small"
             >
               {domains.map((opt) => (
@@ -197,100 +379,14 @@ function JobDetails({
           }}
         >
           <StateAndCityInput
-            state={officeState}
-            setState={setOfficeState}
-            city={officeCity}
-            setCity={setOfficeCity}
+            state={jobState}
+            setState={setJobState}
+            city={jobCity}
+            setCity={setJobCity}
           ></StateAndCityInput>
         </Box>
 
-        {/* job type and gender */}
-        <Box
-          sx={{
-            mt: "2rem",
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: "flex-start",
-            width: { xs: "100%", md: "73%" },
-          }}
-        >
-          {/* job type */}
-          <FormControl
-            sx={{
-              width: {
-                xs: "auto",
-                md: "24rem",
-              },
-              mr: { xs: 0, md: "3rem" },
-              mb: { xs: "1.5rem", md: 0 },
-            }}
-          >
-            <InputLabel id="demo-simple-select-label">Job Type</InputLabel>
-            <Select
-              labelId="Job Type"
-              id="JobType"
-              value={jobType}
-              label="Job Type"
-              onChange={handleJobTypeChange}
-              size="small"
-            >
-              {jobTypes.map((opt) => (
-                <MenuItem
-                  key={opt.id}
-                  value={opt.jobtype}
-                  sx={{ fontSize: "0.8rem" }}
-                >
-                  {opt.jobtype}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          {/* gender */}
-          <FormControl
-            sx={{
-              width: { xs: "auto", md: "24rem" },
-            }}
-          >
-            <InputLabel id="demo-simple-select-label">Gender</InputLabel>
-            <Select
-              labelId="Gender"
-              id="gender"
-              value={gender}
-              label="Gender"
-              onChange={handleGenderChange}
-              size="small"
-            >
-              {genderOptions.map((opt) => (
-                <MenuItem key={opt} value={opt} sx={{ fontSize: "0.8rem" }}>
-                  {opt}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-
-        {/* multiselect skills box */}
-        <Box
-          sx={{
-            mt: "2rem",
-            display: "flex",
-            flexDirection: { xs: "column", md: "row" },
-            justifyContent: "flex-start",
-            width: { xs: "100%", md: "44.5rem", lg: "51rem" },
-          }}
-        >
-          <MultipleSelectInput
-            value={skillName}
-            setValue={setSkillName}
-            options={skills}
-            size="small"
-            id="studentSkills"
-            label="Skills"
-          ></MultipleSelectInput>
-        </Box>
-
-        {/* annual salary */}
+        {/* salary */}
         <Box
           sx={{
             mt: "2rem",
@@ -394,30 +490,11 @@ function JobDetails({
           }}
         >
           <CKEditorBox
-            label="Qualifications/Skills Required"
+            label="Additional Qualifications/Skills Required"
             data={Qualifications}
             setData={setQualification}
           ></CKEditorBox>
         </Box>
-
-        {/* application date */}
-        <DatePicker
-          value={applicationDate}
-          label="Last Application Date"
-          onChange={(newValue) => setApplicationDate(newValue)}
-          sx={{
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused fieldset": {
-                borderColor: "#002648",
-              },
-            },
-            "& label.Mui-focused": {
-              color: "#002648",
-            },
-            width: { xs: "100%", md: "22rem" },
-            mt: "1rem",
-          }}
-        />
 
         {/* Student Eligibity Criteria */}
 
@@ -441,6 +518,26 @@ function JobDetails({
             mb: "1rem",
           }}
         ></Divider>
+
+        {/* skills */}
+        <Box
+          sx={{
+            mt: "2rem",
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
+            justifyContent: "flex-start",
+            width: { xs: "100%", md: "44.5rem", lg: "51rem" },
+          }}
+        >
+          <MultipleSelectInput
+            value={studentSkills}
+            setValue={setStudentSkills}
+            options={skills}
+            size="small"
+            id="studentSkills"
+            label="Skills"
+          ></MultipleSelectInput>
+        </Box>
 
         {/* graduation year */}
         <Box
@@ -481,7 +578,7 @@ function JobDetails({
             options={foss}
             size="small"
             id="mandatorySkills"
-            label="Mandatory Skills"
+            label="Mandatory Technology / Programming Languages"
           ></MultipleSelectInput>
         </Box>
 
@@ -501,7 +598,7 @@ function JobDetails({
             options={foss}
             size="small"
             id="optionalSkills"
-            label="Optional Skills"
+            label="Optional Technology / Programming Languages"
           ></MultipleSelectInput>
         </Box>
 
@@ -560,6 +657,7 @@ function JobDetails({
             manipulateStudentLocationList={setStudentLocation}
           ></StateAndCityMultipleInput>
         </Box>
+
         {/* button to add multiple state and city */}
         <Button
           size="small"
@@ -572,4 +670,4 @@ function JobDetails({
     </>
   );
 }
-export default JobDetails;
+export default CompanyDetails;

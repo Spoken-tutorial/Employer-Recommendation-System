@@ -1,19 +1,21 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
+import EditIcon from "@mui/icons-material/Edit";
+import { Link } from "react-router-dom";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import Chip from "@mui/material/Chip";
-import { companyJobList } from "../../../constants/companyJobList";
+//import Chip from "@mui/material/Chip";
 import "./styles.css";
 
-function JobListTable() {
+function JobListTable(props) {
   const columns = [
+    //Job ID.
     {
       field: "id",
-      headerName: "SL No.",
+      headerName: "Job ID.",
       headerAlign: "center",
       renderHeader: () => (
         <Typography
@@ -21,7 +23,7 @@ function JobListTable() {
           gutterBottom
           sx={{ fontWeight: "bold", mt: "0.5rem" }}
         >
-          SL No.
+          Job ID
         </Typography>
       ),
       renderCell: (params) => {
@@ -32,14 +34,16 @@ function JobListTable() {
           </Typography>
         );
       },
-      width: 200,
+      width: 120,
       align: "center",
       headerStyle: {
         fontWeight: "bold",
       },
     },
+
+    //designation
     {
-      field: "jobDesignation",
+      field: "designation",
       headerName: "Designation",
       renderHeader: () => (
         <Typography
@@ -60,44 +64,48 @@ function JobListTable() {
       },
       width: 250,
     },
+
+    //status put on hold
+    // {
+    //   field: "jobStatus",
+    //   headerName: "Status",
+    //   renderHeader: () => (
+    //     <Typography
+    //       variant="body1"
+    //       gutterBottom
+    //       sx={{ fontWeight: "bold", mt: "0.5rem" }}
+    //     >
+    //       Status
+    //     </Typography>
+    //   ),
+    //   width: 200,
+    //   renderCell: (params) => {
+    //     const status = params.value;
+    //     return (
+    //       <Chip
+    //         label={status}
+    //         sx={{ p: "0.3rem", fontSize: "0.7rem", height: "1.2rem" }}
+    //         variant="outlined"
+    //         size="small"
+    //         color={
+    //           status == "Approved"
+    //             ? "success"
+    //             : status == "Rejected"
+    //               ? "error"
+    //               : status == "Draft"
+    //                 ? "warning"
+    //                 : status == "Pending"
+    //                   ? "secondary"
+    //                   : "null"
+    //         }
+    //       />
+    //     );
+    //   },
+    // },
+
+    //created on
     {
-      field: "jobStatus",
-      headerName: "Status",
-      renderHeader: () => (
-        <Typography
-          variant="body1"
-          gutterBottom
-          sx={{ fontWeight: "bold", mt: "0.5rem" }}
-        >
-          Status
-        </Typography>
-      ),
-      width: 200,
-      renderCell: (params) => {
-        const status = params.value;
-        return (
-          <Chip
-            label={status}
-            sx={{ p: "0.3rem", fontSize: "0.7rem", height: "1.2rem" }}
-            variant="outlined"
-            size="small"
-            color={
-              status == "Approved"
-                ? "success"
-                : status == "Rejected"
-                  ? "error"
-                  : status == "Draft"
-                    ? "warning"
-                    : status == "Pending"
-                      ? "secondary"
-                      : "null"
-            }
-          />
-        );
-      },
-    },
-    {
-      field: "jobCreationDate",
+      field: "created",
       headerName: "Created On",
       renderHeader: () => (
         <Typography
@@ -116,9 +124,61 @@ function JobListTable() {
           </Typography>
         );
       },
-      width: 250,
+      width: 200,
       align: "left",
     },
+
+    //deadline
+    {
+      field: "last_app_date",
+      headerName: "Deadline",
+      renderHeader: () => (
+        <Typography
+          variant="body1"
+          gutterBottom
+          sx={{ fontWeight: "bold", mt: "0.5rem" }}
+        >
+          Deadline
+        </Typography>
+      ),
+      renderCell: (params) => {
+        const data = params.value;
+        return (
+          <Typography variant="caption" display="block" gutterBottom>
+            {data}
+          </Typography>
+        );
+      },
+      width: 200,
+      align: "left",
+    },
+
+    //applicants
+    {
+      field: "get_applicants_count",
+      headerName: "Applicants",
+      renderHeader: () => (
+        <Typography
+          variant="body1"
+          gutterBottom
+          sx={{ fontWeight: "bold", mt: "0.5rem" }}
+        >
+          Applicants
+        </Typography>
+      ),
+      renderCell: (params) => {
+        const data = params.value;
+        return (
+          <Typography variant="caption" display="block" gutterBottom>
+            {data}
+          </Typography>
+        );
+      },
+      width: 150,
+      align: "left",
+    },
+
+    //action buttons
     {
       field: "jobAction",
       headerName: "Action",
@@ -135,7 +195,7 @@ function JobListTable() {
       width: 200,
       sortable: false,
       filterable: false,
-      renderCell: () => {
+      renderCell: (params) => {
         return (
           <Box>
             <Tooltip
@@ -147,16 +207,22 @@ function JobListTable() {
                     {
                       name: "offset",
                       options: {
-                        offset: [0, -16],
+                        offset: [0, -12],
                       },
                     },
                   ],
                 },
               }}
             >
-              <IconButton>
-                <EditOutlinedIcon sx={{ fontSize: "large" }} />
-              </IconButton>
+              <Link
+                to="editJob"
+                state={{ id: params.row }}
+                style={{ textDecoration: "none" }}
+              >
+                <IconButton>
+                  <EditIcon sx={{ fontSize: "large", color: "#002648" }} />
+                </IconButton>
+              </Link>
             </Tooltip>
             <Tooltip
               title="Delete"
@@ -175,7 +241,9 @@ function JobListTable() {
               }}
             >
               <IconButton>
-                <DeleteOutlineOutlinedIcon sx={{ fontSize: "large" }} />
+                <DeleteOutlineOutlinedIcon
+                  sx={{ fontSize: "large", color: "red" }}
+                />
               </IconButton>
             </Tooltip>
           </Box>
@@ -192,7 +260,7 @@ function JobListTable() {
       }}
     >
       <DataGrid
-        rows={companyJobList}
+        rows={props.jobList}
         columns={columns}
         autoHeight={true}
         hideFooterSelectedRowCount={true}

@@ -72,7 +72,7 @@ function ViewAllCompaniesCards() {
           {(data) => (
             <PagePagination
               baseUrl={"/companies/view-all/"}
-              count={Math.ceil(data.count / 2)}
+              count={data.total_page_numbers}
             ></PagePagination>
           )}
         </Await>

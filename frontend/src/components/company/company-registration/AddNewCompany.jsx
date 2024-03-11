@@ -4,18 +4,18 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
-import JobDetails from "./JobDetails";
+import CompanyDetails from "./CompanyDetail";
 import Avatar from "@mui/material/Avatar";
 import { Link, defer, useLoaderData, Await } from "react-router-dom";
-import { getJobFormInitialData } from "../../../../utils/api/company/jobs";
+import { getJobFormInitialData } from "../../../utils/api/company/jobs";
 import { Suspense } from "react";
-import Spinner from "../../../common/Spinner";
+import Spinner from "../../common/Spinner";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AddNewJob() {
+export default function AddNewCompany() {
   const { initialFormData } = useLoaderData();
 
   return (
@@ -58,7 +58,7 @@ export default function AddNewJob() {
             </Typography>
 
             {/* cancel button */}
-            <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
+            <Link to="/" style={{ textDecoration: "none" }}>
               <Typography
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
@@ -72,7 +72,7 @@ export default function AddNewJob() {
             </Link>
 
             {/* add button */}
-            <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
+            <Link to="/" style={{ textDecoration: "none" }}>
               <Typography
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
@@ -83,7 +83,7 @@ export default function AddNewJob() {
                   mr: "1rem",
                 }}
               >
-                Add
+                Register
               </Typography>
             </Link>
           </Box>
@@ -104,7 +104,7 @@ export default function AddNewJob() {
           <Await resolve={initialFormData}>
             {(data) => (
               <>
-                <JobDetails
+                <CompanyDetails
                   skills={data.skills}
                   domains={data.domains}
                   states={data.states}
@@ -113,7 +113,7 @@ export default function AddNewJob() {
                   degrees={data.degrees}
                   graduationYears={data.graduation_years}
                   foss={data.foss}
-                ></JobDetails>
+                ></CompanyDetails>
               </>
             )}
           </Await>

@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import Typography from "@mui/material/Typography";
+import { Link } from "react-router-dom";
 
 function FooterList({ fTitle, fList }) {
   return (
@@ -24,26 +25,36 @@ function FooterList({ fTitle, fList }) {
       >
         {fTitle}
       </Typography>
-      {fList.map((text, index) => (
-        <Typography
-          key={index}
-          variant="caption"
-          display="block"
-          gutterBottom
-          sx={{
-            color: "#ffffff",
-            ml: "0.4rem",
-            textAlign: {
-              xs: "center",
-              sm: "center",
-              md: "left",
-              lg: "left",
-              xl: "left",
-            },
-          }}
-        >
-          {text}
-        </Typography>
+      {fList.map((obj) => (
+        <>
+          <Link
+            to={obj.url}
+            style={{ textDecoration: "none" }}
+            target="_blank"
+            reloadDocument
+          >
+            <Typography
+              key={obj.title}
+              variant="caption"
+              display="block"
+              gutterBottom
+              sx={{
+                color: "#ffffff",
+                ml: "0.4rem",
+                mb: "0.5rem",
+                textAlign: {
+                  xs: "center",
+                  sm: "center",
+                  md: "left",
+                  lg: "left",
+                  xl: "left",
+                },
+              }}
+            >
+              {obj.title}
+            </Typography>
+          </Link>
+        </>
       ))}
     </>
   );

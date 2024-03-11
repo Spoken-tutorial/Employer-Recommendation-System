@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 import Avatar from "@mui/material/Avatar";
-import { about } from "../../constants/footer";
+import { about, training } from "../../constants/footer";
 import FooterList from "./footer-list";
 import BottomEnd from "./copyright-social";
 import ContactDetails from "./contact-details";
@@ -65,15 +65,12 @@ function FooterMain() {
           </Grid>
           {/* Footer Lists */}
           <Grid item xs={4} md={2}>
-            <FooterList fTitle={"Trainings"} fList={about}></FooterList>
+            <FooterList fTitle={"Training"} fList={training}></FooterList>
           </Grid>
           <Grid item xs={4} md={2}>
             <FooterList fTitle={"About"} fList={about}></FooterList>
           </Grid>
-          <Grid item xs={4} md={2}>
-            <FooterList fTitle={"Lorem"} fList={about}></FooterList>
-          </Grid>
-          <Grid item xs={12} md={3}>
+          <Grid item xs={12} md={4}>
             <ContactDetails></ContactDetails>
           </Grid>
         </Grid>

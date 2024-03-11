@@ -51,11 +51,20 @@ function LoginForm() {
 
   return (
     <>
-      <Box>
+      <Box
+        sx={{
+          height: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          mt: "-4rem",
+        }}
+      >
         <Typography
           variant="h5"
           gutterBottom
-          sx={{ textAlign: "center", fontWeight: "bold", mt: "3rem" }}
+          sx={{ textAlign: "center", fontWeight: "bold", mt: "1rem" }}
         >
           Sign in to your account
         </Typography>

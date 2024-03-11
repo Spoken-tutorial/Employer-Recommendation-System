@@ -89,14 +89,19 @@ function MultipleSelectInput(props) {
           )}
           MenuProps={MenuProps}
         >
-          {props.options.map((name) => (
+          {/* options must be in format {id: name:} or {id: foss:} */}
+          {props.options.map((obj) => (
             <MenuItem
-              key={name}
-              value={name}
+              key={obj.id}
+              value={obj.name ? obj.name : obj.foss}
               sx={{ fontSize: "0.8rem" }}
-              style={getStyles(name, props.value, theme)}
+              style={getStyles(
+                obj.name ? obj.name : obj.foss,
+                props.value,
+                theme
+              )}
             >
-              {name}
+              {obj.name ? obj.name : obj.foss}
             </MenuItem>
           ))}
         </Select>
