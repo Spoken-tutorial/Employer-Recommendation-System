@@ -51,6 +51,7 @@ import ManagerLayout, {
   action as ManagerLogoutAction,
 } from "../pages/ManagerLayout";
 import FossFilter from "../components/admin/foss-filter/FossFilter";
+import CompanyRegistration, { loader as Cloader, action as Caction} from "../pages/CompanyRegistration";
 
 const router = createBrowserRouter([
   {
@@ -59,6 +60,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     errorElement: <Error />,
     children: [
+      { path: "/company/registration", element: <CompanyRegistration />, loader: Cloader, action: Caction },
       { path: "/", element: <Homepage />, loader: HomePageLoader },
       {
         path: "/events/view-all/:pageNum",

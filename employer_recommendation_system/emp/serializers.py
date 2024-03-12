@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from .models import Company, Job, CompanyManagers, Domain, JobType, Student, Project, Skill, Degree, Discipline
 from events.models import Event
-from spoken.models import SpokenState, SpokenCity, Profile, SpokenStudent, StudentBatch, StudentMaster, TestAttendance
+from spoken.models import SpokenState, SpokenCity,Profile, SpokenStudent, StudentBatch, StudentMaster, TestAttendance
 from accounts.serializers import UserSerializer
 from datetime import datetime
 from .mixins import DateFormatterMixin
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
+from .models import *
 
 
 class CompanyManagerSerializer(serializers.ModelSerializer):
@@ -26,7 +26,7 @@ class JobTypeSerializer(serializers.ModelSerializer):
         fields = ['jobtype']
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanySerializer1(serializers.ModelSerializer):
     managers = serializers.SerializerMethodField()
     domain = serializers.SerializerMethodField()
     class Meta:
@@ -74,7 +74,7 @@ class JobSerializer(serializers.ModelSerializer, DateFormatterMixin):
         fields = '__all__'
         fields = ['id', 'designation', 'job_state', 'city_state', 'salary_range_min', 'salary_range_max', 'created',
                   'updated', 'requirements',  'key_job_responsibilities', 'last_app_date', 'num_vacancies',
-                   'domain', 'job_type', 'company', 'skills', 'degree', 'discipline', 'job_foss', 'get_applicants_count' ]
+                   'domain', 'job_type', 'company', 'skills', 'degree', 'discipline', 'get_applicants_count' ]
         date_fields = ['last_app_date']
         
     def get_job_state(self, obj):
@@ -100,15 +100,12 @@ class JobSerializer(serializers.ModelSerializer, DateFormatterMixin):
         return datetime.strftime(obj.last_app_date, "%d %B %Y") if obj.last_app_date else None
         
 
-# class CompanyRegSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Company
-#         # fields = ['id', 'name', 'website', 'date_created', 'is_agency', 'domain', 'managers']
-#         fields = ['id', 'name', 'website', 'date_created']
-#         extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
-    
-
 #----------------------------------- Serializers V2 -----------------------------------#
+from django.contrib.auth.models import User
+from accounts.serializers import ProfileSerializer
+from accounts.models import Profile as JRSProfile
+from django.db import transaction
+from utilities.models import State, City
 class DateFormatterMixin:
     """
     Mixin for formatting date fields in a model. To use this mixin, you need to define
@@ -254,3 +251,107 @@ class StudentSerializer(serializers.ModelSerializer):
         profile = self.get_profile(obj)
         return profile.phone if profile else None
 
+
+class JobFossSerializer(serializers.Serializer):
+    
+    class Meta:
+        model = JobFoss
+        fields = ['job', 'foss', 'type', 'grade']
+        read_only_fields = ['job']  # Define read-only fields here
+
+class JobRegistrationSerializer(serializers.ModelSerializer):
+    jobfoss = JobFossSerializer(many=True, required=False)
+    
+    class Meta:
+        model = JobDetail
+        fields = ['designation', 'company', 'state_job','city_job','skills','domain', 'salary_range_min',
+                  'salary_range_max', 'job_type', 'description' , 'requirements', 'key_job_responsibilities','gender',
+                     'last_app_date', 'num_vacancies','degree','discipline', "jobfoss" ]
+
+    def to_internal_value(self, data):
+        mappings = {
+            'state_job': State,
+            'city_job': City,
+            'job_type': JobType,
+            'domain': Domain 
+        }
+
+        for field, modelClass in mappings.items():
+            value = data.get(field)
+            if isinstance(value, modelClass):
+                data[field] = value.id
+
+        for field in ['skills', 'degree', 'discipline']:
+            value = data.get(field)
+            if value:
+                try:
+                    data[field] = [x.id for x in value]
+                except Exception as e:
+                    print(e)
+        return super().to_internal_value(data)  
+
+
+
+class CompanyRegistrationSerializer(serializers.ModelSerializer):
+    user = UserSerializer(write_only=True)
+    job = JobRegistrationSerializer(write_only=True)
+    filter_year = serializers.ListField(child=serializers.IntegerField(), required=False)
+    mandatory_foss = serializers.ListField(child=serializers.IntegerField(), required=True, write_only=True)
+    optional_foss = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
+    filter_location = serializers.ListField(child=serializers.DictField(child=serializers.IntegerField()), write_only=True, required=False)
+    class Meta:
+        model = Company
+        fields = ['name', 'website', 'is_agency','user','job', 'filter_year', 'mandatory_foss', 'optional_foss', 
+                  'filter_location']
+
+    def create_user(self, user_data):
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        return user_serializer.save()
+    
+    def create_job(self, job_data, company):
+        job_serializer = JobRegistrationSerializer(data=job_data)
+        job_serializer.is_valid(raise_exception=True)
+        job = job_serializer.save()
+        job.company = company
+        job.save()
+        return job
+    
+    def create_filters(self, job, filter_year, mandatory_foss, optional_foss, filter_location):
+        if filter_year:
+            year_data = [StudentFilterYear(job=job, year=year) for year in filter_year]
+            StudentFilterYear.objects.bulk_create(year_data)
+        if mandatory_foss:
+            mandatory_fosses_data = [StudentFilterFoss(job=job, foss_id=foss, type='Mandatory') for foss in mandatory_foss]
+            StudentFilterFoss.objects.bulk_create(mandatory_fosses_data)
+        if optional_foss:
+            optional_fosses_data = [StudentFilterFoss(job=job, foss_id=foss, type='Optional') for foss in optional_foss]
+            StudentFilterFoss.objects.bulk_create(optional_fosses_data)
+        if filter_location:
+            filter_location_data = [
+                StudentFilterLocation(job=job, state_id=loc.get('state'), city_id=loc.get('city', None)) 
+                if loc.get('city') != 0 else 
+                StudentFilterLocation(job=job, state_id=loc.get('state'), city=None)
+                for loc in filter_location
+            ]
+            StudentFilterLocation.objects.bulk_create(filter_location_data)
+
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        job_data = validated_data.pop('job')
+        filter_year = validated_data.pop('filter_year', [])
+        mandatory_foss = validated_data.pop('mandatory_foss', [])
+        optional_foss = validated_data.pop('optional_foss', [])
+        filter_location = validated_data.pop('filter_location', [])
+
+        with transaction.atomic():
+            user = self.create_user(user_data)
+            company = Company.objects.create(**validated_data)
+            cm = CompanyManagers.objects.create(user=user, company=company, group_id=3)
+            job = self.create_job(job_data, company)
+            degree = job_data.pop('degree', [])
+            discipline = job_data.pop('discipline', [])
+            job.degree.set(degree)
+            job.discipline.set(discipline)
+            self.create_filters(job, filter_year, mandatory_foss, optional_foss, filter_location)
+            return company

@@ -1,3 +1,4 @@
+@baseUrl=http://127.0.0.1:8000
 GET {{baseUrl}}/accounts/api/registration/data/ HTTP/1.1
 
 ###
@@ -5,16 +6,11 @@ POST {{baseUrl}}/accounts/api/registration/data/ HTTP/1.1
 content-type: application/json
 
 {
-
     "company" : {
         "name": "sogo",
         "website": "{{baseUrl}}/admin/emp/company/add/"
     }
-    
-
-  }
-
-
+}
 
 ###
 GET {{baseUrl}}/api/api/companies/1 HTTP/1.1
@@ -25,11 +21,7 @@ Content-Type: application/json
 
 {
     "name": "ghi"
-
 }
-
-
-
 
 ###
 DELETE {{baseUrl}}/api/api/companies/2/ HTTP/1.1
@@ -37,7 +29,54 @@ DELETE {{baseUrl}}/api/api/companies/2/ HTTP/1.1
 ###
 GET {{baseUrl}}/api/api/companies?search= HTTP/1.1
 
+###
+POST {{baseUrl}}/api/companies/ HTTP/1.1
+content-type: application/json
 
-
-
-
+{
+    "name" : 325,
+    "website" : "http://localhost:3000/company-registration",
+    "is_agency" : 1,
+    "user" : 
+        {
+        "first_name" : "Ankita",
+        "last_name" : "S",
+        "email" : "325@gmail.com",
+        "username" : "325@gmail.com",
+        "password" : "Admin@123",
+        
+        "profile": {
+            "phone": "9810150179"
+        }
+    }
+    ,
+    "job": {
+        "designation": "test designation",
+        "state_job": 2,
+        "city_job": 29,
+        "job_type": 2,
+        "num_vacancies": 10,
+        "domain" : 1,
+        "salary_range_min" : 10,
+        "salary_range_max": 100,
+        "description":"description",
+        "requirements" : "requirements",
+        "key_job_responsibilities": "key_job_responsibilities",
+        "skills" : ["2","3"],
+        "degree" : ["2","3"],
+        "discipline" : ["11","3"]
+    },
+    "filter_year" : [2021, 2022],
+    "mandatory_foss" : [1,10],
+    "optional_foss" : [20,30],
+    "filter_location" : [
+        {
+            "state": 1,
+            "city" : 1
+        },
+         {
+            "state": 10,
+            "city": 0       
+        }
+    ]
+}

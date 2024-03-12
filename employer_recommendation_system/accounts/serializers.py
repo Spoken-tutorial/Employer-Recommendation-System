@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile
 from emp.models import Company, CompanyManagers, Job, Skill, JobFoss, JobFilterState,JobFilterCity, Degree, Discipline, JobFilterYear
-from utilities.models import City                                          
+from utilities.models import City
+from accounts.models import Profile as JRSProfile
 
 class RegistrationFormSerializer(serializers.Serializer):
     company_name = serializers.CharField(max_length=255)
@@ -12,12 +13,24 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['phone']
+        extra_kwargs = {
+            'phone': {'required': True}
+        }
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = serializers.SerializerMethodField()
+    profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['id','first_name', 'last_name', 'username', 'email', 'profile']
+        fields = ['id','first_name', 'last_name', 'username', 'email', 'profile', 'password']
+        extra_kwargs = {
+        'password' : {'write_only': True},
+    }
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop("profile")
+        user = User.objects.create_user(**validated_data)
+        profile = JRSProfile.objects.create(**profile_data, user=user)
+        return user
 
     def get_profile(self, obj):
         try:

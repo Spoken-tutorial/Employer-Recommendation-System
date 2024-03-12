@@ -72,3 +72,21 @@ class City(models.Model):
 
   class Meta(object):
     unique_together = (("name","state"),)
+
+
+class InstituteType(models.Model):
+    name = models.CharField(max_length=200)
+    created = models.DateTimeField(auto_now_add = True)
+    updated = models.DateTimeField(auto_now = True)
+
+    def __str__(self):
+        return self.name
+
+class Location(models.Model):
+   city = models.ForeignKey(City, on_delete=models.CASCADE)
+  #  district = models.ForeignKey(District, on_delete=models.CASCADE)
+   state = models.ForeignKey(State, on_delete=models.CASCADE)
+   address = models.CharField(max_length=250) #Company Address for correspondence
+   pincode = models.CharField(max_length=6)
+   created = models.DateTimeField(auto_now_add = True)
+   updated = models.DateTimeField(auto_now = True)
