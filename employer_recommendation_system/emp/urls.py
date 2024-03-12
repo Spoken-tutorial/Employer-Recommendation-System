@@ -95,7 +95,7 @@ urlpatterns = [
 
     #----------------------------------- APIs V2 -----------------------------------#
     path('api/homepage', HomepageView.as_view(), name='homepage'),
-    path('api/companies/',CompanyView.as_view(),name='companies'),
+    # path('api/companies/',CompanyView.as_view(),name='companies'),
     path('api/students/<int:pk>/dashboard',StudentHomepageView.as_view(),name='companies'),
     path('api/students/<int:pk>/events',StudentJobView.as_view(),name='companies'),
     path('api/students/<int:pk>/profile',StudentProfileView.as_view(),name='companies'),
@@ -107,4 +107,5 @@ urlpatterns = [
 
     ################### v2 APIs ###################
     path('api/job-data/',JobFormData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/companies/',CompanyRegistrationData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
 ]

@@ -9,7 +9,7 @@ import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
-from utilities.models import FossCategory, State, District, City
+from utilities.models import FossCategory, State, District, City, InstituteType, Location
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
@@ -237,30 +237,30 @@ class Company(models.Model):
         ('rejected', 'Rejected'),
     ]
     name = models.CharField(max_length=200, unique=True,verbose_name="Company Name")
+    website = models.URLField(null=True,blank=True)
+    added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
+    email = models.EmailField(null=True,blank=True) #Email for correspondence
     emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
+    address = models.ForeignKey(Location, on_delete=models.CASCADE)
     state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
     city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
+    address = models.CharField(max_length=250) #Company Address for correspondence
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    address = models.CharField(max_length=250) #Company Address for correspondence
-    email = models.EmailField(null=True,blank=True) #Email for correspondence
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)
     description = models.TextField(null=True,blank=True,verbose_name="Description about the company")
     # domain = models.ForeignKey(Domain,on_delete=models.CASCADE) 
     domain = models.ManyToManyField(Domain,blank=True,related_name='domains',null=True) #Domain of work Eg. Consultancy, Development, Software etc
     company_size = models.CharField(max_length=25,choices=NUM_OF_EMPS,default=DEFAULT_NUM_EMP) #Number of employees in company
-    website = models.URLField(null=True,blank=True)
-    date_created = models.DateTimeField(auto_now_add=True)
-    date_updated = models.DateTimeField(auto_now=True )
     # status = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending_approval')
-    added_by = models.ForeignKey(User,on_delete=models.CASCADE,blank=True,null=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
     agency = models.ForeignKey('self',null=True,on_delete=models.SET_NULL, blank=True,related_name='client_companies')
     is_agency = models.BooleanField(default=False)
     show_on_homepage = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True )
 
     class Meta:
         ordering = [('-date_updated')]
@@ -287,7 +287,87 @@ class Foss(models.Model):
 
     def __str__(self):
         return self.foss
+    
+class JobDetail(models.Model):
+    STATUS = [
+        ('draft', 'Draft'),
+        ('pending_approval', 'pending approval'),
+        ('published', 'Published'),
+        ('closed', 'Closed'),
+    ]
+    designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
+    company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
+    state_job = models.ForeignKey(State, on_delete=models.CASCADE)
+    city_job = models.ForeignKey(City, on_delete=models.CASCADE)
+    # skills = models.ManyToManyField(Skill, related_name='jobs')
+    skills = models.ManyToManyField(Skill, related_name='jobs', null=True, blank=True)
+    
+    domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector', null=True) #Domain od work Eg. Consultancy, Development, Software etc
+    salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
+    salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
+    
+    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS, default='draft')
+    description = RichTextField(null=True,blank=True,verbose_name="Job Description")
+    requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
+    key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
+    shift_time = models.CharField(max_length=200,blank=True, null=True)
+    gender = models.CharField(max_length=10,choices=GENDER,default='a')
+    last_app_date = models.DateTimeField(verbose_name="Last Application Date", null=True,blank=True)
+    num_vacancies = models.IntegerField(default=1,blank=True, null=True)
+    slug = models.SlugField(max_length = 250, null = True, blank = True)
+    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
+    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines', null=True)
+    # job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
+    date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
+    date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
 
+    def __str__(self):
+        return self.designation
+
+class StudentFilterLocation(models.Model):
+    job = models.ForeignKey(JobDetail, related_name='location', on_delete=models.CASCADE)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    city = models.ForeignKey(City, on_delete=models.CASCADE, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
+    date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
+
+class StudentFilterFoss(models.Model):
+    CHOICES = (
+        ('Mandatory', 'Mandatory'),
+        ('Optional', 'Optional'),
+    )
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
+    foss = models.ForeignKey(FossCategory,on_delete=models.CASCADE)
+    type = models.CharField(max_length=20, choices=CHOICES, default='Mandatory')
+    status = models.BooleanField(default=True)
+    grade = models.IntegerField(null=True,blank=True, default=60)
+    date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
+    date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.foss)
+    
+    class Meta:
+        unique_together = ('job', 'foss',)
+
+class StudentFilterYear(models.Model):
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
+    year = models.IntegerField(null=True,blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.job)+'-'+str(self.year)
+    
+class StudentFilterInstituteType(models.Model):
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
+    insti_type = models.ForeignKey(InstituteType, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+
+    
 class Job(models.Model):
     STATUS = [
         ('draft', 'Draft'),
@@ -300,9 +380,9 @@ class Job(models.Model):
     state_job = models.IntegerField(null=True,blank=False)  
     #state_job = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_job = models.IntegerField(null=True,blank=False)  
-    city_job = models.ManyToManyField(City,related_name='jobs')
+    city_job = models.ManyToManyField(City,related_name='jobs1')
     #city_job = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
-    skills = models.ManyToManyField(Skill, related_name='jobs')
+    skills = models.ManyToManyField(Skill, related_name='jobs1')
     description = RichTextField(null=True,blank=True,verbose_name="Job Description")
     domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector', null=True) #Domain od work Eg. Consultancy, Development, Software etc
     salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
@@ -324,21 +404,21 @@ class Job(models.Model):
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     last_app_date = models.DateTimeField(verbose_name="Last Application Date", null=True,blank=True)
     rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
-    foss = models.CharField(max_length=200)
+    foss = models.CharField(max_length=200) #TODO
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
-    institute_type = models.CharField(max_length=200,blank=True)
+    institute_type = models.CharField(max_length=200,blank=True) #TODO
     # state = models.CharField(max_length=200,null=True,blank=True)
-    state = models.CharField(max_length=200,blank=True, null=True)#spk #filter
+    state = models.CharField(max_length=200,blank=True, null=True)#spk #filter #TODO
     # city = models.CharField(max_length=200,null=True,blank=True)
-    city = models.CharField(max_length=200,blank=True, null=True)#spk #filter
-    grade = models.IntegerField(null=True)
-    activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS,blank=True,null=True)
-    from_date = models.DateField(null=True,blank=True,verbose_name='Test Date From')
-    to_date = models.DateField(null=True,blank=True,verbose_name='Test Date Upto')
+    city = models.CharField(max_length=200,blank=True, null=True)#spk #filter #TODO
+    grade = models.IntegerField(null=True) #TODO
+    activation_status = models.IntegerField(max_length=10,choices=ACTIVATION_STATUS,blank=True,null=True) #TODO
+    from_date = models.DateField(null=True,blank=True,verbose_name='Test Date From') #TODO
+    to_date = models.DateField(null=True,blank=True,verbose_name='Test Date Upto') #TODO
     num_vacancies = models.IntegerField(default=1,blank=True, null=True)
-    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
-    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines', null=True)
-    job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
+    degree = models.ManyToManyField(Degree,blank=True,related_name='degrees1', null=True)
+    discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines1', null=True)
+    job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses1')
     
     def __str__(self):
         return self.title

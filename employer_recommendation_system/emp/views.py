@@ -56,7 +56,7 @@ from django.db.models import Prefetch
 from accounts.models import Profile
 from .filters import CompanyFilter, JobFilter, StudentFilter
 from events.filters import EventFilter
-from .serializers import CompanySerializer, JobSerializer
+from .serializers import CompanyRegistrationSerializer, JobSerializer
 
 @check_user
 def document_view(request,pk):
@@ -1771,20 +1771,19 @@ class AdminEventsView(BaseListView):
     queryset = Event.objects.all().order_by('-end_date')
 
 ################### v2 APIs ###################
-from utilities.models import FossCategory, State
-import datetime
+from .utils import get_job_form_data
 # This endpoint provides data to prepopulate the create job form page with initial data.
 class JobFormData(APIView):
     def get(self, request):
-        current_year = datetime.datetime.now().year
-        data = {
-            'domains': Domain.objects.all().values('id', 'name'),
-            'job_types': JobType.objects.all().values('id', 'jobtype'),
-            'disciplines': Discipline.objects.all().values('id', 'name'),
-            'degrees': Degree.objects.all().values('id', 'name'),
-            'skills': Skill.objects.all().values('id', 'name'),
-            'states': State.objects.all().values('id', 'name'),
-            'graduation_years': list(range(current_year-2, current_year+3)),
-            'foss': FossCategory.objects.filter(is_learners_allowed=True).values('id', 'foss')
-        }
+        data = get_job_form_data()
         return Response(data, status=status.HTTP_200_OK)
+    
+class CompanyRegistrationData(APIView):
+    def post(self, request):
+        serializer = CompanyRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(f"\033[91m errors : {serializer.errors} \033[0m")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
