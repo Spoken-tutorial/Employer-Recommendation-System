@@ -425,6 +425,13 @@ from django.utils.encoding import force_bytes
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlencode
 from django.contrib.auth import password_validation
+from accounts.models import PasswordResetToken
+from django.utils import timezone
+from smtplib import SMTPException
+from hashlib import md5
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
+from .utils import modify_user_password, check_user_password
 
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
@@ -520,3 +527,43 @@ class ChangePasswordView(APIView):
 		except Exception as e:
 			return Response({"error": f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 			
+class ForgotPasswordView(APIView):
+	def post(self, request, *args, **kwargs):
+		email = request.data.get('email')
+		try:
+			user = User.objects.get(email=email)
+			token = PasswordResetTokenGenerator().make_token(user)
+			PasswordResetToken.objects.create(user=user, token=token, expires_at = timezone.now()+timezone.timedelta(hours=24))
+			reset_link = f"{settings.BASE_URL}/reset-password/{token}/"
+			subject = 'JRS Password Reset'
+			message = f"Click the link to reset your password: {reset_link}"
+			from_user = settings.ADMINISTRATOR_EMAIL
+			send_mail(subject, message, from_user, [email], fail_silently=False )
+			return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
+		except User.DoesNotExist :
+			return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+		except SMTPException as e:
+			return Response({'error': 'User not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ResetPasswordView(APIView):
+	
+	def post(self, request, token):
+		token_obj = PasswordResetToken.objects.filter(token=token).first()
+		if not token_obj or token_obj.is_expired:
+			return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+		user = token_obj.user
+		email = user.email
+		new_password = request.data.get('new_password')
+		modify_user_password(user, email, new_password, token_obj)
+		return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+
+class ChangePasswordAPIView(APIView):
+	def post(self, request):
+		user = request.user
+		current_password = request.data.get('current_password')
+		new_password = request.data.get('new_password')
+		if check_user_password(user, current_password):
+			modify_user_password(user, user.email, new_password)
+			return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)			
+		else:
+			return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)

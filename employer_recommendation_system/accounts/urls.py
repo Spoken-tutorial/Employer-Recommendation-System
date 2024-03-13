@@ -35,6 +35,10 @@ urlpatterns = [
     path('api/logout/', LogoutView.as_view(), name='logout'),
     path('api/password-reset/', PasswordResetView.as_view(), name='password-reset-confirm'),
     path('api/password-change/', ChangePasswordView.as_view(), name='change-password'),
+    path('api/forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('api/reset-password/<str:token>/', ResetPasswordView.as_view(), name='reset_password'),
+    path('api/change-password/', ChangePasswordAPIView.as_view(), name='change_password'),
+    
 
 ]
 
