@@ -1,10 +1,11 @@
-import Hero from "../views/heroSection/hero";
-import About from "../views/aboutSection/about";
+import HeroSection from "../components/heroSection/heroSection";
+import AboutSection from "../components/aboutSection/about";
 import UpcomingEvents from "../components/upcomingEvents/upcomingEvents";
 import FeaturedEvents from "../components/eventsSection/featuredEvents";
 import FeaturedCompanies from "../components/companiesSection/featuredCompanies";
 import FeaturedGallery from "../components/gallerySection/featuredGallery";
 import FeaturedTestimonials from "../components/Testimonials/featuredTestimonials";
+import ContactUs from "../components/contactSection/ContactUs";
 import { getHomePage } from "../utils/api/homepage/homePage";
 import { Await, defer, useLoaderData } from "react-router-dom";
 import { Suspense } from "react";
@@ -15,7 +16,7 @@ const Homepage = () => {
 
   return (
     <>
-      <Hero></Hero>
+      <HeroSection></HeroSection>
       <Suspense fallback={<Spinner></Spinner>}>
         <Await resolve={homePageData}>
           {(data) => (
@@ -25,7 +26,7 @@ const Homepage = () => {
           )}
         </Await>
       </Suspense>
-      <About></About>
+      <AboutSection></AboutSection>
       <Suspense fallback={<Spinner></Spinner>}>
         <Await resolve={homePageData}>
           {(data) => (
@@ -40,6 +41,7 @@ const Homepage = () => {
           )}
         </Await>
       </Suspense>
+      <ContactUs></ContactUs>
     </>
   );
 };

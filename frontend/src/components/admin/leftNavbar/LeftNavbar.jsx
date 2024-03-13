@@ -17,7 +17,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import { Outlet } from "react-router-dom";
-import Footer from "../../../views/footer/footer";
+import FooterMain from "../../footer/footerMain";
 import Collapse from "@mui/material/Collapse";
 import Avatar from "@mui/material/Avatar";
 import LoginSigup from "../../navbar/LoginSignup";
@@ -308,7 +308,7 @@ export default function MiniDrawer(props) {
       <Box component="main" sx={{ flexGrow: 1 }}>
         <DrawerHeader />
         <Outlet></Outlet>
-        <Footer></Footer>
+        <FooterMain></FooterMain>
       </Box>
     </Box>
   );

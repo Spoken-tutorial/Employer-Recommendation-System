@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import NavbarMain from "../components/navbar/navbarMain";
 import Box from "@mui/material/Box";
 import { navItemsStudent } from "../constants/navbar";
-import Footer from "../views/footer/footer";
+import FooterMain from "../components/footer/footerMain";
 import Container from "@mui/material/Container";
 import {
   Outlet,
@@ -49,7 +49,7 @@ function StudentLayout() {
           <Outlet></Outlet>
         )}
       </Container>
-      <Footer></Footer>
+      <FooterMain></FooterMain>
     </>
   );
 }

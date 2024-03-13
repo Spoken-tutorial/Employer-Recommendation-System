@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import NavbarMain from "../components/navbar/navbarMain";
 import { navItemsEmployer } from "../constants/navbar";
-import Footer from "../views/footer/footer";
+import FooterMain from "../components/footer/footerMain";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import {
@@ -48,7 +48,7 @@ function EmployerLayout() {
           <Outlet></Outlet>
         )}
       </Container>
-      <Footer></Footer>
+      <FooterMain></FooterMain>
     </>
   );
 }
