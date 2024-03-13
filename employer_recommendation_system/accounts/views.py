@@ -538,7 +538,6 @@ class ForgotPasswordView(APIView):
 			subject = 'JRS Password Reset'
 			message = f"Click the link to reset your password: {reset_link}"
 			from_user = settings.ADMINISTRATOR_EMAIL
-			email = 'ankitamk@gmail.com'
 			send_mail(subject, message, from_user, [email], fail_silently=False )
 			return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
 		except User.DoesNotExist :
