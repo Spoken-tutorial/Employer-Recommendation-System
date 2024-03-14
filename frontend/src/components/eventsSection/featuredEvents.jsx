@@ -2,9 +2,7 @@
 import React from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
-import { Link } from "react-router-dom";
 import EventSection from "./eventSectionLayout";
 function FeaturedEventsCards(props) {
   return (
@@ -15,13 +13,6 @@ function FeaturedEventsCards(props) {
         height: "100%",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="events/view-all/1" style={{ textDecoration: "none" }}>
-          <Button size="small" variant="text">
-            View all
-          </Button>
-        </Link>
-      </Box>
       <Grid
         container
         direction="row"

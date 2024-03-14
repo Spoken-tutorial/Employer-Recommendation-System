@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import GalleryCardLayout from "./galleryCardLayout";
 import { viewAllGalleryList } from "../../constants/viewAllGallery";
@@ -22,9 +21,6 @@ function ViewAllGalleryCards() {
           style={{ textDecoration: "none" }}
           scroll={(el) => scrollWithOffset(el)}
         >
-          <Button size="small" variant="text">
-            Go Back
-          </Button>
         </HashLink>
       </Box>
       <Grid

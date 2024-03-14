@@ -8,7 +8,7 @@ function HeroSection() {
   return (
     <>
       <Box
-        sx={{ marginTop: "2rem", p: "1rem", marginBottom: "3.5rem" }}
+        sx={{ marginTop: "1rem",  marginBottom: "3.5rem" }}
         id="home"
       >
         <Grid container alignItems="center">
@@ -29,8 +29,8 @@ function HeroSection() {
           >
             <Avatar
               sx={{
-                width: { xs: "18rem", md: "20rem" },
-                height: "20rem",
+                width: { xs: "18rem", md: "24rem" },
+                height: "24rem",
                 textAlign: "center",
               }}
               alt="IIT Bombay"

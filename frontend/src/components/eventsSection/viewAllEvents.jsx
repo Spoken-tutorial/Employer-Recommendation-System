@@ -1,10 +1,7 @@
 import React, { Suspense, useEffect } from "react";
 import { Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import Button from "@mui/material/Button";
 import EventLayout from "./eventCardLayout";
-import { HashLink } from "react-router-hash-link";
-import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import EventSection from "./eventSectionLayout";
 import { scrollToTop } from "../../utils/scrollToTop";
 import { defer, useLoaderData, Await } from "react-router-dom";
@@ -27,17 +24,6 @@ function ViewAllEventsCards() {
         height: "100%",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <HashLink
-          to="/#events"
-          style={{ textDecoration: "none" }}
-          scroll={(el) => scrollWithOffset(el)}
-        >
-          <Button size="small" variant="text">
-            Go Back
-          </Button>
-        </HashLink>
-      </Box>
       <Grid
         container
         direction="row"
