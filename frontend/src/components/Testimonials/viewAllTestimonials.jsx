@@ -1,6 +1,5 @@
 import React, { Suspense, useEffect } from "react";
 import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
 import { HashLink } from "react-router-hash-link";
 import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import TestimonialsSection from "./testimonials";
@@ -26,9 +25,6 @@ function ViewAllTestimonialsVideos() {
           style={{ textDecoration: "none" }}
           scroll={(el) => scrollWithOffset(el)}
         >
-          <Button size="small" variant="text">
-            Go Back
-          </Button>
         </HashLink>
       </Box>
       <Suspense

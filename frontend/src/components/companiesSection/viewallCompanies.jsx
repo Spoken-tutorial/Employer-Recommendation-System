@@ -1,14 +1,11 @@
 import React, { useEffect, Suspense } from "react";
 import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
 import CompanyLayout from "./companyCardLayout";
-import scrollWithOffset from "../../utils/hashScrollwithOffset";
 import CompaniesSection from "./companies";
 import PagePagination from "../common/pagination";
 import { scrollToTop } from "../../utils/scrollToTop";
 import { defer, useLoaderData, Await } from "react-router-dom";
-import { HashLink } from "react-router-hash-link";
 import { getViewAllCompanies } from "../../utils/api/homepage/viewAllOptions";
 import Spinner from "../common/Spinner";
 
@@ -21,17 +18,6 @@ function ViewAllCompaniesCards() {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <HashLink
-          to="/#companies"
-          style={{ textDecoration: "none" }}
-          scroll={(el) => scrollWithOffset(el)}
-        >
-          <Button size="small" variant="text">
-            Go Back
-          </Button>
-        </HashLink>
-      </Box>
       <Grid
         container
         direction="row"
