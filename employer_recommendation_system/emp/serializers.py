@@ -137,6 +137,13 @@ class DateFormatterMixin:
             return date.strftime('%d %b %Y ') if date else None
         return _date_formatter
 
+
+class FormattedDateTimeField(serializers.DateTimeField):
+    def to_representation(self, value):
+        if value is not None:
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return None
+
 class EventSerializer(DateFormatterMixin, serializers.ModelSerializer):
     class Meta:
         model = Event
@@ -355,3 +362,17 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
             job.discipline.set(discipline)
             self.create_filters(job, filter_year, mandatory_foss, optional_foss, filter_location)
             return company
+        
+class JobDetailSerializer(serializers.ModelSerializer):
+    date_created = FormattedDateTimeField()
+    last_app_date = FormattedDateTimeField()
+    applicants_count = serializers.SerializerMethodField()
+
+    def get_applicants_count(self, obj):
+        return JobShortlist.objects.filter(job_detail=obj).count()
+    
+    class Meta:
+        model = JobDetail
+        fields = ['id', 'designation', 'date_created', 'last_app_date', 'applicants_count']
+
+    

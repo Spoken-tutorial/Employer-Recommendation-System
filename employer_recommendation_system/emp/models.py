@@ -321,6 +321,7 @@ class JobDetail(models.Model):
     # job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.designation
@@ -451,6 +452,7 @@ class JobShortlist(models.Model): #Record is created when a student applies for 
     spk_user=models.IntegerField(null=True)  #spk
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
     job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job_detail = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     date_updated = models.DateTimeField(auto_now=True)
     #0 : student has applied but not yet shortlisted by HR Manager
