@@ -17,6 +17,7 @@ import ThumbUpOffAltOutlinedIcon from "@mui/icons-material/ThumbUpOffAltOutlined
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 
+//Homepage
 const navItemsHomepage = [
   { text: "Home", url: "/#home" },
   { text: "About", url: "/#about-us", scroll: "about-us" },
@@ -24,13 +25,17 @@ const navItemsHomepage = [
   { text: "Companies", url: "/#companies" },
   { text: "Gallery", url: "/#gallery" },
   { text: "Testimonials", url: "/#testimonials" },
+  { text: "Contact", url: "/#contact-us" },
 ];
 
+//student dashboard
 const navItemsStudent = [
   { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },
   { text: "Profile", url: "profile" },
 ];
+
+//manager dashboard
 const navItemsManager = [
   {
     nested: false,
@@ -161,6 +166,8 @@ const navItemsManager = [
     icon: <ThumbUpOffAltOutlinedIcon sx={{ color: "#ffffff" }} />,
   },
 ];
+
+//employer dashboard
 const navItemsEmployer = [
   { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },

@@ -1,4 +1,4 @@
-import Footer from "../views/footer/footer";
+import FooterMain from "../components/footer/footerMain";
 import Container from "@mui/material/Container";
 import { Outlet } from "react-router-dom";
 import { navItemsHomepage } from "../constants/navbar";
@@ -11,7 +11,7 @@ const Layout = () => {
       <Container sx={{ marginTop: "8rem", mb: "4rem" }}>
         <Outlet></Outlet>
       </Container>
-      <Footer></Footer>
+      <FooterMain></FooterMain>
     </>
   );
 };
