@@ -1772,6 +1772,7 @@ class AdminEventsView(BaseListView):
 
 ################### v2 APIs ###################
 from .utils import get_job_form_data
+from .serializers import JobDetailSerializer
 # This endpoint provides data to prepopulate the create job form page with initial data.
 class JobFormData(APIView):
     def get(self, request):
@@ -1787,3 +1788,13 @@ class CompanyRegistrationData(APIView):
         else:
             print(f"\033[91m errors : {serializer.errors} \033[0m")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class CompanyManagerJobsView(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            jobs = JobDetail.objects.filter(added_by=user.id)
+            serializer = JobDetailSerializer(jobs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

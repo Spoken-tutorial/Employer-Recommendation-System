@@ -105,7 +105,7 @@ function JobListTable(props) {
 
     //created on
     {
-      field: "created",
+      field: "date_created",
       headerName: "Created On",
       renderHeader: () => (
         <Typography
@@ -155,7 +155,7 @@ function JobListTable(props) {
 
     //applicants
     {
-      field: "get_applicants_count",
+      field: "applicants_count",
       headerName: "Applicants",
       renderHeader: () => (
         <Typography

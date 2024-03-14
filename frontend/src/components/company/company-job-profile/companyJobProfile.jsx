@@ -5,7 +5,6 @@ import Divider from "@mui/material/Divider";
 import JobListTable from "./jobListTable";
 import { Link, defer, useLoaderData, Await } from "react-router-dom";
 import { getJobsByUserId } from "../../../utils/api/company/jobs";
-import { jwtDecode } from "jwt-decode";
 import { Suspense } from "react";
 import Spinner from "../../common/Spinner";
 
@@ -76,6 +75,5 @@ function CompanyJobProfile() {
 export default CompanyJobProfile;
 export function loader() {
   const token = localStorage.getItem("access");
-  const decodedInfo = jwtDecode(token);
-  return defer({ jobListData: getJobsByUserId(decodedInfo.user_id) });
+  return defer({ jobListData: getJobsByUserId(token) });
 }
