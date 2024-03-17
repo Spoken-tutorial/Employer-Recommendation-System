@@ -19,9 +19,15 @@ import ViewAllTestimonials, {
   loader as ViewAllTestimonialsLoader,
 } from "../components/Testimonials/viewAllTestimonials";
 import ViewAllGallery from "../components/gallerySection/viewAllGallery";
+
+//login /reset
 import LoginForm, {
   action as LoginAction,
 } from "../components/login/loginForm";
+
+import NewPasswordInput, {
+  action as NewPasswordInputAction,
+} from "../components/login/ForgotPassword/NewPasswordInput";
 
 //student
 import StudentLayout, {
@@ -90,6 +96,11 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         action: LoginAction,
+      },
+      {
+        path: "/reset-password/:password_token",
+        element: <NewPasswordInput />,
+        action: NewPasswordInputAction,
       },
     ],
   },

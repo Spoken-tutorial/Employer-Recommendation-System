@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
@@ -16,13 +15,17 @@ import {
 import { scrollToTop } from "../../utils/scrollToTop";
 import { Form } from "react-router-dom";
 import { loginUser } from "../../utils/api/login/login";
+import { resetPassword } from "../../utils/api/ResetPassword/resetPassword";
 import { newLoginLocalStorage } from "../../utils/auth/localStorage";
 import { jwtDecode } from "jwt-decode";
+import SendPasswordResetLink from "./ForgotPassword/SendPasswordResetLink";
 
 function LoginForm() {
   const [passwordError, setPasswordError] = useState(false);
   const [emailError, setEmailError] = useState(false);
   const [passwordHelperText, setPasswordHelperText] = useState("");
+  const [resetPasswordSent, setResetPasswordSent] = useState(false);
+  const [resetPasswordSentError, setResetPasswordSentError] = useState(false);
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
@@ -33,18 +36,31 @@ function LoginForm() {
 
   useEffect(() => {
     if (actionData != undefined) {
-      if (actionData.status == 200) {
-        setPasswordError(false);
-        setEmailError(false);
-        setPasswordHelperText("");
-        const decoded = jwtDecode(actionData.access);
-        const role = decoded.roles[0].toLowerCase();
-        //needs to be changed based on role
-        navigate("/auth/" + role + "/dashboard");
-      } else {
-        setPasswordError(true);
-        setEmailError(true);
-        setPasswordHelperText(actionData.error);
+      //--login post method resposne
+      if (actionData.actionType == "login") {
+        if (actionData.status == 200) {
+          setPasswordError(false);
+          setEmailError(false);
+          setPasswordHelperText("");
+          const decoded = jwtDecode(actionData.access);
+          const role = decoded.roles[0].toLowerCase();
+          //needs to be changed based on role
+          navigate("/auth/" + role + "/dashboard");
+        } else {
+          setPasswordError(true);
+          setEmailError(true);
+          setPasswordHelperText(actionData.error);
+        }
+      }
+
+      //--forgot password method response
+      if (actionData.actionType == "reset") {
+        if (actionData.status == 200) {
+          setResetPasswordSentError(false);
+          setResetPasswordSent(true);
+        } else {
+          setResetPasswordSentError(true);
+        }
       }
     }
   }, [actionData]);
@@ -165,6 +181,8 @@ function LoginForm() {
                   fullWidth
                   type="submit"
                   variant="contained"
+                  name="actionType"
+                  value="login"
                   disabled={navigation.state === "submitting" ? true : false}
                   sx={{
                     width: { xs: "18rem", sm: "100%" },
@@ -192,21 +210,22 @@ function LoginForm() {
                 display="block"
                 sx={{ ml: { xs: "0.8rem", sm: "0" } }}
               >
-                <Link
-                  style={{ textDecoration: "none" }}
-                  reloadDocument
-                  to="https://spoken-tutorial.org/accounts/forgot-password/"
-                  target="_blank"
-                >
-                  Forgot Password?
-                </Link>
+                {/* password reset dialog */}
+                <SendPasswordResetLink
+                  linkSent={resetPasswordSent}
+                  linkSentError={resetPasswordSentError}
+                ></SendPasswordResetLink>
                 ( Reset your password with Spoken Tutorial )
               </Typography>
 
               <Typography
                 variant="caption"
                 display="block"
-                sx={{ mb: "1rem", mt: "0.5rem", ml: { xs: "0.8rem", sm: "0" } }}
+                sx={{
+                  mb: "1rem",
+                  mt: "0.5rem",
+                  ml: { xs: "1rem", sm: "0.3rem", md: "0.4rem" },
+                }}
               >
                 <Link
                   style={{ textDecoration: "none" }}
@@ -230,28 +249,38 @@ export default LoginForm;
 
 export async function action({ request }) {
   const formData = await request.formData();
-  const username = formData.get("email");
-  const password = formData.get("password");
+  const actionType = formData.get("actionType");
 
-  const response = await loginUser(username, password);
+  //login post method
+  if (actionType == "login") {
+    const username = formData.get("email");
+    const password = formData.get("password");
+    const response = await loginUser(username, password);
 
-  if (response.status == 200) {
-    //token fetched
-    const localStorageSet = newLoginLocalStorage(
-      response.refresh,
-      response.access
-    );
-    if (localStorageSet) {
+    if (response.status == 200) {
+      //token fetched
+      const localStorageSet = newLoginLocalStorage(
+        response.refresh,
+        response.access
+      );
+      if (localStorageSet) {
+        return response;
+      } else {
+        //local storage error
+        return { error: "Error in logging you in", status: 500 };
+      }
+    } else if (response.token == 401) {
+      //wrong credentials unauthorized
       return response;
     } else {
-      //local storage error
-      return { error: "Error in logging you in", status: 500 };
+      //other error
+      return response;
     }
-  } else if (response.token == 401) {
-    //wrong credentials unauthorized
-    return response;
-  } else {
-    //other error
+  }
+  //reset password post method
+  else if (actionType == "reset") {
+    const email = formData.get("email");
+    const response = await resetPassword(email);
     return response;
   }
 }

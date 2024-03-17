@@ -19,7 +19,11 @@ export async function loginUser(username, password) {
     if (!response.ok) {
       // Handle unauthorize user not found responses status 401
       const errorData = await response.json();
-      return { error: errorData.detail, status: response.status };
+      return {
+        error: errorData.detail,
+        status: response.status,
+        actionType: "login",
+      };
     }
     //success
     const tokens = await response.json();
@@ -28,9 +32,10 @@ export async function loginUser(username, password) {
       refresh: tokens.refresh,
       access: tokens.access,
       status: response.status,
+      actionType: "login",
     };
   } catch (error) {
     // Handle network errors or other exceptions
-    return { message: "Failed to log in", status: 500 };
+    return { message: "Failed to log in", status: 500, actionType: "login" };
   }
 }
