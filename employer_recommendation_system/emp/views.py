@@ -1620,6 +1620,7 @@ from random import sample
 from rest_framework.pagination import PageNumberPagination
 from .utility import StudentService
 from emp.serializers import StudentDetailSerializer, StudentSerializer
+from rest_framework import permissions
 
 class HomepageView(APIView):
     def get(self, request):
@@ -1772,7 +1773,7 @@ class AdminEventsView(BaseListView):
 
 ################### v2 APIs ###################
 from .utils import get_job_form_data
-from .serializers import JobDetailSerializer
+from .serializers import JobDetailSerializer, JobDetailListSerializer
 # This endpoint provides data to prepopulate the create job form page with initial data.
 class JobFormData(APIView):
     def get(self, request):
@@ -1794,7 +1795,31 @@ class CompanyManagerJobsView(APIView):
         try:
             user = request.user
             jobs = JobDetail.objects.filter(added_by=user.id)
-            serializer = JobDetailSerializer(jobs, many=True)
+            serializer = JobDetailListSerializer(jobs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class JobDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, pk):
+        try:
+            job = JobDetail.objects.get(id=pk, added_by=request.user)
+            serializer = JobDetailSerializer(job)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except JobDetail.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": "An error occurred while fetching job details."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def patch(self, request, pk):
+        job = JobDetail.objects.get(id=pk)
+        serializer = JobDetailSerializer(job, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+

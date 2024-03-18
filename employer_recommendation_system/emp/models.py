@@ -333,6 +333,9 @@ class StudentFilterLocation(models.Model):
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
 
+    class Meta:
+        unique_together = ('job', 'city')
+
 class StudentFilterFoss(models.Model):
     CHOICES = (
         ('Mandatory', 'Mandatory'),
@@ -360,6 +363,9 @@ class StudentFilterYear(models.Model):
 
     def __str__(self):
         return str(self.job)+'-'+str(self.year)
+    
+    class Meta:
+        unique_together = ('job', 'year',) 
     
 class StudentFilterInstituteType(models.Model):
     job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
