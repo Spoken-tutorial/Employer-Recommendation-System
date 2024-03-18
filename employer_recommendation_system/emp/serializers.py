@@ -104,7 +104,7 @@ class JobSerializer(serializers.ModelSerializer, DateFormatterMixin):
 from django.contrib.auth.models import User
 from accounts.serializers import ProfileSerializer
 from accounts.models import Profile as JRSProfile
-from django.db import transaction
+from django.db import transaction, IntegrityError
 from utilities.models import State, City
 class DateFormatterMixin:
     """
@@ -363,7 +363,7 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
             self.create_filters(job, filter_year, mandatory_foss, optional_foss, filter_location)
             return company
         
-class JobDetailSerializer(serializers.ModelSerializer):
+class JobDetailListSerializer(serializers.ModelSerializer):
     date_created = FormattedDateTimeField()
     last_app_date = FormattedDateTimeField()
     applicants_count = serializers.SerializerMethodField()
@@ -375,4 +375,214 @@ class JobDetailSerializer(serializers.ModelSerializer):
         model = JobDetail
         fields = ['id', 'designation', 'date_created', 'last_app_date', 'applicants_count']
 
+class StudentFilterYearSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentFilterYear
+        fields = ['job', 'year']
+
+class JobDetailSerializer(serializers.ModelSerializer):
+    date_created = FormattedDateTimeField()
+    date_updated = FormattedDateTimeField()
+    filter_year = serializers.SerializerMethodField()
+    mandatory_foss = serializers.SerializerMethodField()
+    optional_foss = serializers.SerializerMethodField()
+    filter_location = serializers.SerializerMethodField()
+
+    filter_year_w = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
+    mandatory_foss_w = serializers.ListField(child=serializers.IntegerField(), required=True, write_only=True)
+    optional_foss_w = serializers.ListField(child=serializers.IntegerField(), required=False, write_only=True)
+    filter_location_w = serializers.ListField(child=serializers.DictField(child=serializers.IntegerField()), write_only=True, required=False)
+    class Meta:
+        model = JobDetail
+        fields = ['designation', 'state_job', 'city_job', 'skills', 'domain', 'salary_range_min',
+                    'salary_range_max', 'job_type', 'status', 'description', 
+                    'requirements', 'key_job_responsibilities', 'gender',
+                    'last_app_date', 'num_vacancies', 'degree', 'discipline', 'date_created',
+                    'date_updated', 'filter_year', 'mandatory_foss', 'optional_foss', 'filter_location',
+                    'filter_year_w', 'mandatory_foss_w', 'optional_foss_w', 'filter_location_w' ]
     
+    def get_filter_year(self, obj):
+        return StudentFilterYear.objects.filter(job=obj).values_list('year', flat=True)
+    
+    def get_mandatory_foss(self, obj):
+        return StudentFilterFoss.objects.filter(job=obj, type="Mandatory").values_list('foss', flat=True)
+    
+    def get_optional_foss(self, obj):
+        return StudentFilterFoss.objects.filter(job=obj, type="Optional").values_list('foss', flat=True)
+    
+    def get_filter_location(self, obj):
+        return StudentFilterLocation.objects.filter(job=obj).values('state','city')
+    
+    def update_student_filter_year(self, instance, filter_year):
+        try:
+                print(f"\033[93m inside filter_year \033[0m")
+                existing_years = StudentFilterYear.objects.filter(job=instance)
+                for item in existing_years:
+                    if item.year not in filter_year:
+                        item.delete()
+                    else:
+                        filter_year.remove(item.year)
+                year_data = [StudentFilterYear(job=instance, year=year) for year in filter_year]
+                StudentFilterYear.objects.bulk_create(year_data)
+        except IntegrityError:
+            pass
+    
+    def update_student_filter_foss(self, instance, foss_list, foss_type):
+        try:
+            data = StudentFilterFoss.objects.filter(job=instance, type=foss_type)
+            for item in data:
+                if item.foss not in foss_list:
+                    item.delete()
+                else:
+                    foss_list.remove(item.foss)
+            fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type=foss_type) for foss in foss_list]
+            StudentFilterFoss.objects.bulk_create(fosses_data)
+        except IntegrityError as e:
+            pass
+
+    def update_student_filter_location(self, instance, filter_location):
+        city_list = [location['city'] for location in filter_location]
+        existing_locations = StudentFilterLocation.objects.filter(job=instance)
+        for item in existing_locations:
+            if item.city not in  city_list:
+                item.delete()
+            else:
+                for data in filter_location:
+                    if data.city ==  item.city:
+                        filter_location.pop(data)
+        
+        filter_location_data = [
+            StudentFilterLocation(job=instance, state_id=loc.get('state'), city_id=loc.get('city', None)) 
+            if loc.get('city') != 0 else 
+            StudentFilterLocation(job=instance, state_id=loc.get('state'), city=None)
+            for loc in filter_location
+        ]
+        for item in filter_location_data:
+            try:
+                item.save()
+            except:
+                pass
+        # StudentFilterLocation.objects.bulk_create(filter_location_data)
+        
+        
+        
+    
+    def update_student_filter(self, instance, validated_data):
+        filter_year = validated_data.pop('filter_year_w', [])
+        mandatory_foss = validated_data.pop('mandatory_foss_w', [])
+        optional_foss = validated_data.pop('optional_foss_w', [])
+        filter_location = validated_data.pop('filter_location_w', [])
+        
+        try:
+            if filter_year:
+                year_data = [StudentFilterYear(job=instance, year=year) for year in filter_year]
+                StudentFilterYear.objects.bulk_create(year_data)
+        except IntegrityError:
+            pass
+        try:
+            if mandatory_foss:
+                mandatory_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Mandatory') for foss in mandatory_foss]
+                StudentFilterFoss.objects.bulk_create(mandatory_fosses_data)
+        except IntegrityError:
+            pass
+        try:
+            if optional_foss:
+                data = StudentFilterFoss.objects.filter(job=instance)
+                for item in data:
+                    if item.foss not in optional_foss:
+                        item.delete()
+                    else:
+                        optional_foss.remove(item.foss)
+                optional_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Optional') for foss in optional_foss]
+                StudentFilterFoss.objects.bulk_create(optional_fosses_data)
+        except IntegrityError:
+            pass
+        try:
+            if filter_location:
+                filter_location_data = [
+                    StudentFilterLocation(job=instance, state_id=loc.get('state'), city_id=loc.get('city', None)) 
+                    if loc.get('city') != 0 else 
+                    StudentFilterLocation(job=instance, state_id=loc.get('state'), city=None)
+                    for loc in filter_location
+                ]
+                StudentFilterLocation.objects.bulk_create(filter_location_data)
+        except IntegrityError:
+            pass
+
+    def update(self, instance, validated_data):
+        keys = list(validated_data.keys())
+        filter_year = validated_data.pop('filter_year_w', [])
+        mandatory_foss = validated_data.pop('mandatory_foss_w', [])
+        optional_foss = validated_data.pop('optional_foss_w', [])
+        filter_location = validated_data.pop('filter_location_w', [])
+
+        instance = super().update(instance, validated_data)
+        
+        if "filter_year_w" in keys:
+            self.update_student_filter_year(instance, filter_year)
+        if "mandatory_foss_w" in keys:
+            self.update_student_filter_foss(instance, mandatory_foss, "Mandatory")
+        if "optional_foss_w" in keys:
+            self.update_student_filter_foss(instance, optional_foss, "Optional")
+        if "filter_location_w" in keys:
+            self.update_student_filter_location(instance, filter_location)
+        return instance
+
+    def update1(self, instance, validated_data):
+        skills = validated_data.pop('skills',[])
+        degree = validated_data.pop('degree',[])
+        discipline = validated_data.pop('discipline',[])
+
+        filter_year = validated_data.pop('filter_year_w', [])
+        mandatory_foss = validated_data.pop('mandatory_foss_w', [])
+        optional_foss = validated_data.pop('optional_foss_w', [])
+        filter_location = validated_data.pop('filter_location_w', [])
+        instance.designation = validated_data.get('designation', instance.designation)
+        instance.state_job = validated_data.get('state_job', instance.state_job)
+        instance.city_job = validated_data.get('city_job', instance.city_job)
+        # instance.skills = validated_data.get('skills', instance.skills)
+        instance.domain = validated_data.get('domain', instance.domain)
+        instance.salary_range_min = validated_data.get('salary_range_min', instance.salary_range_min)
+        instance.salary_range_max = validated_data.get('salary_range_max', instance.salary_range_max)
+        instance.job_type = validated_data.get('job_type', instance.job_type)
+        instance.status = validated_data.get('status', instance.status)
+        instance.description = validated_data.get('description', instance.description)
+        instance.requirements = validated_data.get('requirements', instance.requirements)
+        instance.key_job_responsibilities = validated_data.get('key_job_responsibilities', instance.key_job_responsibilities)
+        instance.last_app_date = validated_data.get('last_app_date', instance.last_app_date)
+        instance.num_vacancies = validated_data.get('num_vacancies', instance.num_vacancies)
+
+        instance.skills.clear()
+        instance.skills.add(*skills)
+
+        instance.degree.clear()
+        instance.degree.add(*degree)
+
+        instance.discipline.clear()
+        instance.discipline.add(*discipline)
+
+        instance.save()
+        #filters
+        years = StudentFilterYear.objects.filter(job=instance).delete()
+        if filter_year:
+            year_data = [StudentFilterYear(job=instance, year=year) for year in filter_year]
+            StudentFilterYear.objects.bulk_create(year_data)
+        foss = StudentFilterFoss.objects.filter(job=instance).delete()
+        if mandatory_foss:
+            mandatory_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Mandatory') for foss in mandatory_foss]
+            StudentFilterFoss.objects.bulk_create(mandatory_fosses_data)
+        if optional_foss:
+            optional_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Optional') for foss in optional_foss]
+            StudentFilterFoss.objects.bulk_create(optional_fosses_data)
+        location = StudentFilterLocation.objects.filter(job=instance).delete()
+        if filter_location:
+            filter_location_data = [
+                StudentFilterLocation(job=instance, state_id=loc.get('state'), city_id=loc.get('city', None)) 
+                if loc.get('city') != 0 else 
+                StudentFilterLocation(job=instance, state_id=loc.get('state'), city=None)
+                for loc in filter_location
+            ]
+            StudentFilterLocation.objects.bulk_create(filter_location_data)
+
+
+        return instance
