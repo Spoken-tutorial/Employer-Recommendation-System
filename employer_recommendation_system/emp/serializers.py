@@ -84,7 +84,6 @@ class JobSerializer(serializers.ModelSerializer, DateFormatterMixin):
             return None
     
     def get_city_state(self, obj):
-        print(f"\033[95m obj.city_job : {obj.city_job} \033[0m")
         try:
             return SpokenCity.objects.get(id=obj.city_job).name
         except:
@@ -280,7 +279,7 @@ class JobRegistrationSerializer(serializers.ModelSerializer):
             'state_job': State,
             'city_job': City,
             'job_type': JobType,
-            'domain': Domain 
+            'domain': Domain,
         }
 
         for field, modelClass in mappings.items():
@@ -316,11 +315,12 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
         user_serializer.is_valid(raise_exception=True)
         return user_serializer.save()
     
-    def create_job(self, job_data, company):
+    def create_job(self, job_data, company, user):
         job_serializer = JobRegistrationSerializer(data=job_data)
         job_serializer.is_valid(raise_exception=True)
         job = job_serializer.save()
         job.company = company
+        job.added_by = user
         job.save()
         return job
     
@@ -353,9 +353,10 @@ class CompanyRegistrationSerializer(serializers.ModelSerializer):
 
         with transaction.atomic():
             user = self.create_user(user_data)
+            validated_data['added_by_id'] = user.id
             company = Company.objects.create(**validated_data)
             cm = CompanyManagers.objects.create(user=user, company=company, group_id=3)
-            job = self.create_job(job_data, company)
+            job = self.create_job(job_data, company, user=user)
             degree = job_data.pop('degree', [])
             discipline = job_data.pop('discipline', [])
             job.degree.set(degree)
@@ -415,7 +416,6 @@ class JobDetailSerializer(serializers.ModelSerializer):
     
     def update_student_filter_year(self, instance, filter_year):
         try:
-                print(f"\033[93m inside filter_year \033[0m")
                 existing_years = StudentFilterYear.objects.filter(job=instance)
                 for item in existing_years:
                     if item.year not in filter_year:
