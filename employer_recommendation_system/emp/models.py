@@ -321,7 +321,7 @@ class JobDetail(models.Model):
     # job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
-    added_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    added_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
         return self.designation
