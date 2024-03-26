@@ -1681,6 +1681,15 @@ class CompanyView(BaseListView):
     serializer_class = CompanyDataSerializer
     filter_class = CompanyFilter
     queryset = Company.objects.prefetch_related('domain').all()
+
+    def post(self, request):
+        serializer = CompanyRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(f"\033[91m errors : {serializer.errors} \033[0m")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     # def get(self, request):
     #     try:

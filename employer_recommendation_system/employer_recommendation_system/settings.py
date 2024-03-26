@@ -294,6 +294,6 @@ SIMPLE_JWT = {
 
 if DEBUG:
     SILKY_PYTHON_PROFILER = True
-    EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+    # EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
 MOODLE_PASSWORD_SALT=MOODLE_PASSWORD_SALT
