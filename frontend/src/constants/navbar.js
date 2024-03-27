@@ -10,6 +10,7 @@ import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import ForwardToInboxOutlinedIcon from "@mui/icons-material/ForwardToInboxOutlined";
 import PendingOutlinedIcon from "@mui/icons-material/PendingOutlined";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import SettingsIcon from "@mui/icons-material/Settings";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import VignetteOutlinedIcon from "@mui/icons-material/VignetteOutlined";
 import PageviewOutlinedIcon from "@mui/icons-material/PageviewOutlined";
@@ -33,6 +34,7 @@ const navItemsStudent = [
   { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },
   { text: "Profile", url: "profile" },
+  { text: "Settings", url: "settings" },
 ];
 
 //manager dashboard
@@ -165,6 +167,12 @@ const navItemsManager = [
     url: "",
     icon: <ThumbUpOffAltOutlinedIcon sx={{ color: "#ffffff" }} />,
   },
+  {
+    nested: false,
+    text: "Settings",
+    url: "settings",
+    icon: <SettingsIcon sx={{ color: "#ffffff" }} />,
+  },
 ];
 
 //employer dashboard
@@ -172,6 +180,7 @@ const navItemsEmployer = [
   { text: "Dashboard", url: "dashboard" },
   { text: "Jobs", url: "jobs" },
   { text: "Profile", url: "profile" },
+  { text: "Settings", url: "settings" },
 ];
 
 export { navItemsHomepage, navItemsEmployer, navItemsManager, navItemsStudent };

@@ -29,6 +29,11 @@ import NewPasswordInput, {
   action as NewPasswordInputAction,
 } from "../components/login/ForgotPassword/NewPasswordInput";
 
+//auth common
+import PasswordChange, {
+  action as passwordChangeAction,
+} from "../components/AuthCommon/password-change/PasswordChange";
+
 //student
 import StudentLayout, {
   action as StudentLogoutAction,
@@ -118,6 +123,11 @@ const router = createBrowserRouter([
       { path: "dashboard", element: <UnderDevelopmentInfo /> },
       { path: "profile", element: <StudentProfile /> },
       { path: "jobs", element: <UnderDevelopmentInfo /> },
+      {
+        path: "settings",
+        element: <PasswordChange role={"student"} />,
+        action: passwordChangeAction,
+      },
     ],
   },
 
@@ -130,7 +140,14 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
     action: ManagerLogoutAction,
-    children: [{ path: "", element: <UnderDevelopmentInfo /> }],
+    children: [
+      { path: "", element: <UnderDevelopmentInfo /> },
+      {
+        path: "settings",
+        element: <PasswordChange role={"manager/dashboard"} />,
+        action: passwordChangeAction,
+      },
+    ],
   },
 
   {
@@ -145,7 +162,15 @@ const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <UnderDevelopmentInfo /> },
       { path: "jobs", element: <CompanyJobProfile />, loader: jobListLoader },
-      { path: "profile", element: <UnderDevelopmentInfo /> },
+      {
+        path: "profile",
+        element: <UnderDevelopmentInfo />,
+      },
+      {
+        path: "settings",
+        element: <PasswordChange role={"employer"} />,
+        action: passwordChangeAction,
+      },
     ],
   },
   {

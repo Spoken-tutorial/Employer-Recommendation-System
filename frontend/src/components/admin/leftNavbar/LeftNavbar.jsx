@@ -27,6 +27,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import StarBorder from "@mui/icons-material/StarBorder";
 import "./styles.css";
 import { navItemsManager } from "../../../constants/navbar";
+import { Link } from "react-router-dom";
 const drawerWidth = 280;
 
 const openedMixin = (theme) => ({
@@ -278,23 +279,25 @@ export default function MiniDrawer(props) {
                     component="li"
                     sx={{ backgroundColor: "#ffffff", opacity: "15%" }}
                   />
-                  <ListItemButton
-                    key={obj.text}
-                    sx={{ mb: "0.5rem", mt: "0.5rem" }}
-                  >
-                    <ListItemIcon>
-                      {obj.icon ? (
-                        obj.icon
-                      ) : (
-                        <InboxIcon sx={{ color: "#ffffff" }} />
-                      )}
-                    </ListItemIcon>
-                    <Typography
-                      sx={{ color: "#ffffff", fontSize: "0.9rem!important" }}
+                  <Link to={obj.url} style={{ textDecoration: "none" }}>
+                    <ListItemButton
+                      key={obj.text}
+                      sx={{ mb: "0.5rem", mt: "0.5rem" }}
                     >
-                      {obj.text}
-                    </Typography>
-                  </ListItemButton>
+                      <ListItemIcon>
+                        {obj.icon ? (
+                          obj.icon
+                        ) : (
+                          <InboxIcon sx={{ color: "#ffffff" }} />
+                        )}
+                      </ListItemIcon>
+                      <Typography
+                        sx={{ color: "#ffffff", fontSize: "0.9rem!important" }}
+                      >
+                        {obj.text}
+                      </Typography>
+                    </ListItemButton>
+                  </Link>
                   <Divider
                     component="li"
                     sx={{ backgroundColor: "#ffffff", opacity: "15%" }}
