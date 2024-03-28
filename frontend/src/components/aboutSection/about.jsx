@@ -8,7 +8,7 @@ function AboutSection() {
         sx={{
           marginTop: "2rem",
           p: "1rem",
-          marginBottom: "3.5rem",
+          marginBottom: "2rem",
         }}
         id="about-us"
       >
@@ -17,8 +17,8 @@ function AboutSection() {
           gutterBottom
           sx={{
             fontWeight: "bolder",
-            color: "#002648",
-            fontSize: { xs: "2rem" },
+            color: "#054C77",
+            fontSize: { xs: "1.5rem" },
           }}
         >
           About Us
@@ -30,7 +30,7 @@ function AboutSection() {
           }}
         ></Divider>
         <Typography
-          variant="body2"
+          variant="body1"
           gutterBottom
           sx={{ mt: "1rem", lineHeight: "2rem" }}
         >
@@ -39,28 +39,10 @@ function AboutSection() {
           Education through ICT, funded by Ministry of Human Resource
           Development, Government of India. Topper students from Spoken Tutorial
           Tests will be able to apply for the jobs via Job Recommendation
-          System. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-          do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-          ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum
-          dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-          incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-          quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-          commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-          velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-          occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur
-          adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore
-          magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-          ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-          irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-          fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-          sunt in culpa qui officia deserunt mollit anim id est laborum.
+          System.
         </Typography>
-        <Typography variant="subtitle2" gutterBottom sx={{ mt: "1rem" }}>
+        
+        <Typography variant="subtitle1" gutterBottom sx={{ mt: "1rem" }}>
           Welcome to a brighter future with us!
         </Typography>
       </Box>

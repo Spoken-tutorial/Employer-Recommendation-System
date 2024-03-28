@@ -34,9 +34,7 @@ from django.db import IntegrityError
 from rest_framework.decorators import api_view
 from accounts.models import Profile as JRSProfile
 from emp.helper import validate_otp
-from .serializers import CustomTokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-from accounts.serializers import CompanyRegistrationSerializer, CompanyManagerSerializer
+from accounts.serializers import CompanyRegistrationSerializer
 
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
@@ -414,5 +412,158 @@ def login(request):
 		return Response("Invalid credentials", status=status.HTTP_400_BAD_REQUEST)
 	
 
+
+#----------------------------------- View V2 -----------------------------------#
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.core.mail import send_mail
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.http import urlencode
+from django.contrib.auth import password_validation
+from accounts.models import PasswordResetToken
+from django.utils import timezone
+from smtplib import SMTPException
+from hashlib import md5
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import check_password
+from .utils import modify_user_password, check_user_password
+
 class CustomTokenObtainPairView(TokenObtainPairView):
 	serializer_class = CustomTokenObtainPairSerializer
+
+
+class LogoutView(APIView):
+	# permission_classes = (IsAuthenticated,) # ToDo
+	def post(self, request):
+		print(request.data)
+		try:
+			refresh_token = request.data["refresh_token"]
+			token = RefreshToken(refresh_token)
+			token.blacklist()
+			return Response(status=status.HTTP_205_RESET_CONTENT)
+		except Exception as e:
+			return Response(status=status.HTTP_400_BAD_REQUEST)
+		
+class PasswordResetView(APIView):
+	def post(self, request, *args, **kwargs):
+		# Handling password reset request
+		if 'email' in request.data:
+			print(f"\033[93m EMAIL \033[0m")
+			return self.password_reset_request(request)
+		elif 'token' in request.query_params and 'uid' in request.query_params:
+			print(f"\033[93m TOKEN \033[0m")
+			return self.password_reset_confirm(request)
+		else:
+			return Response({"error": "Invalid request"}, status=status.HTTP_400_BAD_REQUEST)
+		
+	def send_password_reset_email(self, user):
+		token = PasswordResetTokenGenerator().make_token(user)
+		uid = urlsafe_base64_encode(force_bytes(user.pk))
+		domain = get_current_site(self.request).domain
+		link = reverse('password-reset-confirm')
+		query_params = {'uid': uid, 'token': token}
+		query_string = urlencode(query_params)
+		reset_url = f"http://{domain}/{link}?{query_string}"
+		print(f"\033[92m reset_url : {reset_url} \033[0m")
+		try:
+			send_mail(
+				'Password Reset Request',
+				f'Please click the following link to reset your password: {reset_url}',
+				'from@example.com',
+				[user.email],
+				fail_silently=False)
+		except Exception as e:
+			pass
+	
+	def password_reset_request(self, request):
+		try:
+			email = request.data.get('email')
+			user = User.objects.get(email=email)
+			self.send_password_reset_email( user)
+			return Response({"message": "Password reset email sent."}, status=status.HTTP_200_OK)
+		except User.DoesNotExist:
+			return Response({"error": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+		except Exception as e:
+			return Response({"error": f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+	def password_reset_confirm(self, request):
+		token = request.query_params.get('token')
+		uid = request.query_params.get('uid')
+		new_password = request.data.get('new_password')
+		try:
+			uid = urlsafe_base64_decode(uid).decode()
+			user = User.objects.get(pk=uid)
+		except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+			user = None
+
+		if user is not None and PasswordResetTokenGenerator().check_token(user, token):
+			user.set_password(new_password)
+			user.save()
+			return Response({"message": "Password reset success."}, status=status.HTTP_200_OK)
+		else:
+			return Response({"error": "Invalid token."}, status=status.HTTP_400_BAD_REQUEST)
+		
+class ChangePasswordView(APIView):
+	permission_classes = [IsAuthenticated,]
+
+	def post(self, request, *args, **kwargs):
+		user = request.user
+		old_password = request.data.get('old_password')
+		new_password = request.data.get('new_password')
+		#check old password
+		if not user.check_password(old_password):
+			return Response({"error": "Old password is not correct"}, status=status.HTTP_400_BAD_REQUEST)
+		# Validate and set new password
+		try:
+			password_validation.validate_password(new_password, user)
+			user.set_password(new_password)
+			user.save()
+			return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+		except Exception as e:
+			return Response({"error": f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+			
+class ForgotPasswordView(APIView):
+	def post(self, request, *args, **kwargs):
+		email = request.data.get('email')
+		try:
+			user = User.objects.get(email=email)
+			token = PasswordResetTokenGenerator().make_token(user)
+			PasswordResetToken.objects.create(user=user, token=token, expires_at = timezone.now()+timezone.timedelta(hours=24))
+			reset_link = f"{settings.BASE_URL}/reset-password/{token}/"
+			subject = 'JRS Password Reset'
+			message = f"Click the link to reset your password: {reset_link}"
+			from_user = settings.ADMINISTRATOR_EMAIL
+			send_mail(subject, message, from_user, [email], fail_silently=False )
+			return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
+		except User.DoesNotExist :
+			return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+		except SMTPException as e:
+			return Response({'error': 'User not found'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ResetPasswordView(APIView):
+	
+	def post(self, request, token):
+		token_obj = PasswordResetToken.objects.filter(token=token).first()
+		if not token_obj or token_obj.is_expired:
+			return Response({'error': 'Invalid or expired token'}, status=status.HTTP_400_BAD_REQUEST)
+		user = token_obj.user
+		email = user.email
+		new_password = request.data.get('new_password')
+		modify_user_password(user, email, new_password, token_obj)
+		return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+
+class ChangePasswordAPIView(APIView):
+	def post(self, request):
+		user = request.user
+		current_password = request.data.get('current_password')
+		new_password = request.data.get('new_password')
+		if check_user_password(user, current_password):
+			modify_user_password(user, user.email, new_password)
+			return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)			
+		else:
+			return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)

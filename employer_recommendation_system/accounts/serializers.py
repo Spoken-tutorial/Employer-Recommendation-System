@@ -1,13 +1,9 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Profile
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-# from emp.serializers import CompanyRegSerializer
-from emp.models import Company, CompanyManagers, Job, Skill, JobFoss, JobFilterState,JobFilterCity, Degree, Discipline, JobFilterYear, Domain
-from utilities.models import City                                          
-# from emp.serializers import SkillSerializer
+from emp.models import Company, CompanyManagers, Job, Skill, JobFoss, JobFilterState,JobFilterCity, Degree, Discipline, JobFilterYear
+from utilities.models import City
+from accounts.models import Profile as JRSProfile
 
 class RegistrationFormSerializer(serializers.Serializer):
     company_name = serializers.CharField(max_length=255)
@@ -17,12 +13,24 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ['phone']
+        extra_kwargs = {
+            'phone': {'required': True}
+        }
 
 class UserSerializer(serializers.ModelSerializer):
-    profile = serializers.SerializerMethodField()
+    profile = ProfileSerializer()
     class Meta:
         model = User
-        fields = ['id','first_name', 'last_name', 'username', 'email', 'profile']
+        fields = ['id','first_name', 'last_name', 'username', 'email', 'profile', 'password']
+        extra_kwargs = {
+        'password' : {'write_only': True},
+    }
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop("profile")
+        user = User.objects.create_user(**validated_data)
+        profile = JRSProfile.objects.create(**profile_data, user=user)
+        return user
 
     def get_profile(self, obj):
         try:
@@ -30,42 +38,6 @@ class UserSerializer(serializers.ModelSerializer):
         except:
             p = None
         return ProfileSerializer(p).data
-
-
-# class UserSerializerWithToken(serializers.ModelSerializer):
-#     token = serializers.SerializerMethodField()
-#     password = serializers.CharField(write_only=True)
-#     profile = serializers.SerializerMethodField()
-#     class Meta:
-#         model = User
-#         fields = ['id','first_name', 'last_name', 'username', 'email', 'password', 'token', 'profile']
-
-#     def get_token(self, obj):
-#         token = RefreshToken.for_user(obj)
-#         return str(token.access_token)
-
-#     def get_profile(self, obj):
-#         try:
-#             p = Profile.objects.get(user=obj.id)
-#         except:
-#             p = None
-#         return ProfileSerializer(p).data
-
-#     def create(self, validated_data):
-#         user = User.objects.create_user(**validated_data)
-#         return user
-
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-
-     @classmethod
-     def get_token(cls, user):
-         print(f"\033[92m CustomTokenObtainPairSerializer  \033[0m")
-         token = super().get_token(user)
-         token['username'] = user.username
-         return token
-     
-
-
 
 class CompanyRegSerializer(serializers.ModelSerializer):
     class Meta:
@@ -97,17 +69,7 @@ class DisciplineSerializer(serializers.ModelSerializer):
         model = Discipline
         fields = ['id', 'name']
     
-# class DynamicSkillsSerializer(serializers.Serializer):
-#     def to_representation(self, instance):
-#         if self.context['request'].method == 'GET':
-#             serializer = SkillSerializer(instance, many=True)
-#         else:
-#             serializer = SkillSerializer(instance, many=True, fields=['id'])
-#         return serializer.data
-
 class JobRegSerializer(serializers.ModelSerializer):
-    # skills = SkillSerializer(many=True)
-    # skills = serializers.ListField(child=serializers.IntegerField())
     skills = SkillSerializer(many=True, read_only=True)
     ws = serializers.ListField(child=serializers.IntegerField(), write_only=True)
     degrees = DegreeSerializer(many=True, read_only=True)
@@ -116,17 +78,12 @@ class JobRegSerializer(serializers.ModelSerializer):
     wdis = serializers.ListField(child=serializers.IntegerField(), write_only=True)
     domain = serializers.IntegerField(write_only=True)
     wjob_city = serializers.ListField(child=serializers.IntegerField(), write_only=True)
-    # comp = serializers.IntegerField(write_only=True)
-    # company = serializers.PrimaryKeyRelatedField(queryset=Company.objects.all())
     class Meta:
         model = Job
         fields = ['id', 'designation', 'num_vacancies', 'salary_range_min', 'salary_range_max', 
                   'description', 'key_job_responsibilities','requirements', 'domain', 'skills' ,'ws', 'degrees', 'disciplines',
                   'wdis', 'wdeg', 'wjob_city']
-        # extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
-        # read_only_fields = ['id', 'date_created', 'skills']
         read_only_fields = ['id', 'date_created']
-        # write_only_fields = ['ws']
         
     def create(self, validated_data):   
         skills_data = validated_data.pop('ws')
@@ -168,30 +125,16 @@ class CompanyRegistrationSerializer(serializers.Serializer):
     filter_state = serializers.ListField(child=serializers.IntegerField())
     filter_city = serializers.ListField(child=serializers.IntegerField())
     years = serializers.ListField(child=serializers.IntegerField(), write_only=True)
-    # job_city = serializers.ListField(child=serializers.IntegerField(), write_only=True)
     def create(self, validated_data):
-        print(f"\033[97m inside CompanyRegistrationSerializer \033[0m")
-        print(f"\033[94m validated_data : {validated_data} \033[0m")
         company_data = validated_data.pop('company')
         user_data = validated_data.pop('user')
         job_data = validated_data.pop('job')
         company_serializer = CompanyRegSerializer(data=company_data)
         company_serializer.is_valid(raise_exception=True)
         company = company_serializer.save()
-
-        print(f"\033[94m company : {company} \033[0m")
-        print(f"\033[94m type company : {type(company)} \033[0m")
-        
         user_serializer = UserRegSerializer(data=user_data)
         user_serializer.is_valid(raise_exception=True)
         user = user_serializer.save()
-
-        print(f"\033[94m user : {user} \033[0m")
-        
-        # job_data['company'] = company
-        # print(f"\033[91m job_data['company_id'] : {job_data['company_id']} \033[0m")
-        print(f"\033[91m company id : {company.id} \033[0m")
-        print(f"\033[4m job_data : {job_data} \033[0m")
         job_serializer = JobRegSerializer(data=job_data)
         try:
             job_serializer.is_valid(raise_exception=True)
@@ -203,10 +146,8 @@ class CompanyRegistrationSerializer(serializers.Serializer):
         
         mandatory_foss = validated_data.pop('mandatory_foss')
         optional_foss = validated_data.pop('optional_foss')
-        print(f"\033[94m mandatory_foss : {mandatory_foss} \033[0m")
         JobFoss.objects.bulk_create([JobFoss(job=job, foss_id=foss_id, type='Mandatory') for foss_id in mandatory_foss])
         JobFoss.objects.bulk_create([JobFoss(job=job, foss_id=foss_id, type='Optional') for foss_id in optional_foss])
-        print(f"\033[94m job 1: {job} \033[0m")
 
         filter_state = validated_data.pop('filter_state')
         filter_city = validated_data.pop('filter_city')
@@ -215,9 +156,6 @@ class CompanyRegistrationSerializer(serializers.Serializer):
         
         years = validated_data.pop('years')
         JobFilterYear.objects.bulk_create([JobFilterYear(job=job, year=year) for year in years])
-
-        
-        # filter_city = validated_data.pop('filter_city')
 
         return {
             'company': company,
@@ -228,3 +166,17 @@ class CompanyRegistrationSerializer(serializers.Serializer):
             'filter_state': filter_state,
             'filter_city': filter_city
         }
+    
+
+#----------------------------------- Serializers V2 -----------------------------------#
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        roles = [group.name for group in user.groups.all()]
+        token['roles'] = roles
+        token['email'] = user.email
+        token['user_id'] = user.id
+        token['name'] = f"{user.first_name} {user.last_name}"
+        return token

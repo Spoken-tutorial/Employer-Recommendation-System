@@ -33,7 +33,7 @@ urlpatterns = [
     path('job_application_status/', JobAppStatusListView.as_view(), name='job-app-status'),
     path('job_application_status/<int:id>/', views.job_app_details, name='job-app-detail'),
     path('check_mail_status/<int:id>/', views.check_mail_status, name='check_mail_status'),
-    path('logout', views.handlelogout, name='logout'),
+    path('logout1', views.handlelogout, name='logout'),
     path('<pk>/document', views.document_view, name='document_view'), #resume & cover_letter as 'type' query
     ################### Degree urls : currently only accessible to MANAGER Role : Set conditions via admin
     path('add_degree/', DegreeCreateView.as_view(), name='add_degree'),
@@ -77,7 +77,7 @@ urlpatterns = [
     # path('degree/<slug:slug>/', CompanyDetailView.as_view(), name='company-detail'),
     
     ################### public urls
-    path('companies',CompanyList.as_view(),name='companies'),
+    path('companies',CompanyList.as_view(),name='companies-list'),
 
     #API for registration
     path('api/register/',RegistrationView.as_view(),name='register'),
@@ -86,12 +86,30 @@ urlpatterns = [
     path('api/utils/cities/',get_cities_from_states,name='get-cities-from-state'),
     
     #API for companies
-    path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
+    # path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
     path('api/companies/<int:pk>',CompanyViewSet.as_view({'get': 'retrieve'}),name='company-patch'),
 
     #API for jobs
     path('api/jobs/',JobView.as_view(),name='jobs'),
     path('api/jobs/<int:pk>',JobView.as_view(),name='jobs-patch'),
 
-    
+    #----------------------------------- APIs V2 -----------------------------------#
+    path('api/homepage', HomepageView.as_view(), name='homepage'),
+    # path('api/companies/',CompanyView.as_view(),name='companies'),
+    path('api/students/<int:pk>/dashboard',StudentHomepageView.as_view(),name='companies'),
+    path('api/students/<int:pk>/events',StudentJobView.as_view(),name='companies'),
+    path('api/students/<int:pk>/profile',StudentProfileView.as_view(),name='companies'),
+    path('api/companies/<int:pk>/jobs',CompanyJobView.as_view(),name='companies'),
+    path('api/admin/companies',AdminCompanyView.as_view(),name='companies'),
+    path('api/admin/jobs',AdminJobView.as_view(),name='companies'),
+    path('api/admin/students',AdminStudentView.as_view(),name='students'), # ToDo Later
+    path('api/admin/events',AdminEventsView.as_view(),name='companies'),
+
+    ################### v2 APIs ###################
+    path('api/job-data/',JobFormData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    # path('api/companies/',CompanyRegistrationData.as_view(),name='job-data'), #API to register a new company from public company registration form
+    path('api/companies/',CompanyView.as_view(),name='job-data'), #API to register a new company from public company registration form
+    path('api/company/manager/jobs/',CompanyManagerJobsView.as_view(),name='jobs'), #API to list jobs corresponding to logged in company manager
+    path('api/company/manager/jobs/<str:pk>',JobDetailView.as_view(),name='job-detail'), #API to get job detail
+
 ]

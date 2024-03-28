@@ -1,9 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import { Box } from "@mui/material";
-import Button from "@mui/material/Button";
 import Grid from "@mui/material/Grid";
-import { Link } from "react-router-dom";
 import GallerySectionLayout from "./gallerySectionLayout";
 import GalleryCardLayout from "./galleryCardLayout";
 
@@ -11,13 +8,6 @@ function FeaturedGalleryCards(props) {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-        <Link to="gallery/view-all" style={{ textDecoration: "none" }}>
-          <Button size="small" variant="text">
-            View all
-          </Button>
-        </Link>
-      </Box>
       <Grid
         container
         direction="row"

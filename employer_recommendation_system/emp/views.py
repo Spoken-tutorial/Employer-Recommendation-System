@@ -54,8 +54,9 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from django.db.models import Prefetch
 from accounts.models import Profile
-from .filters import CompanyFilter
-from .serializers import CompanySerializer, JobSerializer
+from .filters import CompanyFilter, JobFilter, StudentFilter
+from events.filters import EventFilter
+from .serializers import CompanyRegistrationSerializer, JobSerializer
 
 @check_user
 def document_view(request,pk):
@@ -763,7 +764,6 @@ def job_app_details(request,id):
     context['mass_mail']=settings.MASS_MAIL
 
     #stats
-    
     return render(request,'emp/job_app_status_detail.html',context)
 
 
@@ -1610,4 +1610,225 @@ class JobView(APIView):
         except Exception as e:
             return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'message': 'Company updated successfully.'}, status=status.HTTP_200_OK)
+
+
+#----------------------------------- View V2 -----------------------------------#
+from .serializers import EventSerializer, CompanyDataSerializer
+from events.serializers import TestimonialSerializer, GalleryImageSerializer, JobFairSerializer
+from events.models import Event, Testimonial, GalleryImage
+from random import sample
+from rest_framework.pagination import PageNumberPagination
+from .utility import StudentService
+from emp.serializers import StudentDetailSerializer, StudentSerializer
+from rest_framework import permissions
+
+class HomepageView(APIView):
+    def get(self, request):
+        data = {
+            'past_events': self.get_past_events(),
+            'upcoming_events': self.get_upcoming_events(),
+            'companies': self.get_random_companies(),
+            'testimonials':self.get_testimonials(),
+            'gallery_images': self.get_gallery_images()
+        }
+        return Response(data, status=status.HTTP_200_OK)
+        
+    def get_past_events(self):
+        events = Event.objects.filter(show_on_homepage=True, end_date__lt=datetime.date.today())[:6]
+        return EventSerializer(events, many=True).data
+    
+    def get_upcoming_events(self):
+        upcoming_events = Event.objects.filter(end_date__gte=datetime.date.today(), show_on_homepage=True)
+        return EventSerializer(upcoming_events, many=True).data
+
+    def get_random_companies(self):
+        companies = Company.objects.filter(show_on_homepage=True).prefetch_related('domain')
+        companies = sample(list(companies), 6) #Random companies from the list
+        return CompanyDataSerializer(companies, many=True).data
+
+    def get_testimonials(self):
+        testimonials = Testimonial.objects.filter(display_on_homepage=True)[:4]
+        return TestimonialSerializer(testimonials, many=True).data
+
+    def get_gallery_images(self):
+        gallery_images = GalleryImage.objects.filter(display_on_homepage=True)[:8]
+        return GalleryImageSerializer(gallery_images, many=True).data
+
+class BaseListView(APIView):
+    model = None
+    serializer_class = None
+    filter_class = None
+    page_size = 10 # Change to 50 before commit
+    queryset = None
+    
+
+    def get(self, request):
+        try:
+            # queryset = self.model.objects.all()
+            filtered_queryset = self.filter_class(request.GET, queryset=self.queryset).qs
+            paginator = PageNumberPagination()
+            paginator.page_size = self.page_size
+            paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+            serializer = self.serializer_class(paginated_queryset, many=True)
+            paginated_response = paginator.get_paginated_response(serializer.data)
+            paginated_response.data['total_page_numbers'] = paginator.page.paginator.num_pages
+            return paginated_response
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class CompanyView(BaseListView):
+    model = Company
+    serializer_class = CompanyDataSerializer
+    filter_class = CompanyFilter
+    queryset = Company.objects.prefetch_related('domain').all()
+
+    def post(self, request):
+        serializer = CompanyRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(f"\033[91m errors : {serializer.errors} \033[0m")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    # def get(self, request):
+    #     try:
+    #         #ToDo Number of job postings for each company
+    #         queryset = Company.objects.prefetch_related('domain').all().order_by('-date_updated')
+    #         filtered_queryset = CompanyFilter(request.GET, queryset=queryset).qs
+    #         paginator = PageNumberPagination()
+    #         paginator.page_size = 2
+    #         paginated_queryset = paginator.paginate_queryset(filtered_queryset, request)
+    #         serializer = CompanyDataSerializer(paginated_queryset, many=True)
+    #         return paginator.get_paginated_response(serializer.data)
+
+    #     except Exception as e:
+    #         return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+class StudentHomepageView(APIView):
+    def get(self, request, pk):
+        data = {
+            **StudentService.get_upcoming_events(),
+            'recommended_jobs': StudentService.get_recommended_jobs(pk)
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+class StudentJobView(APIView):
+    def get(self, request, pk):
+        data = {
+            **StudentService.get_student_events(pk)
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+class StudentProfileView(APIView):
+    def get(self, request, pk):
+        student = Student.objects.get(user_id=pk)
+        return Response(StudentDetailSerializer(student).data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, pk):
+        try:
+            print(f"\033[95m request.data : {request.data} \033[0m")
+            student = Student.objects.get(user_id=pk)
+            serializer = StudentDetailSerializer(student, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({'message': 'Profile updated successfully.'}, status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+
+class CompanyJobView(APIView):
+    def get(self, request, pk):
+        try:
+            company = Company.objects.get(id=pk)
+            jobs = Job.objects.filter(company=company)
+            serializer = JobSerializer(jobs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Company.DoesNotExist:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+class AdminCompanyView(BaseListView):
+    model = Company
+    serializer_class = CompanyDataSerializer
+    filter_class = CompanyFilter
+    queryset = Company.objects.all().prefetch_related('domain').annotate(
+                num_jobs=Count('job')
+            ).order_by('-date_updated'
+            )
+    
+class AdminJobView(BaseListView):
+    model = Job
+    serializer_class = JobSerializer
+    filter_class = JobFilter
+    queryset = Job.objects.all().select_related('domain'
+                                                ).prefetch_related('company').prefetch_related('job_type'
+                                                ).prefetch_related('degree').prefetch_related('discipline'
+                                                ).prefetch_related('skills').order_by('-date_updated')
+
+
+class AdminStudentView(BaseListView):
+    model = Student
+    serializer_class = StudentSerializer
+    filter_class = StudentFilter
+    queryset = Student.objects.all().select_related('user')
+
+class AdminEventsView(BaseListView):
+    model = Event
+    serializer_class = EventSerializer
+    filter_class = EventFilter
+    queryset = Event.objects.all().order_by('-end_date')
+
+################### v2 APIs ###################
+from .utils import get_job_form_data
+from .serializers import JobDetailSerializer, JobDetailListSerializer
+# This endpoint provides data to prepopulate the create job form page with initial data.
+class JobFormData(APIView):
+    def get(self, request):
+        data = get_job_form_data()
+        return Response(data, status=status.HTTP_200_OK)
+    
+class CompanyRegistrationData(APIView):
+    def post(self, request):
+        serializer = CompanyRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            print(f"\033[91m errors : {serializer.errors} \033[0m")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class CompanyManagerJobsView(APIView):
+    def get(self, request):
+        try:
+            user = request.user
+            jobs = JobDetail.objects.filter(added_by=user.id)
+            serializer = JobDetailListSerializer(jobs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class JobDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request, pk):
+        try:
+            job = JobDetail.objects.get(id=pk, added_by=request.user)
+            serializer = JobDetailSerializer(job)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except JobDetail.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": "An error occurred while fetching job details."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def patch(self, request, pk):
+        job = JobDetail.objects.get(id=pk)
+        serializer = JobDetailSerializer(job, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 

@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'utilities',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_simplejwt',
-    'crispy_bootstrap4',
+    # 'crispy_bootstrap4',
     # 'debug_toolbar',
     'silk',
 
@@ -277,11 +277,11 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    # 'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
-
+# Simple JWT configuration
 SIMPLE_JWT = {
-     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
@@ -294,4 +294,6 @@ SIMPLE_JWT = {
 
 if DEBUG:
     SILKY_PYTHON_PROFILER = True
+    # EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
+MOODLE_PASSWORD_SALT=MOODLE_PASSWORD_SALT

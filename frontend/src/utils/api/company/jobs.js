@@ -12,10 +12,10 @@ export async function getJobList(token) {
         Authorization: "Bearer " + token,
       },
     };
-
     const response = await fetch(url, requestOptions);
     if (!response.ok) {
       return { message: response.detail, status: response.status };
+
     }
     const jobsData = await response.json();
     return jobsData;

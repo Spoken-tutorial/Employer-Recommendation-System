@@ -11,7 +11,7 @@ function TextAndBtn() {
       <Grid item>
         <Box>
           <Typography
-            variant="h3"
+            variant="h1"
             gutterBottom
             sx={{
               fontWeight: "bolder",
@@ -30,7 +30,7 @@ function TextAndBtn() {
       </Grid>
       <Grid item>
         <Typography
-          variant="h4"
+          variant="h2"
           gutterBottom
           sx={{
             fontWeight: "bold",
@@ -60,7 +60,7 @@ function TextAndBtn() {
       ></Divider>
       <Grid item>
         <Typography
-          variant="subtitle1"
+          variant="h6"
           gutterBottom
           sx={{ mt: "0.7rem", fontSize: {} }}
         >
@@ -69,10 +69,10 @@ function TextAndBtn() {
         </Typography>
       </Grid>
       <Grid item>
-        <Link to="login">
+        <Link to="company-registration">
           <Button
-            size="small"
-            variant="contained"
+            size="large"
+            variant="outlined"
             sx={{
               backgroundColor: "#054C77",
               color: "#ffffff",
@@ -90,8 +90,9 @@ function TextAndBtn() {
               },
             }}
           >
-            Get Started
+            Company Registration
           </Button>
+          
         </Link>
       </Grid>
     </Grid>
