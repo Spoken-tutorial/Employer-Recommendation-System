@@ -1,20 +1,26 @@
 /* eslint-disable no-undef */
 
 //to get job list
-export async function getJobsByUserId(userId) {
+export async function getJobList(token) {
   try {
-    const response = await fetch(
-      process.env.REACT_APP_API_LINK +
-        `/api/jobs/?format=json&user_id=${userId}`
-    );
+    const url = process.env.REACT_APP_API_LINK + "/api/company/manager/jobs/";
+
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    };
+
+    const response = await fetch(url, requestOptions);
     if (!response.ok) {
-      throw { message: "Failed to fetch jobs", status: response.status };
+      return { message: response.detail, status: response.status };
     }
     const jobsData = await response.json();
     return jobsData;
   } catch (error) {
-    console.error("Error fetching jobs:", error);
-    throw error;
+    return { message: "Error fetching jobs:", error };
   }
 }
 

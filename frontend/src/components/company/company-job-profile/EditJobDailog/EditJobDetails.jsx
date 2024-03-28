@@ -52,50 +52,63 @@ function EditJobDetails({
   useEffect(() => {
     if (data) {
       //extracting skill names from skill ids
-      const filteredSkills = skills.filter((obj) =>
-        data.id.skills.includes(obj.id)
-      );
+      let filteredSkills = [];
+      let filteredDisciplines = [];
+      if (data.id.skills) {
+        filteredSkills = skills.filter((obj) =>
+          data.id.skills.includes(obj.id)
+        );
+        //extracting discipline names from discipline ids
+        filteredDisciplines = disciplines.filter((obj) =>
+          data.id.skills.includes(obj.id)
+        );
+      }
       const skillNames = filteredSkills.map((skill) => skill.name);
-      
-      //extracting discipline names from discipline ids
-      const filteredDisciplines = disciplines.filter((obj) =>
-        data.id.skills.includes(obj.id)
-      );
+
       const disciplineNames = filteredDisciplines.map((skill) => skill.name);
 
       //application date
-      const dateString = data.id.last_app_date;
-      const parts = dateString.split(" ");
-      const monthIndex =
-        new Date(Date.parse(parts[1] + " 1, 2000")).getMonth() + 1;
+      let lastDate = null;
+      if (data.id.last_app_date) {
+        const dateString = data.id.last_app_date;
+        const parts = dateString.split(" ");
+        const monthIndex =
+          new Date(Date.parse(parts[1] + " 1, 2000")).getMonth() + 1;
 
-      const formattedDate = `${parts[2]}-${monthIndex
-        .toString()
-        .padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
-      const lastDate = dayjs(formattedDate);
+        const formattedDate = `${parts[2]}-${monthIndex
+          .toString()
+          .padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
+        lastDate = dayjs(formattedDate);
+      }
 
       // Update state values with data from the 'data' prop
       setJobDesignation(data.id.designation || "");
       setMinSalary(data.id.salary_range_min || "");
       setMaxSalary(data.id.salary_range_max || "");
-      setJobDomain(data.id.domain.name || "");
-      setJobType(data.id.job_type.jobtype || "");
-      setGender(data.id.gender || "");
-      setOfficeState(data.id.job_state || "");
-      setOfficeCity(data.id.city_state || "");
+      setJobDomain(data.id.domain ? data.id.domain.name : "");
+      setJobType(data.id.job_type ? data.id.job_type.jobtype : "");
+      setGender(data.id.gender ? data.id.gender : "");
+      setOfficeState(data.id.job_state ? data.id.job_state : "");
+      setOfficeCity(data.id.city_state ? data.id.city_state : "");
       setSkillName(skillNames || []);
-      setJobDescription(data.id.jobDescription || "");
-      setKeyResponsibilities(data.id.key_job_responsibilities || "");
-      setQualification(data.id.requirements || "");
-      setApplicationDate(lastDate || null);
-      setGradYears(data.id.gradYears || []);
-      setMandatorySkills(data.id.mandatorySkills || []);
-      setOptionalSkills(data.id.optionalSkills || []);
-      setDegree(data.id.degree || []);
+      setJobDescription(data.id.jobDescription ? data.id.jobDescription : "");
+      setKeyResponsibilities(
+        data.id.key_job_responsibilities ? data.id.key_job_responsibilities : ""
+      );
+      setQualification(data.id.requirements ? data.id.requirements : "");
+      setApplicationDate(lastDate ? lastDate : null);
+      setGradYears(data.id.gradYears ? data.id.gradYears : []);
+      setMandatorySkills(
+        data.id.mandatorySkills ? data.id.mandatorySkills : []
+      );
+      setOptionalSkills(data.id.optionalSkills ? data.id.optionalSkills : []);
+      setDegree(data.id.degree ? data.id.degree : []);
       setDiscipline(disciplineNames || []);
-      setStudentLocation(data.id.studentLocation || []);
+      setStudentLocation(
+        data.id.studentLocation ? data.id.studentLocation : []
+      );
     }
-  }, [data]); 
+  }, [data]);
 
   const handleJobDesignationChange = (event) => {
     setJobDesignation(event.target.value);
