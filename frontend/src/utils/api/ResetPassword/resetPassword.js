@@ -39,7 +39,7 @@ export async function resetPassword(email) {
   }
 }
 
-//to set new password
+//to set new password from reset link
 export async function setNewPassword(password, token) {
   const url =
     process.env.REACT_APP_API_LINK + "/api/reset-password/" + token + "/";
@@ -72,6 +72,48 @@ export async function setNewPassword(password, token) {
   } catch (error) {
     return {
       message: "Failed to reset password",
+      status: 500,
+    };
+  }
+}
+
+//to set new password from user's profile
+export async function updatePasswordFromProfile(
+  email,
+  currentPassword,
+  newPassword
+) {
+  const accessToken = localStorage.getItem("access");
+  const url = process.env.REACT_APP_API_LINK + "/api/change-password/";
+  const requestOptions = {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + accessToken,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: email,
+      current_password: currentPassword,
+      new_password: newPassword,
+    }),
+  };
+
+  try {
+    const response = await fetch(url, requestOptions);
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        message: errorData.detail || errorData.error,
+        status: response.status,
+      };
+    }
+    return {
+      message: "Password updated successfully",
+      status: response.status,
+    };
+  } catch (error) {
+    return {
+      message: "Failed to update password",
       status: 500,
     };
   }

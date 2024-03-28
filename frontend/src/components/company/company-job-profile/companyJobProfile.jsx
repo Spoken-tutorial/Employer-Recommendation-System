@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import JobListTable from "./jobListTable";
 import { Link, defer, useLoaderData, Await } from "react-router-dom";
-import { getJobsByUserId } from "../../../utils/api/company/jobs";
+import { getJobList } from "../../../utils/api/company/jobs";
 import { Suspense } from "react";
 import Spinner from "../../common/Spinner";
 
@@ -75,5 +75,5 @@ function CompanyJobProfile() {
 export default CompanyJobProfile;
 export function loader() {
   const token = localStorage.getItem("access");
-  return defer({ jobListData: getJobsByUserId(token) });
+  return defer({ jobListData: getJobList(token) });
 }

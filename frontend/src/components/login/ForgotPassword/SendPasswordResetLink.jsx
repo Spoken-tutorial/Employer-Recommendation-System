@@ -57,29 +57,31 @@ export default function SendPasswordResetLink({ linkSent, linkSentError }) {
             </DialogContentText>
 
             {/* email input */}
-            <TextField
-              autoFocus
-              required
-              margin="dense"
-              id="email"
-              name="email"
-              label="Email Address"
-              disabled={linkSent}
-              type="email"
-              fullWidth
-              variant="standard"
-              sx={{
-                "& .MuiTextInput-root": {
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#002648",
+            {!linkSent ? (
+              <TextField
+                autoFocus
+                required
+                margin="dense"
+                id="email"
+                name="email"
+                label="Email Address"
+                disabled={linkSent}
+                type="email"
+                fullWidth
+                variant="standard"
+                sx={{
+                  "& .MuiTextInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#002648",
+                    },
                   },
-                },
-                "& label.Mui-focused": {
-                  color: "#002648",
-                },
-                mt: "1rem",
-              }}
-            />
+                  "& label.Mui-focused": {
+                    color: "#002648",
+                  },
+                  mt: "1rem",
+                }}
+              />
+            ) : null}
           </DialogContent>
 
           <DialogActions>
