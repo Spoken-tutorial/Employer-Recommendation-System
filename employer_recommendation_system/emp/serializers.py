@@ -586,3 +586,73 @@ class JobDetailSerializer(serializers.ModelSerializer):
 
 
         return instance
+
+
+class JobDetailCreateSerializer(serializers.ModelSerializer):
+    filter_year = serializers.ListField(child=serializers.IntegerField(), required=False)
+    filter_mandatory_skills = serializers.ListField(child=serializers.IntegerField())
+    filter_optional_skills = serializers.ListField(child=serializers.IntegerField())
+    filter_state = serializers.ListField(child=serializers.IntegerField(), required=False)
+    filter_city = serializers.ListField(child=serializers.IntegerField(), required=False)
+
+    REQUIRED_FIELDS = ['designation', 'state_job', 'city_job', 'job_type',
+                  'domain', 'salary_range_min', 'salary_range_max',
+                'description', 'requirements', 'key_job_responsibilities',
+                'last_app_date', 'num_vacancies', 
+                'filter_year', 'filter_mandatory_skills', 'filter_optional_skills',
+                # 'filter_degree' ,'filter_discipline', #ToDo for degree, discipline
+                'filter_state', 'filter_city'
+                  ]
+
+    def validate(self, data):
+        status = data.get('status', 'draft')
+        if status == 'draft':
+            return data
+        else:
+            for field in self.REQUIRED_FIELDS:
+                if not data.get(field):
+                    raise serializers.ValidationError('Please fill all the fields to submit the job application.')
+        return data
+    
+    class Meta:
+        model = JobDetail
+        fields = ['designation', 'state_job', 'city_job', 'job_type',
+                  'domain', 'salary_range_min', 'salary_range_max',
+                'description', 'requirements', 'key_job_responsibilities',
+                'last_app_date', 'num_vacancies', 
+                'filter_year', 'filter_mandatory_skills', 'filter_optional_skills',
+                # 'filter_degree' ,'filter_discipline', #ToDo for degree, discipline
+                'filter_state', 'filter_city','status'
+                  ]
+        extra_kwargs = {
+            'designation' : {'required': False}
+        }
+    def create(self, validated_data):
+        try:
+            filter_year = validated_data.pop('filter_year', [])
+            filter_mandatory_skills = validated_data.pop('filter_mandatory_skills', [])
+            filter_optional_skills = validated_data.pop('filter_optional_skills', [])
+            # filter_degree = validated_data.pop('filter_degree', [])
+            # filter_discipline = validated_data.pop('filter_discipline', [])
+            filter_state = validated_data.pop('filter_state', [])
+            filter_city = validated_data.pop('filter_city', [])
+            
+            with transaction.atomic():
+                instance = super().create(validated_data)
+                year_data = [JobFilterYear(job=instance, year=year) for  year in filter_year]
+                JobFilterYear.objects.bulk_create(year_data)
+                mandatory_skills_data = [ JobFoss(job=instance, foss_id=foss, type='Mandatory') for foss in filter_mandatory_skills]
+                JobFoss.objects.bulk_create(mandatory_skills_data)
+                optional_skills_data = [ JobFoss(job=instance, foss_id=foss, type='Optional') for foss in filter_optional_skills]
+                JobFoss.objects.bulk_create(optional_skills_data)
+                cities = City.objects.filter(id__in=filter_city).values_list('id', 'state_id')
+                location_data = [JobFilterLocation(job=instance, city_id=id, state_id=state) for id, state in cities]
+                saved_state_ids = [x[1] for x in cities]
+                for state in filter_state:
+                    if state not in saved_state_ids:
+                        location_data.append(JobFilterLocation(job=instance, state_id=state, city=None))
+                JobFilterLocation.objects.bulk_create(location_data)
+                return instance
+        except Exception as e:
+            print(e)
+        return None
