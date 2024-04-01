@@ -111,5 +111,7 @@ urlpatterns = [
     path('api/companies/',CompanyView.as_view(),name='job-data'), #API to register a new company from public company registration form
     path('api/company/manager/jobs/',CompanyManagerJobsView.as_view(),name='jobs'), #API to list jobs corresponding to logged in company manager
     path('api/company/manager/jobs/<str:pk>',JobDetailView.as_view(),name='job-detail'), #API to get job detail
-
+    path('api/dashboard/company',CompanyDashboardView.as_view(),name='job-detail'), #API to get company dashboard data
+    # path('api/students/<str:pk>',StudentDetailView.as_view(),name='job-detail'), #API to get job detail
+    path('api/jobs/',JobDetailCreateView.as_view(),name='job-detail'), #API to get company dashboard data
 ]

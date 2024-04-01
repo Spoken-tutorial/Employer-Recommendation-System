@@ -540,7 +540,7 @@ class JobFoss(models.Model):
         ('Mandatory', 'Mandatory'),
         ('Optional', 'Optional'),
     )
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     foss = models.ForeignKey(FossCategory,on_delete=models.CASCADE)
     type = models.CharField(max_length=20, choices=CHOICES, default='Mandatory')
     status = models.BooleanField(default=True)
@@ -553,7 +553,7 @@ class JobFoss(models.Model):
         unique_together = ('job', 'foss',)
     
 class JobGraduatingYear(models.Model):
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     year = models.IntegerField(null=True,blank=True)
 
     class Meta:
@@ -573,7 +573,7 @@ class CompanyManagers(models.Model):
         return str(self.company)+'-'+str(self.user)
     
 class JobFilterState(models.Model):
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     state = models.ForeignKey(State,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -582,7 +582,7 @@ class JobFilterState(models.Model):
         return str(self.job)+'-'+str(self.state)
     
 class JobFilterCity(models.Model):
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     city = models.ForeignKey(City,on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -609,10 +609,21 @@ class JobFilterCity(models.Model):
 #         return str(self.job)+'-'+str(self.discipline)
     
 class JobFilterYear(models.Model):
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
     year = models.IntegerField(null=True,blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return str(self.job)+'-'+str(self.year)
+    
+
+class JobFilterLocation(models.Model):
+    job = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
+    state = models.ForeignKey(State,on_delete=models.CASCADE)
+    city = models.ForeignKey(City,on_delete=models.CASCADE, null=True, blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.job} - {self.state} = {self.city}"

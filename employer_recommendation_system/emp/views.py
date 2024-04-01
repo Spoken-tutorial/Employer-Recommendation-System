@@ -56,7 +56,7 @@ from django.db.models import Prefetch
 from accounts.models import Profile
 from .filters import CompanyFilter, JobFilter, StudentFilter
 from events.filters import EventFilter
-from .serializers import CompanyRegistrationSerializer, JobSerializer
+from .serializers import CompanyRegistrationSerializer, JobSerializer, JobDetailCreateSerializer
 
 @check_user
 def document_view(request,pk):
@@ -1831,4 +1831,31 @@ class JobDetailView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CompanyDashboardView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    def get(self, request):
+        try:
+            company_manager = CompanyManagers.objects.get(user=request.user, status=1)
+            company = company_manager.company
+            data = {
+                'total_jobs' : company.get_job_count(),
+                'active_jobs' : company.get_active_jobs_count(),
+                'total_applicants' : company.get_applicants_count(),
+                'total_shortlisted_applicants' : company.get_shortlisted_applicants_count(),
+                'total_offers_extended' : company.get_total_job_offers_count()
+            }
+        except CompanyManagers.DoesNotExist as e:
+            return Response({"error":'You are not authorized to access this information.'}, status=status.HTTP_403_FORBIDDEN)
+        return Response(data, status=status.HTTP_200_OK)
 
+
+class JobDetailCreateView(APIView):
+    def post(self, request):
+        try:
+            serializer = JobDetailCreateSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+            return Response(status=status.HTTP_201_CREATED)
+        except Exception as e:
+            print(e)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
