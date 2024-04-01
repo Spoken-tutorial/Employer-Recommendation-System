@@ -1,5 +1,7 @@
+from django.db.models import F
 from utilities.models import FossCategory, State
 from .models import Domain, JobType, Discipline, Degree, Skill
+from spoken.models import FossMdlCourses
 import datetime
 
 def get_job_form_data():
@@ -12,7 +14,7 @@ def get_job_form_data():
             'skills': Skill.objects.all().values('id', 'name'),
             'states': State.objects.all().values('id', 'name'),
             'graduation_years': list(range(current_year-2, current_year+3)),
-            'foss': FossCategory.objects.filter(is_learners_allowed=True).values('id', 'foss')
+            'foss' : FossMdlCourses.objects.all().values('foss__id', 'foss__foss').annotate(id=F('foss__id'), foss=F('foss__foss'))
         }
     return data
 

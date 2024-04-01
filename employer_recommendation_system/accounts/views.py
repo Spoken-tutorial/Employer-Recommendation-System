@@ -35,6 +35,7 @@ from rest_framework.decorators import api_view
 from accounts.models import Profile as JRSProfile
 from emp.helper import validate_otp
 from accounts.serializers import CompanyRegistrationSerializer
+from utilities.utils import send_forgot_pwd_mail
 
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
 PASSWORD_MAIL_SENDER = getattr(settings, "NO_REPLY_SPOKEN_MAIL", "no-reply@spoken-tutorial.org")
@@ -534,11 +535,9 @@ class ForgotPasswordView(APIView):
 			user = User.objects.get(email=email)
 			token = PasswordResetTokenGenerator().make_token(user)
 			PasswordResetToken.objects.create(user=user, token=token, expires_at = timezone.now()+timezone.timedelta(hours=24))
-			reset_link = f"{settings.BASE_URL}/reset-password/{token}/"
-			subject = 'JRS Password Reset'
-			message = f"Click the link to reset your password: {reset_link}"
-			from_user = settings.ADMINISTRATOR_EMAIL
-			send_mail(subject, message, from_user, [email], fail_silently=False )
+			reset_link = f"{settings.REACT_APP_BASE_URL}/reset-password/{token}/"
+			send_forgot_pwd_mail(user, reset_link)
+			
 			return Response({'message': 'Password reset email sent'}, status=status.HTTP_200_OK)
 		except User.DoesNotExist :
 			return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
