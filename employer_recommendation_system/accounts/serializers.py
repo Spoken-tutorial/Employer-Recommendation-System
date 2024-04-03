@@ -180,3 +180,21 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['user_id'] = user.id
         token['name'] = f"{user.first_name} {user.last_name}"
         return token
+    
+class CompanyManagerProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    
+    class Meta:
+        model = CompanyManagers
+        fields = ['first_name', 'last_name', 'phone']
+    
+    def update(self, instance, validated_data):
+        user = instance.user
+        user_data = validated_data.get('user', {})
+        user.first_name = user_data.get('first_name', instance.user.first_name)
+        user.last_name = user_data.get('last_name', instance.user.last_name)
+        user.save()
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.save()
+        return instance

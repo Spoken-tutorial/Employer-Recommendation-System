@@ -34,7 +34,7 @@ from django.db import IntegrityError
 from rest_framework.decorators import api_view
 from accounts.models import Profile as JRSProfile
 from emp.helper import validate_otp
-from accounts.serializers import CompanyRegistrationSerializer
+from accounts.serializers import CompanyRegistrationSerializer, CompanyManagerUserProfileSerializer
 from utilities.utils import send_forgot_pwd_mail
 
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
@@ -566,3 +566,16 @@ class ChangePasswordAPIView(APIView):
 			return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)			
 		else:
 			return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+		
+class ProfileUpdateView(APIView):
+	permission_classes = [IsAuthenticated]
+	
+	def patch(self, request):
+		try:
+			instance = CompanyManagers.objects.get(user_id=request.user)
+		except CompanyManagers.DoesNotExist:
+			return Response(status=status.HTTP_404_NOT_FOUND)
+		serializer = CompanyManagerUserProfileSerializer(data=request.data, partial=True, instance=instance)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+		return Response(serializer.data, status=status.HTTP_200_OK)

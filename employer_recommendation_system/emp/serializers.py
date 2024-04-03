@@ -528,65 +528,6 @@ class JobDetailSerializer(serializers.ModelSerializer):
             self.update_student_filter_location(instance, filter_location)
         return instance
 
-    def update1(self, instance, validated_data):
-        skills = validated_data.pop('skills',[])
-        degree = validated_data.pop('degree',[])
-        discipline = validated_data.pop('discipline',[])
-
-        filter_year = validated_data.pop('filter_year_w', [])
-        mandatory_foss = validated_data.pop('mandatory_foss_w', [])
-        optional_foss = validated_data.pop('optional_foss_w', [])
-        filter_location = validated_data.pop('filter_location_w', [])
-        instance.designation = validated_data.get('designation', instance.designation)
-        instance.state_job = validated_data.get('state_job', instance.state_job)
-        instance.city_job = validated_data.get('city_job', instance.city_job)
-        # instance.skills = validated_data.get('skills', instance.skills)
-        instance.domain = validated_data.get('domain', instance.domain)
-        instance.salary_range_min = validated_data.get('salary_range_min', instance.salary_range_min)
-        instance.salary_range_max = validated_data.get('salary_range_max', instance.salary_range_max)
-        instance.job_type = validated_data.get('job_type', instance.job_type)
-        instance.status = validated_data.get('status', instance.status)
-        instance.description = validated_data.get('description', instance.description)
-        instance.requirements = validated_data.get('requirements', instance.requirements)
-        instance.key_job_responsibilities = validated_data.get('key_job_responsibilities', instance.key_job_responsibilities)
-        instance.last_app_date = validated_data.get('last_app_date', instance.last_app_date)
-        instance.num_vacancies = validated_data.get('num_vacancies', instance.num_vacancies)
-
-        instance.skills.clear()
-        instance.skills.add(*skills)
-
-        instance.degree.clear()
-        instance.degree.add(*degree)
-
-        instance.discipline.clear()
-        instance.discipline.add(*discipline)
-
-        instance.save()
-        #filters
-        years = StudentFilterYear.objects.filter(job=instance).delete()
-        if filter_year:
-            year_data = [StudentFilterYear(job=instance, year=year) for year in filter_year]
-            StudentFilterYear.objects.bulk_create(year_data)
-        foss = StudentFilterFoss.objects.filter(job=instance).delete()
-        if mandatory_foss:
-            mandatory_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Mandatory') for foss in mandatory_foss]
-            StudentFilterFoss.objects.bulk_create(mandatory_fosses_data)
-        if optional_foss:
-            optional_fosses_data = [StudentFilterFoss(job=instance, foss_id=foss, type='Optional') for foss in optional_foss]
-            StudentFilterFoss.objects.bulk_create(optional_fosses_data)
-        location = StudentFilterLocation.objects.filter(job=instance).delete()
-        if filter_location:
-            filter_location_data = [
-                StudentFilterLocation(job=instance, state_id=loc.get('state'), city_id=loc.get('city', None)) 
-                if loc.get('city') != 0 else 
-                StudentFilterLocation(job=instance, state_id=loc.get('state'), city=None)
-                for loc in filter_location
-            ]
-            StudentFilterLocation.objects.bulk_create(filter_location_data)
-
-
-        return instance
-
 
 class JobDetailCreateSerializer(serializers.ModelSerializer):
     filter_year = serializers.ListField(child=serializers.IntegerField(), required=False)
