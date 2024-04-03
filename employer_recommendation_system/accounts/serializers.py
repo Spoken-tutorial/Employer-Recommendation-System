@@ -181,7 +181,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['name'] = f"{user.first_name} {user.last_name}"
         return token
     
-class CompanyManagerProfileSerializer(serializers.ModelSerializer):
+class CompanyManagerUserProfileSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     

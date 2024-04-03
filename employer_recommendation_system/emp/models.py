@@ -242,10 +242,11 @@ class Company(models.Model):
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
     email = models.EmailField(null=True,blank=True) #Email for correspondence
     emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
-    address = models.ForeignKey(Location, on_delete=models.CASCADE)
-    state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
-    city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
-    address = models.CharField(max_length=250) #Company Address for correspondence
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    # address = models.ForeignKey(Location, on_delete=models.CASCADE)
+    # state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
+    # city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
+    # address = models.CharField(max_length=250) #Company Address for correspondence
     # state_c = models.ForeignKey(SpokenState,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     # city_c = models.ForeignKey(SpokenCity,on_delete=models.CASCADE,null=True,blank=True) #Company Address for correspondence
     logo = models.ImageField(upload_to='logo/',null=True,blank=True)

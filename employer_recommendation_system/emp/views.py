@@ -1619,9 +1619,10 @@ from events.models import Event, Testimonial, GalleryImage
 from random import sample
 from rest_framework.pagination import PageNumberPagination
 from .utility import StudentService
-from emp.serializers import StudentDetailSerializer, StudentSerializer
+from emp.serializers import StudentDetailSerializer, StudentSerializer, CompanyUpdateSerializer
 from rest_framework import permissions
-
+from .permissions import IsCompanyManagerOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 class HomepageView(APIView):
     def get(self, request):
         data = {
@@ -1859,3 +1860,17 @@ class JobDetailCreateView(APIView):
         except Exception as e:
             print(e)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+class CompanyUpdateView(APIView):
+
+    permission_classes = [IsCompanyManagerOrReadOnly]
+    
+    def patch(self, request, pk):
+        try:
+            instance = Company.objects.get(id=pk)
+        except Company.DoesNotExist:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CompanyUpdateSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)

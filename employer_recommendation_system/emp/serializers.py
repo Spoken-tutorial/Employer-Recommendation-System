@@ -7,6 +7,7 @@ from .mixins import DateFormatterMixin
 from django.db.models import Max
 from django.shortcuts import get_object_or_404
 from .models import *
+from utilities.serializers import LocationSerializer
 
 
 class CompanyManagerSerializer(serializers.ModelSerializer):
@@ -597,3 +598,22 @@ class JobDetailCreateSerializer(serializers.ModelSerializer):
         except Exception as e:
             print(e)
         return None
+
+class CompanyUpdateSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
+    class Meta:
+        model = Company
+        fields = ['name', 'website', 'location', 'description',
+                  'domain', 'company_size' ]
+        
+    def update(self, instance, validated_data):
+        location = validated_data.pop('location', None)
+        if location : 
+            if instance.location:
+                location_serializer = LocationSerializer(instance.location,data=location, partial=True )
+            else:
+                location_serializer = LocationSerializer(data=location )
+            location_serializer.is_valid(raise_exception=True)
+            location_serializer.save()
+        instance = super().update(instance, validated_data)
+        return instance

@@ -87,7 +87,7 @@ urlpatterns = [
     
     #API for companies
     # path('api/companies/',CompanyViewSet.as_view({'get': 'list'}),name='company'),
-    path('api/companies/<int:pk>',CompanyViewSet.as_view({'get': 'retrieve'}),name='company-patch'),
+    # path('api/companies/<int:pk>',CompanyViewSet.as_view({'get': 'retrieve'}),name='company-patch'),
 
     #API for jobs
     path('api/jobs/',JobView.as_view(),name='jobs'),
@@ -114,4 +114,5 @@ urlpatterns = [
     path('api/dashboard/company',CompanyDashboardView.as_view(),name='job-detail'), #API to get company dashboard data
     # path('api/students/<str:pk>',StudentDetailView.as_view(),name='job-detail'), #API to get job detail
     path('api/jobs/',JobDetailCreateView.as_view(),name='job-detail'), #API to get company dashboard data
+    path('api/companies/<int:pk>/',CompanyUpdateView.as_view(),name='job-data'), # to update company details
 ]
