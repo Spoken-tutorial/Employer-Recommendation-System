@@ -658,3 +658,15 @@ class StudentProfileSerializer(serializers.ModelSerializer):
             }
         except StudentMaster.DoesNotExist:
             return None
+        
+    def update(self, instance, validated_data):
+        projects_data = validated_data.pop('projects', None)
+        if projects_data is not None:
+            instance.projects.clear()
+            for project_data in projects_data:
+                project = Project.objects.create(**project_data)
+                instance.projects.add(project)
+        # project_serializer = ProjectSerializer(data=request.data)
+        # print(f"\033[93m projects : {projects} \033[0m")
+        instance = super().update(instance, validated_data)
+        return instance

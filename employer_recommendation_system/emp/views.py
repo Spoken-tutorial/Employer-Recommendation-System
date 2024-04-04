@@ -1883,3 +1883,14 @@ class StudentProfileView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Student.DoesNotExist:
             return Response({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+    def patch(self, request, pk):
+        try:
+            instance = Student.objects.get(id=pk)
+            
+        except Student.DoesNotExist:
+            return Response({'error': 'Company not found.'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = StudentProfileSerializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
