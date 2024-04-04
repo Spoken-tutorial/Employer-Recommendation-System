@@ -1619,7 +1619,7 @@ from events.models import Event, Testimonial, GalleryImage
 from random import sample
 from rest_framework.pagination import PageNumberPagination
 from .utility import StudentService
-from emp.serializers import StudentDetailSerializer, StudentSerializer, CompanyUpdateSerializer
+from emp.serializers import StudentDetailSerializer, StudentSerializer, CompanyUpdateSerializer, StudentProfileSerializer
 from rest_framework import permissions
 from .permissions import IsCompanyManagerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
@@ -1721,7 +1721,7 @@ class StudentJobView(APIView):
         }
         return Response(data, status=status.HTTP_200_OK)
     
-class StudentProfileView(APIView):
+class StudentProfileView1(APIView):
     def get(self, request, pk):
         student = Student.objects.get(user_id=pk)
         return Response(StudentDetailSerializer(student).data, status=status.HTTP_200_OK)
@@ -1874,3 +1874,12 @@ class CompanyUpdateView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class StudentProfileView(APIView):
+    def get(self, request, pk):
+        try:
+            student = Student.objects.get(id=pk)
+            serializer = StudentProfileSerializer(student)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Student.DoesNotExist:
+            return Response({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)

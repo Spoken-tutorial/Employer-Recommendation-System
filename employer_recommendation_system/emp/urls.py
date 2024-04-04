@@ -115,4 +115,5 @@ urlpatterns = [
     # path('api/students/<str:pk>',StudentDetailView.as_view(),name='job-detail'), #API to get job detail
     path('api/jobs/',JobDetailCreateView.as_view(),name='job-detail'), #API to get company dashboard data
     path('api/companies/<int:pk>/',CompanyUpdateView.as_view(),name='job-data'), # to update company details
+    path('api/students/<int:pk>/',StudentProfileView.as_view(),name='job-data'), # to fetch student profile details
 ]

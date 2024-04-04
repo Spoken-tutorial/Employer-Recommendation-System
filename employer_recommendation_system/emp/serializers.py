@@ -617,3 +617,44 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
             location_serializer.save()
         instance = super().update(instance, validated_data)
         return instance
+    
+class StudentProfileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    projects = ProjectSerializer(many=True)
+    education_details  = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Student
+        fields = ['name', 'email', 'phone', 'address', 'alternate_email',
+                  'about', 'joining_immediate', 'avail_for_intern', 'willing_to_relocate',
+                   'skills', 'certifications', 'linkedin' , 'github', 'resume',
+                   'projects', 'education_details' ]
+    
+    def get_spoken_user(self, obj):
+        try:
+            return SpokenUser.objects.get(id=obj.spk_usr_id)
+        except SpokenUser.DoesNotExist:
+            return None
+    
+    def get_name(self, obj):
+        spk_user = self.get_spoken_user(obj)
+        return f"{spk_user.first_name} {spk_user.last_name}" if spk_user else None
+    
+    def get_email(self, obj):
+        spk_user = self.get_spoken_user(obj)
+        return spk_user.email if spk_user else None
+        
+    
+    def get_education_details(self, obj):
+        try:
+            student_master = StudentMaster.objects.select_related('batch').select_related(
+                'batch__academic').select_related(
+                'batch__department').get(student_id = obj.spk_student_id)
+            batch = student_master.batch
+            return {
+                "academic" : batch.academic.institution_name,
+                "department" : batch.department.name
+            }
+        except StudentMaster.DoesNotExist:
+            return None
