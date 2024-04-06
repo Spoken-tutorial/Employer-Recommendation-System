@@ -101,7 +101,7 @@ urlpatterns = [
     path('api/students/<int:pk>/profile',StudentProfileView.as_view(),name='companies'),
     path('api/companies/<int:pk>/jobs',CompanyJobView.as_view(),name='companies'),
     path('api/admin/companies',AdminCompanyView.as_view(),name='companies'),
-    path('api/admin/jobs',AdminJobView.as_view(),name='companies'),
+    # path('api/admin/jobs',AdminJobView.as_view(),name='companies'),
     path('api/admin/students',AdminStudentView.as_view(),name='students'), # ToDo Later
     path('api/admin/events',AdminEventsView.as_view(),name='companies'),
 
@@ -116,4 +116,6 @@ urlpatterns = [
     path('api/jobs/',JobDetailCreateView.as_view(),name='job-detail'), #API to get company dashboard data
     path('api/companies/<int:pk>/',CompanyUpdateView.as_view(),name='job-data'), # to update company details
     path('api/students/<int:pk>/',StudentProfileView.as_view(),name='job-data'), # to fetch student profile details
+    path('api/dashboard/student/<int:pk>',StudentDashboardView.as_view(),name='job-data'), # to fetch student profile details
+    path('api/admin/jobs',AdminJobListView.as_view(),name='job-data'), # to fetch student profile details
 ]

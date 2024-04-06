@@ -44,3 +44,7 @@ class EventFilter(django_filters.FilterSet):
     class Meta:
         model = Event
         fields = ['name', 'start_date', 'end_date']
+
+
+class JobDetailFilter(django_filters.FilterSet):
+    status = django_filters.CharFilter(field_name='status')

@@ -108,6 +108,11 @@ class JobFair(models.Model):
     event = models.ForeignKey(Event,on_delete=models.CASCADE)
     # students = models.ManyToManyField(Student, null=True, blank=True)
 
+    @classmethod
+    def get_upcoming_jobfairs(cls):
+        return cls.objects.filter(event__start_date__gte=date.today())
+
+
     def __str__(self) -> str:
         return self.event.name
     

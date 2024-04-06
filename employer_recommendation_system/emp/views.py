@@ -54,7 +54,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from django.db.models import Prefetch
 from accounts.models import Profile
-from .filters import CompanyFilter, JobFilter, StudentFilter
+from .filters import CompanyFilter, JobFilter, StudentFilter, JobDetailFilter
 from events.filters import EventFilter
 from .serializers import CompanyRegistrationSerializer, JobSerializer, JobDetailCreateSerializer
 
@@ -1619,7 +1619,8 @@ from events.models import Event, Testimonial, GalleryImage
 from random import sample
 from rest_framework.pagination import PageNumberPagination
 from .utility import StudentService
-from emp.serializers import StudentDetailSerializer, StudentSerializer, CompanyUpdateSerializer, StudentProfileSerializer
+from emp.serializers import StudentDetailSerializer, StudentSerializer, CompanyUpdateSerializer, StudentProfileSerializer, StudentAppliedJobSerializer, StudentRecommendedJobSerializer
+
 from rest_framework import permissions
 from .permissions import IsCompanyManagerOrReadOnly
 from rest_framework.permissions import IsAuthenticated
@@ -1893,4 +1894,24 @@ class StudentProfileView(APIView):
         serializer = StudentProfileSerializer(instance, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class StudentDashboardView(APIView):
+    def get(self, request, pk):
+        student = Student.objects.get(id=pk)
+        applied_jobs = student.get_appiled_jobs()
+        recommeded_jobs = student.get_recommended_jobs()
+        jobfair = JobFair.get_upcoming_jobfairs()
+        data = {
+            "applied_jobs" : StudentAppliedJobSerializer(applied_jobs, many=True).data,
+            "recommeded_jobs" : StudentRecommendedJobSerializer(recommeded_jobs, many=True).data,
+            "events" : JobFairSerializer(jobfair, many=True).data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+from rest_framework.status import HTTP_200_OK
+class AdminJobListView(APIView):
+    def get(self, request):
+        queryset = JobDetail.objects.with_applicants_count()
+        serializer = JobDetailListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

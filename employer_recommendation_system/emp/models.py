@@ -4,13 +4,14 @@ import datetime
 from django.contrib.auth.models import User, Group
 from django.template.defaultfilters import slugify
 from django.urls import reverse
-from spoken.models import AcademicCenter
+from spoken.models import AcademicCenter, FossMdlCourses
 import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
 from utilities.models import FossCategory, State, District, City, InstituteType, Location
-
+from moodle.models import MdlUser, MdlQuizGrades 
+# from .managers import JobDetailManager    
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
 START_YEAR_CHOICES = []
@@ -75,10 +76,6 @@ class Domain(models.Model):
             obj = Domain.objects.get(name=self.name,date_created=self.date_created)
             obj.slug = slugify(obj.id) 
             obj.save()
-    
-    # def get_queryset(self):
-    #     print("******************************* get queryset")
-    #     return super().get_queryset().order_by('name')
 
 class CustomJobTypeManager(models.Manager):
     def get_queryset(self):
@@ -227,8 +224,49 @@ class Student(models.Model):
         url = str(self.id)+'/'+'profile'
         return reverse('student_profile',kwargs={'pk':self.id}) 
     
+    def get_appiled_jobs(self):
+        return JobShortlist.objects.filter(student_id=self.id).order_by('date_updated')[:10]
+
+    def is_qualified_for_job(self,student_scores,job):
+        job_foss_data = StudentFilterFoss.objects.filter(job=job, type="Mandatory").values('foss', 'grade')
+        for foss, grade in job_foss_data:
+            if foss not in student_scores.keys():
+                return False
+            if student_scores[foss] < grade:
+                return False
+            return True
+    
+    def get_recommended_jobs(self): #ToDo Logic For Recommended Jobs
+        available_jobs = JobDetail.get_active_jobs()
+        user = self.user
+        mdl_user = MdlUser.objects.get(email=user.email)
+        mdl_grades = MdlQuizGrades.objects.filter(userid=mdl_user.id).values('quiz', 'grade')
+        quiz_ids = [x['quiz'] for x in mdl_grades]
+        quiz_foss = FossMdlCourses.objects.filter(mdlquiz_id__in=quiz_ids).values('mdlquiz_id', 'foss__id')
+        quiz_foss_map = {}
+        for item in quiz_foss:
+            quiz_foss_map[item['mdlquiz_id']] = item['foss__id']
+        student_scores = {}
+        for item in mdl_grades:
+            quiz = item['quiz']
+            grade = item['grade']
+            fosses = FossMdlCourses.objects.filter(mdlquiz_id=quiz).values_list('foss_id', flat=True)
+            for foss in fosses:
+                
+                try:
+                    student_scores[foss] = grade
+                except Exception as e:
+                    print(e)
+        recommended_jobs = []
+        for job in available_jobs:
+            if self.is_qualified_for_job(student_scores, job):
+                recommended_jobs.add(job)
+        return recommended_jobs
+    
     class Meta:
         ordering = ('-date_created', '-date_updated')
+
+    
 
 class Company(models.Model):
     STATUS_CHOICES = [
@@ -289,6 +327,12 @@ class Foss(models.Model):
     def __str__(self):
         return self.foss
     
+from django.db.models import Count, Prefetch
+class JobDetailManager(models.Manager):
+    def with_applicants_count(self):
+        data = self.get_queryset().select_related('company').annotate(applicants=Count('jobshortlist'))
+        return data
+    
 class JobDetail(models.Model):
     STATUS = [
         ('draft', 'Draft'),
@@ -314,7 +358,8 @@ class JobDetail(models.Model):
     key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
     shift_time = models.CharField(max_length=200,blank=True, null=True)
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
-    last_app_date = models.DateTimeField(verbose_name="Last Application Date", null=True,blank=True)
+    # last_app_date = models.DateTimeField(verbose_name="Last Application Date", null=True,blank=True)
+    last_application_date = models.DateField(null=True,blank=True)
     num_vacancies = models.IntegerField(default=1,blank=True, null=True)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
     degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
@@ -324,8 +369,21 @@ class JobDetail(models.Model):
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
     added_by = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
+
+    objects = JobDetailManager()
     def __str__(self):
         return self.designation
+    
+    @classmethod
+    def get_active_jobs(cls):
+        jobs = cls.objects.filter(status='published', last_application_date__gte=datetime.date.today())
+        return jobs
+    
+    def get_total_applicants(self):
+        return JobShortlist.objects.filter(job_detail_id=self.id).count()
+    
+    class Meta:
+        ordering = ['-date_updated']
 
 class StudentFilterLocation(models.Model):
     job = models.ForeignKey(JobDetail, related_name='location', on_delete=models.CASCADE)
@@ -375,7 +433,7 @@ class StudentFilterInstituteType(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
 
-    
+
 class Job(models.Model):
     STATUS = [
         ('draft', 'Draft'),
