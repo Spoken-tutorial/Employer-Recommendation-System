@@ -101,12 +101,17 @@ class JobFair(models.Model):
     students_placed = models.IntegerField(null=True,blank=True)
     companies = models.ManyToManyField(Company,null=True,blank=True)
     jobs = models.ManyToManyField(Job,null=True,blank=True)
-    venue = models.CharField(max_length=255)
+    # venue = models.CharField(max_length=255)
     type = models.CharField(choices=JOBFAIR_VENUE_TYPE,max_length=100)
     student_last_registration = models.DateField(null=True,blank=True)
     emp_last_registration = models.DateField(null=True,blank=True)
     event = models.ForeignKey(Event,on_delete=models.CASCADE)
     # students = models.ManyToManyField(Student, null=True, blank=True)
+
+    @classmethod
+    def get_upcoming_jobfairs(cls):
+        return cls.objects.filter(event__start_date__gte=date.today())
+
 
     def __str__(self) -> str:
         return self.event.name

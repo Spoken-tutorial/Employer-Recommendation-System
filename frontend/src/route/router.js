@@ -19,7 +19,7 @@ import ViewAllTestimonials, {
   loader as ViewAllTestimonialsLoader,
 } from "../components/Testimonials/viewAllTestimonials";
 import ViewAllGallery from "../components/gallerySection/viewAllGallery";
-
+import AddJobForm, { loader as addJobLoader } from "../components/company/company-job-profile/AddJob"; 
 //login /reset
 import LoginForm, {
   action as LoginAction,
@@ -34,6 +34,7 @@ import StudentLayout, {
   action as StudentLogoutAction,
 } from "../pages/StudentLayout";
 import StudentProfile from "../components/student/student-profile/studentProfile";
+import RegisterCompany, { loader as registerCompanyLoader } from "../components/company/company-registration/RegisterCompany";
 
 //company
 import EmployerLayout, {
@@ -42,22 +43,26 @@ import EmployerLayout, {
 import CompanyJobProfile, {
   loader as jobListLoader,
 } from "../components/company/company-job-profile/companyJobProfile";
-import AddNewJob, {
-  loader as initialFormDataLoader,
-} from "../components/company/company-job-profile/AddNewJobDailog/AddNewJob";
-import EditJobDialog, {
-  loader as EditJobInitialDataLoader,
-} from "../components/company/company-job-profile/EditJobDailog/EditJobDialog";
-import AddNewCompany, {
-  loader as initialCompanyFormDatLoader,
-} from "../components/company/company-registration/AddNewCompany";
-
+// import AddNewJob, {
+//   loader as initialFormDataLoader,
+// } from "../components/company/company-job-profile/AddNewJobDailog/AddNewJob";
+import AddNewJob from "../components/company/company-job-profile/AddNewJobDailog/AddNewJob";
+// import EditJobDialog, {
+//   loader as EditJobInitialDataLoader,
+// } from "../components/company/company-job-profile/EditJobDailog/EditJobDialog";
+// import AddNewCompany, {
+//   loader as initialCompanyFormDatLoader,
+// } from "../components/company/company-registration/AddNewCompany";
+import EmployerDashboard, {loader as empDashboardLoader} from "../components/company/dashboard/EmployerDashboard";
+import UpdateJob, { loader as JobDataLoader} from "../components/company/company-job-profile/UpdateJob";
 //manager
 import ManagerLayout, {
   action as ManagerLogoutAction,
 } from "../pages/ManagerLayout";
 import FossFilter from "../components/admin/foss-filter/FossFilter";
 import CompanyRegistration, { loader as Cloader, action as Caction} from "../pages/CompanyRegistration";
+import CompanyUserProfile, {loader as companyUserProfileLoader} from "../components/company/company-job-profile/Profile";
+import StudentProfileData from "../components/student/student-profile/studentProfileData";
 
 const router = createBrowserRouter([
   {
@@ -87,8 +92,9 @@ const router = createBrowserRouter([
       { path: "/foss-filter", element: <FossFilter /> },
       {
         path: "/company-registration",
-        element: <AddNewCompany />,
-        loader: initialCompanyFormDatLoader,
+        // element: <AddNewCompany />,
+        element: <RegisterCompany/>,
+        loader: registerCompanyLoader,
       },
       {
         path: "/login",
@@ -119,6 +125,9 @@ const router = createBrowserRouter([
     children: [
       { path: "dashboard", element: <UnderDevelopmentInfo /> },
       { path: "profile", element: <StudentProfile /> },
+      { path: "student-profile", element: <StudentProfileData /> },
+
+      
       { path: "jobs", element: <UnderDevelopmentInfo /> },
     ],
   },
@@ -145,9 +154,12 @@ const router = createBrowserRouter([
     ),
     action: EmployerLogoutAction,
     children: [
-      { path: "dashboard", element: <UnderDevelopmentInfo /> },
+      { path: "dashboard", element: <EmployerDashboard />, loader: empDashboardLoader },
       { path: "jobs", element: <CompanyJobProfile />, loader: jobListLoader },
-      { path: "profile", element: <UnderDevelopmentInfo /> },
+      // { path: "profile", element: <UnderDevelopmentInfo /> },
+      { path: "profile", 
+      element: <CompanyUserProfile/> ,
+      loader: companyUserProfileLoader},
     ],
   },
   {
@@ -157,16 +169,27 @@ const router = createBrowserRouter([
         <AddNewJob />
       </ProtectedRoute>
     ),
-    loader: initialFormDataLoader,
+    // loader: initialFormDataLoader,
   },
   {
-    path: "/auth/employer/jobs/editJob",
+    path: "/auth/employer/jobs/add",
     element: (
-      <ProtectedRoute accessBy={"auth"} roleAllowed={["EMPLOYER"]}>
-        <EditJobDialog />
+      <ProtectedRoute accessBy={"auth"} roleAllowed={"EMPLOYER"}>
+        <AddJobForm />
       </ProtectedRoute>
     ),
-    loader: EditJobInitialDataLoader,
+    loader: addJobLoader,
+  },
+  {
+    path: "/auth/employer/jobs/editJob/:job_id",
+    element: (
+      <ProtectedRoute accessBy={"auth"} roleAllowed={["EMPLOYER"]}>
+        {/* <EditJobDialog /> */}
+        <UpdateJob/>
+      </ProtectedRoute>
+    ),
+    loader: JobDataLoader,
+    // loader: EditJobInitialDataLoader,
   },
 ]);
 

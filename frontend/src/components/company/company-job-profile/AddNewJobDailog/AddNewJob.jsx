@@ -6,8 +6,9 @@ import Typography from "@mui/material/Typography";
 import Slide from "@mui/material/Slide";
 import JobDetails from "./JobDetails";
 import Avatar from "@mui/material/Avatar";
-import { Link, defer, useLoaderData, Await } from "react-router-dom";
-import { getJobFormInitialData } from "../../../../utils/api/company/jobs";
+// import { Link, defer, useLoaderData, Await } from "react-router-dom";
+import { Link, defer, Await } from "react-router-dom";
+// import { getJobFormInitialData } from "../../../../utils/api/company/jobs";
 import { Suspense } from "react";
 import Spinner from "../../../common/Spinner";
 
@@ -16,7 +17,10 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 
 export default function AddNewJob() {
-  const { initialFormData } = useLoaderData();
+  // const { initialFormData } = useLoaderData();
+  const { initialFormData } = {
+    "skills":[]
+  };
 
   return (
     <React.Fragment>
@@ -123,5 +127,8 @@ export default function AddNewJob() {
   );
 }
 export function loader() {
-  return defer({ initialFormData: getJobFormInitialData() });
+  // return defer({ initialFormData: getJobFormInitialData() });
+  return defer({ initialFormData: {
+    "states" : []
+  } });
 }

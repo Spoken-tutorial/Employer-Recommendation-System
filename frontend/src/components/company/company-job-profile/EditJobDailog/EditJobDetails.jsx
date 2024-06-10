@@ -16,6 +16,7 @@ import MultipleSelectInput from "../../../common/MultipleSelectInput";
 import "../AddNewJobDailog/style.css";
 import CKEditorBox from "../../../common/CKEditor";
 import dayjs from "dayjs";
+// import JobDetails from "../AddNewJobDailog/JobDetails";
 
 function EditJobDetails({
   domains,
@@ -26,6 +27,9 @@ function EditJobDetails({
   skills,
   foss,
   data,
+  handleFormSubmit,
+  JobDetails,
+  setJobDetails
 }) {
   const [jobDesignation, setJobDesignation] = useState("");
   const [maxSalaryHelperText, setMaxSalaryHelperText] = useState("");
@@ -50,21 +54,25 @@ function EditJobDetails({
   const [studentLocation, setStudentLocation] = useState([]);
 
   useEffect(() => {
+    console.log("DATA USEEFFECT");
+    console.log(data);
     if (data) {
       //extracting skill names from skill ids
       const filteredSkills = skills.filter((obj) =>
-        data.id.skills.includes(obj.id)
+        // data.id.skills.includes(obj.id)
+        data.skills.includes(obj.id)
       );
       const skillNames = filteredSkills.map((skill) => skill.name);
       
       //extracting discipline names from discipline ids
       const filteredDisciplines = disciplines.filter((obj) =>
-        data.id.skills.includes(obj.id)
+        // data.id.skills.includes(obj.id)
+        data.discipline.includes(obj.id)
       );
       const disciplineNames = filteredDisciplines.map((skill) => skill.name);
 
       //application date
-      const dateString = data.id.last_app_date;
+      const dateString = data.last_application_date;
       const parts = dateString.split(" ");
       const monthIndex =
         new Date(Date.parse(parts[1] + " 1, 2000")).getMonth() + 1;
@@ -74,34 +82,38 @@ function EditJobDetails({
         .padStart(2, "0")}-${parts[0].padStart(2, "0")}`;
       const lastDate = dayjs(formattedDate);
 
-      // Update state values with data from the 'data' prop
-      setJobDesignation(data.id.designation || "");
-      setMinSalary(data.id.salary_range_min || "");
-      setMaxSalary(data.id.salary_range_max || "");
-      setJobDomain(data.id.domain.name || "");
-      setJobType(data.id.job_type.jobtype || "");
-      setGender(data.id.gender || "");
-      setOfficeState(data.id.job_state || "");
-      setOfficeCity(data.id.city_state || "");
+      
+      setJobDesignation(data.designation || "");
+      setMinSalary(data.salary_range_min || "");
+      setMaxSalary(data.salary_range_max || "");
+      setJobDomain(data.domain || "");
+      setJobType(data.job_type || "");
+      setGender(data.gender || "");
+      setOfficeState(data.state_job || "");
+      setOfficeCity(data.city_job || "");
       setSkillName(skillNames || []);
-      setJobDescription(data.id.jobDescription || "");
-      setKeyResponsibilities(data.id.key_job_responsibilities || "");
-      setQualification(data.id.requirements || "");
+      setJobDescription(data.description || "");
+      setKeyResponsibilities(data.key_job_responsibilities || "");
+      setQualification(data.requirements || "");
       setApplicationDate(lastDate || null);
-      setGradYears(data.id.gradYears || []);
-      setMandatorySkills(data.id.mandatorySkills || []);
-      setOptionalSkills(data.id.optionalSkills || []);
-      setDegree(data.id.degree || []);
+      setGradYears(data.filter_year || []);
+      setMandatorySkills(data.filter_mandatory_skills || []);
+      setOptionalSkills(data.filter_optional_skills || []);
+      setDegree(data.degree || []);
       setDiscipline(disciplineNames || []);
-      setStudentLocation(data.id.studentLocation || []);
+      setStudentLocation(data.studentLocation || []);
     }
   }, [data]); 
 
   const handleJobDesignationChange = (event) => {
-    setJobDesignation(event.target.value);
+    const designnation = event.target.value;
+    setJobDesignation(designnation);
+    setJobDetails({...JobDetails, designation:designnation})
   };
   const handleMinSalaryChange = (event) => {
+    const minSalary = event.target.value;
     setMinSalary(event.target.value);
+    setJobDetails({...JobDetails, salary_range_min:minSalary})
   };
   const handleMaxSalaryChange = (event) => {
     const newMaxSalary = event.target.value;
@@ -118,12 +130,17 @@ function EditJobDetails({
     }
     // Always update the maxSalary state
     setMaxSalary(newMaxSalary);
+    setJobDetails({...JobDetails, salary_range_max:newMaxSalary})
   };
   const handleJobDomainChange = (event) => {
+    const domain = event.target.value;
     setJobDomain(event.target.value);
+    setJobDetails({...JobDetails, domain:domain})
   };
   const handleJobTypeChange = (event) => {
+    const jobType = event.target.value;
     setJobType(event.target.value);
+    setJobDetails({...JobDetails, job_type:jobType})
   };
   const handleGenderChange = (event) => {
     setGender(event.target.value);
@@ -142,6 +159,7 @@ function EditJobDetails({
     <>
       {/* parent box */}
       <Box
+        component="form"
         sx={{
           marginTop: "1rem",
           p: "1rem",
@@ -149,6 +167,7 @@ function EditJobDetails({
           ml: "1rem",
         }}
         id="student-profile"
+        onSubmit={handleFormSubmit}
       >
         {/* page title */}
         <Typography
@@ -222,7 +241,7 @@ function EditJobDetails({
               {domains.map((opt) => (
                 <MenuItem
                   key={opt.id}
-                  value={opt.name}
+                  value={opt.id}
                   sx={{ fontSize: "0.8rem" }}
                 >
                   {opt.name}
@@ -283,7 +302,7 @@ function EditJobDetails({
               {jobTypes.map((opt) => (
                 <MenuItem
                   key={opt.id}
-                  value={opt.jobtype}
+                  value={opt.id}
                   sx={{ fontSize: "0.8rem" }}
                 >
                   {opt.jobtype}

@@ -53,6 +53,13 @@ class UserRegSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'email', 'password', 'username']
         extra_kwargs = {'id': {'read_only': True}, 'date_created': {'read_only': True}}
 
+    def create(self, validated_data):
+        # print(f"\033[95m validated_data : {validated_data} \033[0m")
+        # print(f"\033[95m type validated_data : type : {validated_data} \033[0m")
+        user = User.objects.create_user(**validated_data)
+        return user
+        # return super().create(validated_data)
+
 class SkillSerializer(serializers.ModelSerializer):
     class Meta:
         model = Skill
@@ -170,6 +177,7 @@ class CompanyRegistrationSerializer(serializers.Serializer):
 
 #----------------------------------- Serializers V2 -----------------------------------#
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from emp.models import Student
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -179,4 +187,51 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['email'] = user.email
         token['user_id'] = user.id
         token['name'] = f"{user.first_name} {user.last_name}"
+        token['student_id'] = Student.objects.get(user=user).id if "STUDENT" in roles else None
         return token
+    
+class CompanyManagerUserProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    
+    class Meta:
+        model = CompanyManagers
+        fields = ['first_name', 'last_name', 'phone']
+    
+    def update(self, instance, validated_data):
+        user = instance.user
+        user_data = validated_data.get('user', {})
+        user.first_name = user_data.get('first_name', instance.user.first_name)
+        user.last_name = user_data.get('last_name', instance.user.last_name)
+        user.save()
+        instance.phone = validated_data.get('phone', instance.phone)
+        instance.save()
+        return instance
+    
+
+class CompanyUserProfileSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
+    class Meta:
+        model = Profile
+        fields = ['first_name', 'last_name', 'email', 'phone']
+
+    def update(self, instance, validated_data):
+        print(f"\033[93m validated_data : {validated_data} \033[0m")
+        if 'phone' in validated_data:
+            instance.phone = validated_data.pop('phone')
+            instance.save()
+        user = instance.user
+        if 'user' in validated_data:
+            data = validated_data.pop('user')
+            
+            if 'first_name' in data:
+                user.first_name = data.pop('first_name')
+            if 'last_name' in data:
+                user.last_name = data.pop('last_name')
+            if 'email' in data:
+                user.email = data.pop('email')
+            user.save()
+        
+        return instance

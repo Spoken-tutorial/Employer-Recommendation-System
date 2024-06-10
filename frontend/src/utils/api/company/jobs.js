@@ -1,5 +1,8 @@
 /* eslint-disable no-undef */
 
+import api from "../../auth/axiosInstance";
+// import { defer } from "react-router-dom";
+
 //to get job list
 export async function getJobsByUserId(token) {
   const headers = {
@@ -17,6 +20,7 @@ export async function getJobsByUserId(token) {
       throw { message: "Failed to fetchs jobs", status: response.status };
     }
     const jobsData = await response.json();
+    console.log(jobsData);
     return jobsData;
   } catch (error) {
     console.error("Error fetching jobs:", error);
@@ -25,13 +29,12 @@ export async function getJobsByUserId(token) {
 }
 
 //to get initial job form data
-export async function getJobFormInitialData() {
-  const response = await fetch(
-    process.env.REACT_APP_API_LINK + "/api/job-data/?format=json"
-  );
-  if (!response.ok) {
-    throw { message: "Failed to fetch homepage", status: 500 };
-  }
-  const jsonData = await response.json();
-  return jsonData;
+export async function getJobFormInitialData(job_id) {
+  const endpoint = `${process.env.REACT_APP_API_LINK}api/job-data/${job_id}`;
+  const response = await api.get(endpoint);
+  console.log("response.data");
+  console.log(response.data);
+  return response.data;
+  
+  // return defer({ dashboardData: response.data });
 }

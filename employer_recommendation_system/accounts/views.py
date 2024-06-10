@@ -34,7 +34,7 @@ from django.db import IntegrityError
 from rest_framework.decorators import api_view
 from accounts.models import Profile as JRSProfile
 from emp.helper import validate_otp
-from accounts.serializers import CompanyRegistrationSerializer
+from accounts.serializers import CompanyRegistrationSerializer, CompanyManagerUserProfileSerializer
 from utilities.utils import send_forgot_pwd_mail
 
 SITE_URL = getattr(settings, "SITE_URL", "https://jrs.spoken-tutorial.org/")
@@ -556,7 +556,15 @@ class ResetPasswordView(APIView):
 		modify_user_password(user, email, new_password, token_obj)
 		return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
 
+#Final
 class ChangePasswordAPIView(APIView):
+	"""
+	API view for changing the password of the authenticated user.
+
+    Accepts a POST request with the current password and the new password.
+    Verifies the current password, and if correct, changes it to the new password.
+	"""
+	permission_classes = [IsAuthenticated]
 	def post(self, request):
 		user = request.user
 		current_password = request.data.get('current_password')
@@ -566,3 +574,17 @@ class ChangePasswordAPIView(APIView):
 			return Response({'message': 'Password changed successfully'}, status=status.HTTP_200_OK)			
 		else:
 			return Response({'error': 'Current password is incorrect'}, status=status.HTTP_400_BAD_REQUEST)
+		
+class ProfileUpdateView(APIView):
+	permission_classes = [IsAuthenticated]
+	
+	def patch(self, request):
+		try:
+			instance = CompanyManagers.objects.get(user_id=request.user)
+		except CompanyManagers.DoesNotExist:
+			return Response(status=status.HTTP_404_NOT_FOUND)
+		serializer = CompanyManagerUserProfileSerializer(data=request.data, partial=True, instance=instance)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+		return Response(serializer.data, status=status.HTTP_200_OK)
+	
