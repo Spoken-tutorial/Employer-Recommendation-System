@@ -101,7 +101,7 @@ class JobFair(models.Model):
     students_placed = models.IntegerField(null=True,blank=True)
     companies = models.ManyToManyField(Company,null=True,blank=True)
     jobs = models.ManyToManyField(Job,null=True,blank=True)
-    venue = models.CharField(max_length=255)
+    # venue = models.CharField(max_length=255)
     type = models.CharField(choices=JOBFAIR_VENUE_TYPE,max_length=100)
     student_last_registration = models.DateField(null=True,blank=True)
     emp_last_registration = models.DateField(null=True,blank=True)

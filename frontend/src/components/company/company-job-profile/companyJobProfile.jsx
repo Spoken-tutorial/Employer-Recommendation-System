@@ -1,20 +1,20 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, Button } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import JobListTable from "./jobListTable";
 import { Link, defer, useLoaderData, Await } from "react-router-dom";
 import { getJobsByUserId } from "../../../utils/api/company/jobs";
 import { Suspense } from "react";
 import Spinner from "../../common/Spinner";
-
+import AddIcon from '@mui/icons-material/Add';
 function CompanyJobProfile() {
   const { jobListData } = useLoaderData();
 
   return (
     <>
       <Box sx={{ marginTop: "2rem", p: "1rem", marginBottom: "6rem" }}>
-        <Typography
+        {/* <Typography
           variant="h3"
           gutterBottom
           sx={{
@@ -24,13 +24,50 @@ function CompanyJobProfile() {
           }}
         >
           Job List
+        </Typography> */}
+       
+
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{
+            fontWeight: "bolder",
+            color: "#054C77",
+            fontSize: { xs: "1.5rem" },
+          }}
+        >
+          Job List
         </Typography>
-        <Divider
+        {
+          <Button
+          component={Link}
+          to="add"
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          style={{ textDecoration: 'none' }}
+          // size="small"
+          sx={{
+            textDecoration: 'none',
+            padding: '4px 8px',  // Adjust the padding to reduce height
+            minHeight: '30px',   // Adjust the minimum height if needed
+            maxHeight: '30px',   // Adjust the maximum height if needed
+        }}
+      >
+          New Job
+      </Button>
+        }
+      </Box>
+      <Divider
           sx={{
             backgroundColor: "#000000",
             mt: "0.3rem",
           }}
         ></Divider>
+
+
         <Box
           sx={{
             display: "flex",
@@ -46,9 +83,26 @@ function CompanyJobProfile() {
               designation, status, creation date and action.
             </Typography>
             {/* add new job action button */}
-            <Link to="addNewJob" style={{ textDecoration: "none" }}>
+            {/* <Link to="addNewJob" style={{ textDecoration: "none" }}>
               New Job +
-            </Link>
+            </Link> */}
+            {/* <Button
+            component={Link}
+            to="add"
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            style={{ textDecoration: 'none' }}
+            // size="small"
+            sx={{
+              textDecoration: 'none',
+              padding: '4px 8px',  // Adjust the padding to reduce height
+              minHeight: '30px',   // Adjust the minimum height if needed
+              maxHeight: '30px',   // Adjust the maximum height if needed
+          }}
+        >
+            New Job
+        </Button> */}
           </Box>
         </Box>
         {/* data grid */}

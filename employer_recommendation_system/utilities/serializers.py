@@ -5,7 +5,7 @@ from utilities.models import City, State
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ['city', 'state', 'address', 'pincode']
+        fields = ['city_id', 'state_id', 'address', 'pincode']
 
     def create(self, validated_data):
         return super().create(validated_data)

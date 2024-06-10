@@ -7,6 +7,10 @@ import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import { Link } from "react-router-dom";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import DraftsIcon from '@mui/icons-material/Drafts';
 //import Chip from "@mui/material/Chip";
 import "./styles.css";
 
@@ -65,47 +69,66 @@ function JobListTable(props) {
       width: 250,
     },
 
-    //status put on hold
-    // {
-    //   field: "jobStatus",
-    //   headerName: "Status",
-    //   renderHeader: () => (
-    //     <Typography
-    //       variant="body1"
-    //       gutterBottom
-    //       sx={{ fontWeight: "bold", mt: "0.5rem" }}
-    //     >
-    //       Status
-    //     </Typography>
-    //   ),
-    //   width: 200,
-    //   renderCell: (params) => {
-    //     const status = params.value;
-    //     return (
-    //       <Chip
-    //         label={status}
-    //         sx={{ p: "0.3rem", fontSize: "0.7rem", height: "1.2rem" }}
-    //         variant="outlined"
-    //         size="small"
-    //         color={
-    //           status == "Approved"
-    //             ? "success"
-    //             : status == "Rejected"
-    //               ? "error"
-    //               : status == "Draft"
-    //                 ? "warning"
-    //                 : status == "Pending"
-    //                   ? "secondary"
-    //                   : "null"
-    //         }
-    //       />
-    //     );
-    //   },
-    // },
+    {
+      field: "status",
+      headerName: "Status",
+      renderHeader: () => (
+        <Typography
+          variant="body1"
+          gutterBottom
+          sx={{ fontWeight: "bold", mt: "0.5rem" }}
+        >
+          Status
+        </Typography>
+      ),
+      renderCell: (params) => {
+        const data = params.value;
+        let IconComponent;
+        let color;
+        let text;
+  
+        switch (data) {
+          case 'published':
+            IconComponent = CheckCircleIcon;
+            color = 'green';
+            text = 'published';
+            break;
+          case 'rejected':
+            IconComponent = CancelIcon;
+            color = 'red';
+            text = 'rejected';
+            break;
+          case 'pending_approval':
+            IconComponent = HourglassEmptyIcon;
+            color = 'orange';
+            text = 'pending';
+            break;
+          case 'draft':
+            IconComponent = DraftsIcon;
+            color = 'blue';
+            text = 'draft';
+            break;
+          default:
+            IconComponent = null;
+            color = 'default';
+            text = "NA";
+        }
+  
+        return (
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            {IconComponent && <IconComponent style={{ color, marginRight: '0.5rem' }} />}
+            <Typography variant="caption" display="block" gutterBottom>
+              {text}
+            </Typography>
+          </div>
+        );
+      },
+      width: 250,
+    },
 
     //created on
     {
-      field: "date_created",
+      field: "formatted_date_created",
       headerName: "Created On",
       renderHeader: () => (
         <Typography
@@ -130,7 +153,7 @@ function JobListTable(props) {
 
     //deadline
     {
-      field: "last_app_date",
+      field: "formatted_last_app",
       headerName: "Deadline",
       renderHeader: () => (
         <Typography
@@ -155,7 +178,7 @@ function JobListTable(props) {
 
     //applicants
     {
-      field: "applicants_count",
+      field: "total_applicants",
       headerName: "Applicants",
       renderHeader: () => (
         <Typography
@@ -215,7 +238,8 @@ function JobListTable(props) {
               }}
             >
               <Link
-                to="editJob"
+                // to="editJob"
+                to={`editJob/${params.row.id}`}
                 state={{ id: params.row }}
                 style={{ textDecoration: "none" }}
               >

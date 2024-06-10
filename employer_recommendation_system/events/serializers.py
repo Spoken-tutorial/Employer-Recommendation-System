@@ -37,7 +37,7 @@ class JobFairSerializer(DateFormatterMixin, serializers.ModelSerializer):
     event = EventSerializer(read_only=True)
     class Meta:
         model = JobFair
-        fields = ['id','event','students_enrolled', 'venue', 'type', 'student_last_registration']
+        fields = ['id','event','students_enrolled',  'type', 'student_last_registration']
         date_fields = ['student_last_registration']
 
 class JobShortlistSerializer(DateFormatterMixin, serializers.ModelSerializer):

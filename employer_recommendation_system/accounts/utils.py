@@ -32,7 +32,8 @@ def reset_mdl_password(email, password):
     except Exception as e:
         print(f"\033[91m Exception : {e} \033[0m")
         pass
-	
+
+# Final
 def modify_user_password(user, email, new_password, token_obj=None):
 	# If user is student, change password in spk & mdl db
 	if user.groups.filter(name='STUDENT').exists():
@@ -44,7 +45,8 @@ def modify_user_password(user, email, new_password, token_obj=None):
 		user.save()
 	if token_obj:
 		token_obj.delete()
-		
+
+# Final		
 def check_user_password(user, current_password):
 	if user.groups.filter(name='STUDENT').exists():
 		try:

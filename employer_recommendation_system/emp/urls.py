@@ -106,16 +106,49 @@ urlpatterns = [
     path('api/admin/events',AdminEventsView.as_view(),name='companies'),
 
     ################### v2 APIs ###################
-    path('api/job-data/',JobFormData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    
     # path('api/companies/',CompanyRegistrationData.as_view(),name='job-data'), #API to register a new company from public company registration form
+    #Final
     path('api/companies/',CompanyView.as_view(),name='job-data'), #API to register a new company from public company registration form
-    path('api/company/manager/jobs/',CompanyManagerJobsView.as_view(),name='jobs'), #API to list jobs corresponding to logged in company manager
+    
+    #Final
     path('api/company/manager/jobs/<str:pk>',JobDetailView.as_view(),name='job-detail'), #API to get job detail
+    #Final
+    path('api/jobs/<str:pk>/change-status/<str:new_status>/',JobStatusChangeView.as_view(),name='job-detail'), #API to change job status
     path('api/dashboard/company',CompanyDashboardView.as_view(),name='job-detail'), #API to get company dashboard data
     # path('api/students/<str:pk>',StudentDetailView.as_view(),name='job-detail'), #API to get job detail
     path('api/jobs/',JobDetailCreateView.as_view(),name='job-detail'), #API to get company dashboard data
     path('api/companies/<int:pk>/',CompanyUpdateView.as_view(),name='job-data'), # to update company details
     path('api/students/<int:pk>/',StudentProfileView.as_view(),name='job-data'), # to fetch student profile details
-    path('api/dashboard/student/<int:pk>',StudentDashboardView.as_view(),name='job-data'), # to fetch student profile details
+    path('api/dashboard/student/<int:pk>',StudentDashboardView.as_view(),name='job-data'), # to fetch student dashboard details
     path('api/admin/jobs',AdminJobListView.as_view(),name='job-data'), # to fetch student profile details
+    path('api/admin/jobs/shortlist/<int:pk>',AdminJobShortListView.as_view(),name='job-data'), # to fetch student profile details
+    #Final
+    path('api/students/jobs/recommended',StudentRecommendedJobListView.as_view(),name='job-data'), # to fetch student profile details
+    #Final
+    path('api/students/jobs/applied',StudentAppliedJobListView.as_view(),name='job-data'), # to fetch student profile details
+    #Final
+    path('api/apply-job',ApplyJobView.as_view(),name='job-data'), # to fetch student profile details
+
+    path('api/profile/employer/<int:user_id>', EmployerProfile.as_view(), name="employer-profile"),
+    # -----------------------------------
+    #Company API
+    #Final
+    path('api/dashboard/employer/', EmployerDashboardView.as_view(), name="employer-profile"), #API to fetch employer dashboard data
+    #Final
+    path('api/company/manager/jobs/',CompanyManagerJobsView.as_view(),name='jobs'), #API to list jobs corresponding to logged in employer
+    #Final
+    path('api/job-data/<int:job_id>',JobDetailData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/job-data/',JobFormData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/job-initial-data/',JobFormInitialData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/profile/company/',CompanyUserData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/profile/company/user/',CompanyUserProfile.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/profile/company/data/',CompanyData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/profile/company/location/',CompanyLocation.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/profile/company/reset-password/',CompanyPasswordReset.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/company-initial-data/',CompanyRegInitialData.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    path('api/register/company/',RegisterCompany.as_view(),name='job-data'), #API to prepopulate job form with initial options data
+    
+    
+    
 ]

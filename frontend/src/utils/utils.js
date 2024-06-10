@@ -38,3 +38,13 @@ export async function handleCityDropdownOpen(states, setCity) {
   console.log("handleCityDropdownOpen");
   console.log("states", states);
 }
+
+export const graduation_years = () => {
+  const range = 4;
+  const years = [];
+  const currentYear = new Date().getFullYear();
+  for(let i = currentYear - range;  i <= currentYear + range ; i++){
+    years.push({ value: i, label: i.toString() });
+  }
+  return years;
+}

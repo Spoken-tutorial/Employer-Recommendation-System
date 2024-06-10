@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 import * as React from "react";
+import { useState } from "react";
+// import { useParams } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -12,11 +14,15 @@ import {
   defer,
   useLoaderData,
   Await,
-  useLocation,
+  // useLocation,
 } from "react-router-dom";
 import { getJobFormInitialData } from "../../../../utils/api/company/jobs";
 import { Suspense } from "react";
 import Spinner from "../../../common/Spinner";
+import api from "../../../../utils/auth/axiosInstance";
+import { Button, Toolbar } from "@mui/material";
+import AppBar from "@mui/material";
+import Toolbar from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -24,10 +30,22 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 
 export default function EditJobDialog() {
   const { initialFormData } = useLoaderData();
-  
-  //getting job data from previour route
-  let { state } = useLocation();
-
+  console.log("initialFormData")
+  console.log(initialFormData)
+  const [jobDetails, setJobDetails] = useState({});
+  console.log("jobDetails")
+  console.log(jobDetails)
+  const handleUpdateJob = async (event) => {
+    event.preventDefault();
+    try {
+      console.log("jobDetails")
+      console.log(jobDetails)
+      const response = await api.patch(`/api/jobs/${jobDetails.id}`, jobDetails);
+      console.log('Update successful', response.data);
+    } catch (error) {
+      console.error('Error updating job', error);
+    }
+  }
   return (
     <React.Fragment>
       <Dialog
@@ -68,7 +86,7 @@ export default function EditJobDialog() {
             </Typography>
 
             {/* cancel button */}
-            <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
+            {/* <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
               <Typography
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
@@ -79,10 +97,10 @@ export default function EditJobDialog() {
               >
                 Cancel
               </Typography>
-            </Link>
-
+            </Link> */}
+            <Button component={Link}  to="/auth/employer/jobs" variant="contained" sx={{backgroundColor: "grey", mr: 1.5, mt: 1.5, mb: 1.5}} >Cancel</Button>
             {/* add button */}
-            <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
+            {/* <Link to="/auth/employer/jobs" style={{ textDecoration: "none" }}>
               <Typography
                 sx={{
                   fontSize: { xs: "0.8rem", sm: "0.9rem", md: "1rem" },
@@ -95,7 +113,8 @@ export default function EditJobDialog() {
               >
                 Update
               </Typography>
-            </Link>
+            </Link> */}
+            <Button variant="contained" color="success" sx={{ mr: 1.5,mt: 1.5, mb: 1.5 }} onClick={handleUpdateJob}>Update Job</Button>
           </Box>
         </AppBar>
 
@@ -113,18 +132,23 @@ export default function EditJobDialog() {
         >
           <Await resolve={initialFormData}>
             {(data) => (
+              
               <>
                 <EditJobDetails
-                  skills={data.skills}
-                  domains={data.domains}
-                  states={data.states}
-                  jobTypes={data.job_types}
-                  disciplines={data.disciplines}
-                  degrees={data.degrees}
-                  graduationYears={data.graduation_years}
-                  foss={data.foss}
-                  data={state}
+                  skills={data.initial_data.skills}
+                  domains={data.initial_data.domains}
+                  states={data.initial_data.states}
+                  jobTypes={data.initial_data.job_types}
+                  disciplines={data.initial_data.disciplines}
+                  degrees={data.initial_data.degrees}
+                  graduationYears={data.initial_data.graduation_years}
+                  foss={data.initial_data.foss}
+                  data={data.job}
+                  handleUpdateJob={handleUpdateJob}
+                  jobDetails={jobDetails}
+                  setJobDetails={setJobDetails}
                 ></EditJobDetails>
+                
               </>
             )}
           </Await>
@@ -133,6 +157,8 @@ export default function EditJobDialog() {
     </React.Fragment>
   );
 }
-export function loader() {
-  return defer({ initialFormData: getJobFormInitialData() });
+export function loader({ params }) {
+  console.log("params")
+  console.log(params)
+  return defer({ initialFormData: getJobFormInitialData(params.job_id) });
 }

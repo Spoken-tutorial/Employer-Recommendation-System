@@ -556,7 +556,15 @@ class ResetPasswordView(APIView):
 		modify_user_password(user, email, new_password, token_obj)
 		return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
 
+#Final
 class ChangePasswordAPIView(APIView):
+	"""
+	API view for changing the password of the authenticated user.
+
+    Accepts a POST request with the current password and the new password.
+    Verifies the current password, and if correct, changes it to the new password.
+	"""
+	permission_classes = [IsAuthenticated]
 	def post(self, request):
 		user = request.user
 		current_password = request.data.get('current_password')
@@ -579,3 +587,4 @@ class ProfileUpdateView(APIView):
 		serializer.is_valid(raise_exception=True)
 		serializer.save()
 		return Response(serializer.data, status=status.HTTP_200_OK)
+	

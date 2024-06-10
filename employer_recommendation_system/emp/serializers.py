@@ -8,14 +8,15 @@ from django.db.models import Max, Prefetch, Count
 from django.shortcuts import get_object_or_404
 from .models import *
 from utilities.serializers import LocationSerializer
+from django.db.models import Q
+from django.contrib.auth.password_validation import validate_password
+from accounts.serializers import UserRegSerializer
 
-
-
-class CompanyManagerSerializer(serializers.ModelSerializer):
+class CompanyManagerSerializer1(serializers.ModelSerializer):
         user = UserSerializer()
         class Meta:
             model = CompanyManagers
-            fields = ['id', 'user', 'company']
+            fields = ['id', 'user', 'company', 'phone']
 
 class DomainSerializer(serializers.ModelSerializer):
     class Meta:
@@ -251,33 +252,40 @@ class StudentSerializer(serializers.ModelSerializer):
         profile = self.get_profile(obj)
         return profile.phone if profile else None
 
+#Final
 class StudentProfileSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
     projects = ProjectSerializer(many=True)
     education_details  = serializers.SerializerMethodField()
 
     class Meta:
         model = Student
-        fields = ['name', 'email', 'phone', 'address', 'alternate_email',
+        fields = ['about', 'joining_immediate', 'avail_for_intern', 'willing_to_relocate',
+                   'skills', 'certifications', 'resume',
+                   'projects', 'education_details' ]
+        
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        print(f"\033[92m 1 \033[0m")
+        groups = user.groups.all().values_list('name', flat=True)
+        print(f"\033[92m 2 \033[0m")
+        if 'STUDENT' in groups or 'MANAGER' in groups:
+            print(f"\033[91m 10 \033[0m")
+            self.fields['name'] = serializers.SerializerMethodField()
+            self.fields['email'] = serializers.SerializerMethodField()
+            self.Meta.fields = ['name', 'email', 'phone', 'address', 'alternate_email',
                   'about', 'joining_immediate', 'avail_for_intern', 'willing_to_relocate',
                    'skills', 'certifications', 'linkedin' , 'github', 'resume',
                    'projects', 'education_details' ]
-    
-    def get_spoken_user(self, obj):
-        try:
-            return SpokenUser.objects.get(id=obj.spk_usr_id)
-        except SpokenUser.DoesNotExist:
-            return None
+        print(f"\033[92m 3 \033[0m")
+        super().__init__(*args, **kwargs)
     
     def get_name(self, obj):
-        spk_user = self.get_spoken_user(obj)
-        return f"{spk_user.first_name} {spk_user.last_name}" if spk_user else None
+        print(f"\033[92m 4 \033[0m")
+        return f"{obj.user.first_name} {obj.user.last_name}" if obj.user else None
     
     def get_email(self, obj):
-        spk_user = self.get_spoken_user(obj)
-        return spk_user.email if spk_user else None
-        
+        print(f"\033[92m 5 \033[0m")
+        return f"{obj.user.email}" if obj.user else None
     
     def get_education_details(self, obj):
         try:
@@ -303,35 +311,34 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-class StudentDahboardJobSerializier(serializers.ModelSerializer):
+class StudentDashboardJobSerializier(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.name')
     class Meta:
         model = JobDetail
-        fields = ['designation', 'company_name']
+        fields = ['id','designation', 'company_name']
 
+#Final
 class StudentAppliedJobSerializer(serializers.ModelSerializer):
-    job_detail = StudentDahboardJobSerializier()
+    job_detail = StudentDashboardJobSerializier()
     applied_on_date = serializers.SerializerMethodField()
     class Meta:
         model = JobShortlist
-        fields = ['job_detail', 'date_created', 'status', 'applied_on_date' ]
-
-    def get_formatted_last_app_date(self, obj):
-        obj.last_app_date.strftime('%Y-%m-%d')
+        fields = ['job_detail', 'app_status', 'applied_on_date' ]
 
     def get_applied_on_date(self, obj):
-        return obj.date_created.strftime('%Y-%m-%d')
+        return obj.date_created.strftime('%d-%B-%Y')
 
 class StudentRecommendedJobSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source='company.name')
     formatted_last_app_date = serializers.SerializerMethodField()
+    job_type = serializers.CharField(source='job_type.jobtype')
     class Meta:
         model = JobDetail
-        fields = ['company_name', 'designation', 'description', 'last_application_date', 'job_type', 'formatted_last_app_date' ]
+        fields = ['id', 'company_name', 'designation', 'description', 'last_application_date', 'job_type', 'formatted_last_app_date' ]
 
     def get_formatted_last_app_date(self, obj):
         if obj.last_application_date:
-            return obj.last_application_date.strftime('%Y-%m-%d')
+            return obj.last_application_date.strftime('%d-%B-%Y')
         return None
 
 #--------------------------------------Job--------------------------------------------------
@@ -373,15 +380,10 @@ class JobRegistrationSerializer(serializers.ModelSerializer):
         return super().to_internal_value(data)  
         
 class JobDetailListSerializer(serializers.ModelSerializer):
-    company = serializers.CharField(source='company.name')
     date_created = serializers.SerializerMethodField()
     last_application_date = serializers.SerializerMethodField()
-    applicants_count = serializers.SerializerMethodField()
+    total_applicants = serializers.IntegerField()
 
-    def get_applicants_count(self, obj):
-        # return obj.get_total_applicants()
-        return obj.applicants
-    
     
     def get_date_created(self, obj):
         return obj.date_created.strftime("%d %B %Y")
@@ -391,9 +393,13 @@ class JobDetailListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = JobDetail
-        fields = ['id', 'designation', 'date_created', 'last_application_date', 'applicants_count', 'company', 'status']
+        # fields = ['id', 'designation', 'date_created', 'last_application_date', 'applicants_count', 'company', 'status']
+        fields = ['id', 'designation', 'date_created', 'last_application_date', 'status', 'total_applicants']
 
-
+class JobDetailCreateSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = JobDetail
+        fields = ['id', 'designation', 'date_created', 'last_application_date', 'status', 'total_applicants']
     
 
 class StudentFilterYearSerializer(serializers.ModelSerializer):
@@ -401,7 +407,7 @@ class StudentFilterYearSerializer(serializers.ModelSerializer):
         model = StudentFilterYear
         fields = ['job', 'year']
 
-class JobDetailSerializer(serializers.ModelSerializer):
+class JobDetailSerializer1(serializers.ModelSerializer):
     date_created = FormattedDateTimeField()
     date_updated = FormattedDateTimeField()
     filter_year = serializers.SerializerMethodField()
@@ -548,8 +554,228 @@ class JobDetailSerializer(serializers.ModelSerializer):
             self.update_student_filter_location(instance, filter_location)
         return instance
 
+#Final
+class JobDetailSerializer(serializers.ModelSerializer):
+    filter_year = serializers.SerializerMethodField()
+    filter_mandatory_skills = serializers.SerializerMethodField()
+    filter_optional_skills = serializers.SerializerMethodField()
+    filter_location = serializers.SerializerMethodField()
+    filter_cities = serializers.SerializerMethodField()
+    filter_states = serializers.SerializerMethodField()
+    date_created = serializers.SerializerMethodField()
+    date_updated = serializers.SerializerMethodField()
+    # last_application_date = serializers.SerializerMethodField()
+    last_app_date = serializers.SerializerMethodField()
+    total_applicants = serializers.IntegerField(read_only=True)  # annotated field
+    class Meta:
+        model = JobDetail
+        fields = '__all__'
 
+    def get_filter_year(self, obj):
+        # print(f"\033[97m INSIDE  get_filter_year\033[0m")
+        return JobFilterYear.objects.filter(job=obj).values_list('year', flat=True)
+    
+    def get_filter_mandatory_skills(self, obj):
+        return JobFoss.objects.filter(job=obj, type="Mandatory").values_list('foss_id', flat=True)
+    
+    def get_filter_optional_skills(self, obj):
+        return JobFoss.objects.filter(job=obj, type="Optional").values_list('foss_id', flat=True)
+    
+    def get_filter_location(self, obj):
+        return JobFilterLocation.objects.filter(job=obj).values('city_id', 'state_id')
+    
+    def get_filter_states(self, obj):
+        return JobFilterLocation.objects.filter(job=obj, city__isnull=True).values_list('state_id', flat=True)
+    
+    def get_filter_cities(self, obj):
+        return JobFilterLocation.objects.filter(job=obj, city__isnull=False).values_list('city_id', flat=True)
+
+    def get_date_created(self, obj):
+        return obj.date_created.strftime('%d %b %Y ') 
+
+    def get_date_updated(self, obj):
+        return obj.date_updated.strftime('%d %b %Y ') 
+    
+    def get_last_app_date(self, obj):
+        return obj.last_application_date.strftime('%d %b %Y ') 
+
+#Final
 class JobDetailCreateSerializer(serializers.ModelSerializer):
+    # Field for all filters which will be used to filter students for a particular job
+    filters = serializers.DictField(child=serializers.ListField(child=serializers.IntegerField()), required=False)
+    state_job = serializers.PrimaryKeyRelatedField(queryset=State.objects.all(), required=False)
+    city_job = serializers.PrimaryKeyRelatedField(queryset=City.objects.all(), required=False)
+
+    class Meta:
+        model = JobDetail
+        exclude = ['date_created', 'date_updated']
+        
+
+    def to_internal_value(self, data):
+        print(f"\033[97m To internale Value : ********* \033[0m")
+        print(f"\033[93m data from to_internal_value: {data} \033[0m")
+        internal_value = super().to_internal_value(data)
+        if 'state_job' in data:
+        #     # internal_value['state_job'] = data.get('state_job').id
+            internal_value['state_job'] = data.get('state_job')
+        if 'city_job' in data:
+        #     # internal_value['state_job'] = data.get('state_job').id
+            internal_value['city_job'] = data.get('city_job')
+
+        return internal_value
+
+    def validate(self, data):
+        print(f"\033[97m data : from validate \033[0m")
+        print(f"\033[97m data from validate: {data} \033[0m")
+        # Validation for salary range
+
+        if data.get('salary_range_min') and data.get('salary_range_max', 0):
+            if data.get('salary_range_min') > data.get('salary_range_max'):
+                raise serializers.ValidationError("Minimum salary must be less than maximum salary value")
+        # Validation for last application date
+        if (data.get('last_application_date', None) and data.get('last_application_date') < datetime.date.today()):
+                raise serializers.ValidationError("Last Application date should be greater than toady")
+        status = data.get('status', 'draft')
+        # if status == 'draft':
+        #     return data
+        # else:
+        #     for field in self.REQUIRED_FIELDS:
+        #         if not data.get(field):
+        #             raise serializers.ValidationError('Please fill all the fields to submit the job application.')
+        state = data.get('state_job', None)
+        city = data.get('city_job', None)
+        print(f"\033[95m state ****** {state} \033[0m")
+        print(f"\033[95m city ****** {city} \033[0m")
+        # if state:
+        #     data['state_job'] = state
+        # if city:
+        #     data['city_job'] = city
+        # print(f"\033[97m  state : {data.get('state_job')} \033[0m")
+        # print(f"\033[97m type state : {type(data.get('state_job'))} \033[0m")
+
+        return data
+    
+    def create(self, validated_data):
+        filters = validated_data.pop('filters', {})
+        try:
+            with transaction.atomic():
+                print(f"\033[97m validated_data from create job: {validated_data} \033[0m")
+                print(f"\033[92m ******* This \033[0m")
+                state_job = validated_data.pop('state_job', None)
+                city_job = validated_data.pop('city_job', None)
+
+                instance = super().create(validated_data)
+                if state_job:
+                    instance.state_job_id = state_job
+
+                if city_job:
+                    instance.city_job_id = city_job
+                if state_job or city_job:
+                    instance.save()
+                print(f"\033[93m 1 ***** \033[0m")
+                self.create_filter_years(instance, filters.get('filter_year', []))
+                print(f"\033[93m 2 ***** \033[0m")
+                self.create_fosses(instance, filters.get('filter_mandatory_skills', []), type="Mandatory")
+                print(f"\033[93m 3 ***** \033[0m")
+                self.create_fosses(instance, filters.get('filter_optional_skills', []), type="Optional")
+                print(f"\033[93m 4 ***** \033[0m")
+                # self.create_locations(instance, filters.get('city', []), filters.get('state', []))
+                self.update_city(instance, filters.get('filter_cities', []))
+                self.update_state(instance, filters.get('filter_states', []))
+                return instance
+        except Exception as e:
+            print(f"\033[91m Exceptionfrom job create  {e} \033[0m")
+            return None
+        
+    def update(self, instance, validated_data):
+        filters = validated_data.pop('filters', {})
+        print(f"\033[93m filters : {filters} \033[0m")
+        try:
+            if "filter_year" in filters:
+                self.update_filter_years(instance, filters.get('filter_year', []))
+            if "filter_mandatory_skills" in filters:
+                self.update_fosses(instance, filters.get('filter_mandatory_skills', []), type="Mandatory")
+            if "filter_optional_skills" in filters:
+                self.update_fosses(instance, filters.get('filter_optional_skills', []), type="Optional")
+            if "filter_cities" in filters:
+                print(f"\033[92m City in filter \033[0m")
+                self.update_city(instance, filters.get('filter_cities', []))
+            if "filter_states" in filters:
+                print(f"\033[92m State in filter \033[0m")
+                self.update_state(instance, filters.get('filter_states', []))
+            
+            instance = super().update(instance, validated_data)
+            return instance
+        except Exception as e:
+            print(f"\033[91m e : {e} \033[0m")
+            return instance
+        
+    # Helper method to create filter years
+    def create_filter_years(self, job_detail, years):
+        year_data = [JobFilterYear(job=job_detail, year=year) for year in years]
+        JobFilterYear.objects.bulk_create(year_data)
+
+    # Helper method to create fosses (skills)
+    def create_fosses(self, job_detail, fosses, type):
+        foss_data = [JobFoss(job=job_detail, foss_id=foss, type=type) for foss in fosses]
+        JobFoss.objects.bulk_create(foss_data)
+
+    # Helper method to create locations
+    def create_locations(self, job_detail, cities, states):
+        city_ids = City.objects.filter(id__in=cities).values_list('id', 'state_id')
+        location_data = [JobFilterLocation(job=job_detail, city_id=id, state_id=state) for id, state in city_ids]
+        saved_state_ids = {state_id for _, state_id in city_ids}
+        for state in states:
+            if state not in saved_state_ids:
+                location_data.append(JobFilterLocation(job=job_detail, state_id=state))
+        JobFilterLocation.objects.bulk_create(location_data)
+
+    # Helper method to update filter years
+    def update_filter_years(self, job_detail, years):
+        JobFilterYear.objects.filter(job=job_detail).delete()
+        self.create_filter_years(job_detail, years)
+
+    # Helper method to update fosses (skills)
+    def update_fosses(self, job_detail, fosses, type):
+        print(f"\033[92m update_fosses: {fosses} \033[0m")
+        JobFoss.objects.filter(job=job_detail, type=type).delete()
+        self.create_fosses(job_detail, fosses, type)
+    
+    # Helper method to update locations
+    def update_locations(self, job_detail, cities, states):
+        JobFilterLocation.objects.filter(job=job_detail).delete()
+        self.create_locations(job_detail, cities, states)
+
+    def update_city(self, job_detail, cities):
+        print(f"\033[93m updating cities : {cities} \033[0m")
+        # Delete existing cities filter locations
+        # job_filter_locations_with_city = JobFilterLocation.objects.exclude(job = job_detail,city__isnull=True)
+        job_filter_locations_with_city = JobFilterLocation.objects.filter(job = job_detail).exclude(city__isnull=True)
+        job_filter_locations_with_city.delete()
+        print(f"\033[92m Deleted the cities \033[0m")
+        # Delete filter locations having state same as incoming city data state
+        new_city_ids = City.objects.filter(id__in=cities).values_list('id', 'state_id')
+        new_state_ids = {state_id for _, state_id in new_city_ids}
+        job_filter_locations_with_new_state = JobFilterLocation.objects.filter(job = job_detail,state_id__in=new_state_ids)
+        job_filter_locations_with_new_state.delete()
+        print(f"\033[92m Deleted the states with incoming cities \033[0m")
+        # Save new city data
+        location_data = [JobFilterLocation(job=job_detail, city_id=id, state_id=state) for id, state in new_city_ids]
+        JobFilterLocation.objects.bulk_create(location_data)
+        print(f"\033[92m saved the data \033[0m")
+
+    def update_state(self, job_detail, states):
+        print(f"\033[93m updating states : {states} \033[0m")
+        # Delete existing state filter locations
+        job_filter_locations_with_state = JobFilterLocation.objects.filter(Q(job = job_detail) & Q(city__isnull=True))
+        job_filter_locations_with_state.delete()
+
+        # Save new state data
+        location_data = [JobFilterLocation(job=job_detail, state_id=state) for state in states]
+        JobFilterLocation.objects.bulk_create(location_data)
+    
+
+class JobDetailCreateSerializer1(serializers.ModelSerializer):
     filter_year = serializers.ListField(child=serializers.IntegerField(), required=False)
     filter_mandatory_skills = serializers.ListField(child=serializers.IntegerField())
     filter_optional_skills = serializers.ListField(child=serializers.IntegerField())
@@ -559,7 +785,7 @@ class JobDetailCreateSerializer(serializers.ModelSerializer):
     REQUIRED_FIELDS = ['designation', 'state_job', 'city_job', 'job_type',
                   'domain', 'salary_range_min', 'salary_range_max',
                 'description', 'requirements', 'key_job_responsibilities',
-                'last_app_date', 'num_vacancies', 
+                'last_application_date', 'num_vacancies', 
                 'filter_year', 'filter_mandatory_skills', 'filter_optional_skills',
                 # 'filter_degree' ,'filter_discipline', #ToDo for degree, discipline
                 'filter_state', 'filter_city'
@@ -580,7 +806,7 @@ class JobDetailCreateSerializer(serializers.ModelSerializer):
         fields = ['designation', 'state_job', 'city_job', 'job_type',
                   'domain', 'salary_range_min', 'salary_range_max',
                 'description', 'requirements', 'key_job_responsibilities',
-                'last_app_date', 'num_vacancies', 
+                'last_application_date', 'num_vacancies', 
                 'filter_year', 'filter_mandatory_skills', 'filter_optional_skills',
                 # 'filter_degree' ,'filter_discipline', #ToDo for degree, discipline
                 'filter_state', 'filter_city','status'
@@ -618,6 +844,14 @@ class JobDetailCreateSerializer(serializers.ModelSerializer):
             print(e)
         return None
 
+class JobShortlistSerializer(serializers.ModelSerializer):
+    full_name = serializers.CharField()
+    email = serializers.EmailField()
+    phone = serializers.CharField(source='student.phone')
+    
+    class Meta:
+        model = JobShortlist
+        fields = ['full_name', 'email', 'phone','job_detail', 'student' ,'date_created','date_updated', 'app_status'  ]
 #--------------------------------------Company--------------------------------------------------
 class CompanyDataSerializer(serializers.ModelSerializer):
     domain = serializers.SerializerMethodField()
@@ -628,9 +862,76 @@ class CompanyDataSerializer(serializers.ModelSerializer):
 
     def get_domain(self, obj):
         return [domain.name for domain in obj.domain.all()]    
-    
 
 class CompanyRegistrationSerializer(serializers.ModelSerializer):
+    user = UserRegSerializer(write_only=True)
+    job = JobDetailCreateSerializer(write_only=True)
+    location = LocationSerializer(write_only=True)
+    
+    class Meta:
+            model = Company
+            fields = ['name', 'website', 'description', 'domain' ,'user', 'job', 'location']
+
+    def create_user(self, user_data):
+        # user_data['username'] = user_data['email']
+        user_serializer = UserRegSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        return user_serializer.save()
+
+    def create_job(self, job_data, company, user):
+        print(f"\033[97m inside create job ********** \033[0m")
+        job_serializer = JobDetailCreateSerializer(data=job_data)
+        print(f"\033[95m Before job_serializer.is_valid ********** \033[0m")
+        job_serializer.is_valid(raise_exception=True)
+        print(f"\033[95m After job_serializer.is_valid ********** \033[0m")
+
+        job = job_serializer.save()
+        print(f"\033[97m saved job ****** \033[0m")
+        job.company = company
+        job.added_by = user
+        job.save()
+        return job 
+    
+    def create_location(self, location_data):
+        print(f"\033[93m location_data : {location_data} \033[0m")
+        location_serializer = LocationSerializer(data=location_data)
+        location_serializer.is_valid(raise_exception=True)
+        location = location_serializer.save()
+        print(f"\033[97m saved location \033[0m")
+        return location
+
+
+    def create(self, validated_data):
+        print(f"\033[92m create of register company \033[0m")
+        user_data = validated_data.pop('user', None)
+        job_data = validated_data.pop('job', None)
+        location_data = validated_data.pop('location', None)
+        if user_data and job_data:
+            with transaction.atomic():
+                print(f"\033[92m in transaction \033[0m")
+                user = self.create_user(user_data)
+                print(f"\033[92m created user \033[0m")
+                validated_data['added_by_id'] = user.id
+                location = self.create_location(location_data)
+                print(f"\033[92m created location : {location} \033[0m")
+                # company = Company.objects.create(**validated_data)
+                # validated_data['location_id'] = location.id
+                company = super().create(validated_data)
+                print(f"\033[92m created company \033[0m")
+                cm = CompanyManagers.objects.create(user=user, company=company, group_id=3)
+                print(f"\033[92m created company manager \033[0m")
+                job = self.create_job(job_data, company, user=user)
+                print(f"\033[92m created job \033[0m")
+                company.location = location
+                company.save()
+                print(f"\033[92m saved company location \033[0m")
+                return company
+    
+
+        # return super().create(validated_data)
+
+
+class CompanyRegistrationSerializer1(serializers.ModelSerializer):
     user = UserSerializer(write_only=True)
     job = JobRegistrationSerializer(write_only=True)
     filter_year = serializers.ListField(child=serializers.IntegerField(), required=False)
@@ -715,9 +1016,65 @@ class CompanyUpdateSerializer(serializers.ModelSerializer):
         instance = super().update(instance, validated_data)
         return instance
     
-        
+#Final
+class EmployerUserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ['id', 'first_name', 'last_name', 'username', 'email']
+        read_only_fields = ['email']
 
+#Final
+class EmployerProfileSerializer(serializers.ModelSerializer):
+    user = EmployerUserSerializer()
+    company = serializers.CharField(source='company.name')
+    date_created = serializers.SerializerMethodField()
+    class Meta:
+        model = CompanyManagers
+        fields = ['user', 'company', 'phone', 'date_created']
 
-# class StudentDashboardSerializier(serializers.ModelSerializer):
-#     class Meta:
-#         pass
+    def get_date_created(self, obj):
+        return obj.date_created.strftime("%d %B %Y")
+    
+    def update(self, instance, validated_data):
+        phone = validated_data.get('phone', None)
+        if phone:
+            instance.phone = validated_data.get('phone')
+            instance.save()
+        user_data = validated_data.pop("user", {})
+        if user_data:
+            user_serializer = UserSerializer(instance.user, data=user_data, partial=True)
+            if user_serializer.is_valid():
+                user_serializer.save()
+        return instance
+    
+
+class CompanyDataSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ['name', 'domain']
+
+class PasswordResetSerializer(serializers.Serializer):
+    current_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])
+    retype_new_password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        print(f"\033[93m Inside validate ************ \033[0m")
+        if attrs['new_password'] != attrs['retype_new_password']:
+            raise serializers.ValidationError({"retype_new_password": "New passwords do not match."})
+        return attrs
+    
+    def validate_current_password(self, value):
+        print(f"\033[93m validate_current_password ************ \033[0m")
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Current password is incorrect.")
+        return value
+    
+    def save(self, **kwargs):
+        print(f"\033[93m save ************ \033[0m")
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user

@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 from django.contrib.auth import logout
 
 from events.models import *
@@ -54,9 +54,17 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status
 from django.db.models import Prefetch
 from accounts.models import Profile
+from accounts.models import Profile as JRSProfile
 from .filters import CompanyFilter, JobFilter, StudentFilter, JobDetailFilter
 from events.filters import EventFilter
-from .serializers import CompanyRegistrationSerializer, JobSerializer, JobDetailCreateSerializer
+from .serializers import CompanyRegistrationSerializer, JobSerializer, JobDetailCreateSerializer, CompanyDataSerializer
+from accounts.serializers import CompanyUserProfileSerializer
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+from django.db.models import F, Func , CharField, Value
+from .permissions import *
 
 @check_user
 def document_view(request,pk):
@@ -1663,10 +1671,13 @@ class BaseListView(APIView):
     page_size = 10 # Change to 50 before commit
     queryset = None
     
-
+    def get_queryset(self):
+        print(f"\033[93m GET QUERYSET  \033[0m")
+        self.queryset = self.model.objects.all()
     def get(self, request):
         try:
             # queryset = self.model.objects.all()
+            queryset = self.get_queryset()
             filtered_queryset = self.filter_class(request.GET, queryset=self.queryset).qs
             paginator = PageNumberPagination()
             paginator.page_size = self.page_size
@@ -1800,32 +1811,97 @@ class CompanyRegistrationData(APIView):
         else:
             print(f"\033[91m errors : {serializer.errors} \033[0m")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-class CompanyManagerJobsView(APIView):
-    def get(self, request):
+
+#Final
+class JobDetailData(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, job_id):
+        data = {}
+        data['initial_data'] = get_job_form_data()
         try:
-            user = request.user
-            jobs = JobDetail.objects.filter(added_by=user.id)
-            serializer = JobDetailListSerializer(jobs, many=True)
+            job = JobDetail.objects.get(added_by=request.user, id=job_id)
+            data['job'] = JobDetailSerializer(job).data
+            # print(f"\033[92m {data} \033[0m")
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"\033[91m {e} \033[0m")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, job_id):
+        job = get_object_or_404(JobDetail,id=job_id)
+        serializer = JobDetailCreateSerializer(job, data=request.data, partial=True)
+        if serializer.is_valid():
+            print(f"\033[92m Patch is validated \033[0m")
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        except:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class JobFormInitialData(APIView):
+    def get(self, request):
+        data = {}
+        data['initial_data'] = get_job_form_data()
+        return Response(data, status=status.HTTP_200_OK)
+    
+class JobStatusChangeView(APIView):
+    """
+    This view class handles the API endpoint for changing the status of a job.
+    The user must be authenticated and have the manager role to access this endpoint.
+    It receives a PUT request with the job's primary key (pk) and the new status.
+    """
+    
+    permission_classes = [IsAuthenticated, JobObjectPermission]
+    
+    def patch(self, request, pk, new_status):
+        try:
+            job = JobDetail.objects.get(pk=pk)
+            job.status = new_status
+            job.save()
+            return Response({"id": job.id, "status": job.status}, status=status.HTTP_200_OK)
+        except JobDetail.DoesNotExist:
+            return Response({"error": "Job not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, pk, new_status):
+        print(f"\033[92m Inside delte \033[0m")
+        try:
+            job = JobDetail.objects.get(id=pk)
+            if job.added_by != request.user:
+                return Response({"error": "You are not authorized to delete this job detail."}, status=status.HTTP_403_FORBIDDEN)
+            job.status = 'deleted'
+            job.save()
+            return Response({"id": job.id, "status": job.status}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class JobDetailView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    
     def get(self, request, pk):
+        print(f"\033[92m GET \033[0m")
+        # print(f"\033[97m request.user : {request.user} \033[0m")
+
+
         try:
             job = JobDetail.objects.get(id=pk, added_by=request.user)
+
             serializer = JobDetailSerializer(job)
             return Response(serializer.data, status=status.HTTP_200_OK)
+            # return Response(job, status=status.HTTP_200_OK)
         except JobDetail.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
+            print(f"\033[91m e : {e} \033[0m")
             return Response({"error": "An error occurred while fetching job details."}, status=status.HTTP_400_BAD_REQUEST)
         
     def patch(self, request, pk):
         job = JobDetail.objects.get(id=pk)
-        serializer = JobDetailSerializer(job, data=request.data, partial=True)
+        # serializer = JobDetailSerializer(job, data=request.data, partial=True)
+        if job.added_by != request.user:
+            return Response({"error": "You are not authorized to edit this job detail."}, status=status.HTTP_403_FORBIDDEN)
+        serializer = JobDetailCreateSerializer(job, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -1877,12 +1953,16 @@ class CompanyUpdateView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 class StudentProfileView(APIView):
+    permission_classes = [IsAuthenticated, StudentPermission]
     def get(self, request, pk):
         try:
-            student = Student.objects.get(id=pk)
-            serializer = StudentProfileSerializer(student)
+            student = Student.objects.select_related('user').prefetch_related('skills').prefetch_related('projects').get(id=pk)
+            print(f"\033[93m 1 \033[0m")
+            serializer = StudentProfileSerializer(student, user=request.user)
+            print(f"\033[93m 2 \033[0m")
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Student.DoesNotExist:
+            print(f"\033[93m 3 \033[0m")
             return Response({"error": "Student not found."}, status=status.HTTP_404_NOT_FOUND)
         
     def patch(self, request, pk):
@@ -1899,19 +1979,316 @@ class StudentProfileView(APIView):
 class StudentDashboardView(APIView):
     def get(self, request, pk):
         student = Student.objects.get(id=pk)
-        applied_jobs = student.get_appiled_jobs()
-        recommeded_jobs = student.get_recommended_jobs()
+        applied_jobs = student.get_appiled_jobs()[:10]
+        recommended_jobs = student.get_recommended_jobs()[:10]
         jobfair = JobFair.get_upcoming_jobfairs()
         data = {
             "applied_jobs" : StudentAppliedJobSerializer(applied_jobs, many=True).data,
-            "recommeded_jobs" : StudentRecommendedJobSerializer(recommeded_jobs, many=True).data,
+            "recommeded_jobs" : StudentRecommendedJobSerializer(recommended_jobs, many=True).data,
             "events" : JobFairSerializer(jobfair, many=True).data
         }
         return Response(data, status=status.HTTP_200_OK)
 
 from rest_framework.status import HTTP_200_OK
-class AdminJobListView(APIView):
+
+class AdminJobListView(BaseListView):
+    model = JobDetail
+    serializer_class = JobDetailListSerializer
+    filter_class = JobDetailFilter
+    queryset = JobDetail.objects.with_applicants_count()
+    # def get(self, request):
+    #     queryset = JobDetail.objects.with_applicants_count()
+    #     serializer = JobDetailListSerializer(queryset, many=True)
+    #     return Response(serializer.data, status=status.HTTP_200_OK)
+from spoken.models import SpokenStudent
+class AdminJobShortListView(APIView):
+    def get(self, request, pk):
+        print(f"\033[95m GET \033[0m")
+        emails = list(JobShortlist.objects.filter(job_detail_id=pk).values_list('student__user__email', flat=True))
+        pass
+
+class StudentRecommendedJobListView(BaseListView):
+   def get(self, request):
+       student = Student.objects.get(id=4)
+       serializer = StudentRecommendedJobSerializer(student.get_recommended_jobs(), many=True)
+       return Response(serializer.data, status=status.HTTP_200_OK)
+#Final   
+class StudentAppliedJobListView(BaseListView):
+   def get(self, request):
+       student = Student.objects.get(id=4)
+       serializer = StudentAppliedJobSerializer(student.get_appiled_jobs(), many=True)
+       return Response(serializer.data, status=status.HTTP_200_OK)
+
+#Final    
+class ApplyJobView(APIView):
+    def post(self, request):
+        student_id = request.data.get('student_id')
+        job_id = request.data.get('job_id')
+        student = Student.objects.get(id=student_id)
+        job = JobDetail.objects.get(id=job_id)
+        recommended_jobs = [x.id for x in student.get_recommended_jobs()]
+        if job_id in recommended_jobs:
+            try:
+                JobShortlist.objects.create(student=student, job_detail=job, spk_user=student.spk_usr_id)
+                return Response({"message": "Successfully applied for the job."}, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"error": "Your profile does not meet eligibility criteria for this job."}, status=status.HTTP_400_BAD_REQUEST)
+    
+from .serializers import *
+class EmployerProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request, user_id):
+        try:
+            cm = CompanyManagers.objects.select_related('user').select_related('company').get(user=request.user)
+            serializer = EmployerProfileSerializer(cm)
+            return Response(serializer.data, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, user_id):
+        try:
+            cm = CompanyManagers.objects.get(user=request.user)
+            serializer = EmployerProfileSerializer(cm, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=HTTP_200_OK)
+            else:
+                return Response({"error": str(serializer.errors)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EmployerDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
-        queryset = JobDetail.objects.with_applicants_count()
-        serializer = JobDetailListSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            # Get jobs added by the authenticated user
+            jobs = JobDetail.objects.filter(added_by=request.user).values('id', 'last_application_date','designation')
+            job_ids = [job['id'] for job in jobs]
+
+            # Get counts of total students who applied for the job & count of students whose application is still in process - i.e neither approved or rejected
+            total_students_count = JobShortlist.objects.filter(job_detail_id__in=job_ids).values('job_detail_id').annotate(count=Count('id')).order_by('job_detail_id')
+            pending_students_count = JobShortlist.objects.filter(job_detail_id__in=job_ids, app_status="Applied").values('job_detail_id').annotate(count=Count('id')).order_by('job_detail_id')
+            
+            # Convert querysets to dictionaries for easier access
+            pending_students_dict = {item['job_detail_id']: item['count'] for item in pending_students_count}
+            total_students_dict = {item['job_detail_id']: item['count'] for item in total_students_count}
+
+            # Prepare job application data
+            job_application_data = []
+            for job in jobs:
+                job_id = job['id']
+                job_application_data.append({
+                    'job_id': job_id,
+                    'designation': job['designation'],
+                    'last_app_date': job['last_application_date'].strftime('%d %b, %Y') if job['last_application_date'] else None,
+                    'total_students': total_students_dict.get(job_id, 0),
+                    'pending_students': pending_students_dict.get(job_id, 0)
+
+                })
+            
+            # Get jobs which are in draft, pending approval or rejected
+            pending_job_status = JobDetail.objects.filter(added_by=request.user, status__in=['draft', 'pending_approval', 'rejected']).values(
+                'id', 'designation', 'status', 'date_created'
+            )
+            pending_job_status_data = []
+            for job in pending_job_status:
+                pending_job_status_data.append({
+                    'id': job['id'],
+                    'designation': job['designation'],
+                    'status': job['status'],
+                    'date_created': job['date_created'].strftime('%d %b, %Y %I:%M %p') if job['date_created'] else None
+                })
+            return Response({
+                "job_application_data": job_application_data,
+                "pending_job_status": pending_job_status_data
+            }, status=HTTP_200_OK)
+        except Exception as e:
+            print(f"\033[91m Returning response : {e} \033[0m")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+#Final   
+class CompanyManagerJobsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            # jobs = JobDetail.objects.filter(added_by=request.user).annotate(total_applicants=Count('jobshortlist'))
+            # serializer = JobDetailSerializer(jobs, many=True)
+
+            jobs = JobDetail.objects.filter(added_by=request.user).annotate(
+                total_applicants=Count('jobshortlist'),
+                  formatted_date_created=Func(
+                    F('date_created'), Value('%d-%b-%Y'),function='DATE_FORMAT', output_field=CharField()
+                ),
+                formatted_last_app=Func(
+                    F('last_application_date'), Value('%d-%b-%Y'),function='DATE_FORMAT', output_field=CharField()
+                ),
+            ).values('id', 'designation', 'total_applicants', 'formatted_date_created', 'formatted_last_app', 'status', 'company__name')
+            
+            return Response(jobs, status=status.HTTP_200_OK)
+            # return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+    
+    # POST method to create a job  
+    def post(self, request):
+        print(f"\033[92m Inside post \033[0m")
+        print(f"\033[93m request.data : {request.data} \033[0m")
+        serializer = JobDetailCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            print(f"\033[91m errors : {serializer.errors} \033[0m")
+            
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class CompanyUserData(APIView):
+    def get(self, request):
+        data = {}
+        data['user'] = {
+            'first_name': 'abc',
+            'last_name': 'xyz',
+            'email': 'abc@gmail.com',
+            'phone': '9810150179'
+        }
+        data['company'] = {
+            'name': 'abc pvt ltd',
+            'domain': 2
+        }
+
+        data['location']= {
+            'state': 12,
+            'district': 2,
+            'city': 3,
+            'pincode': '101010',
+            'address' : 'abc xyz'
+        }
+        data['states'] = State.objects.values('id', 'name')
+        data['districts'] = District.objects.values('id', 'name')
+        data['cities'] = City.objects.values('id', 'name')
+        data['domains'] = Domain.objects.values('id', 'name')
+        
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class CompanyUserProfile(APIView):
+    permission_classes = [IsAuthenticated]
+    def patch(self, request):
+        print(f"\033[92m user : {request.user} \033[0m")
+        try:
+            data = {}
+            print(f"\033[93m request.user : {request.user} \033[0m")
+            profile = JRSProfile.objects.get(user=request.user)
+            
+            print(f"\033[97m profile : {profile} \033[0m")
+            serializer = CompanyUserProfileSerializer(profile, data=request.data, partial=True)
+            print(f"\033[95m 1 \033[0m")
+            if serializer.is_valid():
+                print(f"\033[92m serializer is valid \033[0m")
+                serializer.save()
+                return Response(data, status=HTTP_200_OK)
+            else:
+                print(f"\033[91m error : {serializer.errors} \033[0m")
+                
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"\033[91m error : {e} \033[0m")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class CompanyData(APIView):
+    permission_classes = [IsAuthenticated]
+    def patch(self, request):
+        print(f"\033[92m user : {request.user} \033[0m")
+        try:
+            data = {}
+            company = CompanyManagers.objects.get(user=request.user).company
+            serializer = CompanyDataSerializer(company, data=request.data, partial=True)
+            print(f"\033[95m 1 \033[0m")
+            if serializer.is_valid():
+                print(f"\033[92m serializer is valid \033[0m")
+                serializer.save()
+                return Response(data, status=HTTP_200_OK)
+            else:
+                print(f"\033[91m error : {serializer.errors} \033[0m")
+                
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            print(f"\033[91m error : {e} \033[0m")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class CompanyLocation(APIView):
+    def patch(self, request):
+        try:
+            company = CompanyManagers.objects.get(user=request.user).company
+            try:
+                location = Location.objects.get(id=company.location_id)
+            except Exception as e:
+                location = Location()
+            data = request.data
+            if 'state' in data:
+                location.state_id = data.get('state')
+            if 'district' in data:
+                location.district_id = data.get('district')
+            if 'city' in data:
+                location.city_id = data.get('city')
+            if 'pincode' in data:
+                location.pincode = data.get('pincode')
+            if 'address' in data:
+                location.address = data.get('address')
+            location.save()
+
+                
+            print(f"\033[92m request : {request.data} \033[0m")
+            return Response(data, status=HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class CompanyPasswordReset(APIView):
+    def patch(self, request):
+        try:
+            print(f"\033[92m POST *********** \033[0m")
+            serializer = PasswordResetSerializer(data=request.data, context={'request': request})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"\033[91m e : {e} \033[0m")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class CompanyRegInitialData(APIView):
+    def get(self, request):
+        try:
+            data = {}
+            print(f"\033[92m GET CompanyRegInitialData *********** \033[0m")
+            data['initial_data'] = get_job_form_data()
+            # data['domains'] = get_job_form_data()
+            
+            
+            return Response(data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"\033[91m e : {e} \033[0m")
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class RegisterCompany(APIView):
+    def post(self, request):
+        try:
+            print(f"\033[92m 1: Inside post view \033[0m")
+            print(f"\033[93m {request.data} \033[0m")
+            serializer = CompanyRegistrationSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"detail": "Company profile created successfully."}, status=status.HTTP_200_OK)
+            # return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"\033[91m Exception of post: {e}  \033[0m")
+            error_detail = getattr(e, 'detail', str(e))
+            # return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': error_detail}, status=status.HTTP_400_BAD_REQUEST)
+            

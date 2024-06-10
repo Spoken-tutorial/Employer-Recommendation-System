@@ -225,42 +225,73 @@ class Student(models.Model):
         return reverse('student_profile',kwargs={'pk':self.id}) 
     
     def get_appiled_jobs(self):
-        return JobShortlist.objects.filter(student_id=self.id).order_by('date_updated')[:10]
+        print(f"\033[92m 1 \033[0m")
+        data  = JobShortlist.objects.filter(student_id=self.id).order_by('date_updated')
+        print(f"\033[92m 2 \033[0m")
+        # print(f"\033[93m data get_appiled_jobs : {data} \033[0m")
+        return data
 
+#Final
     def is_qualified_for_job(self,student_scores,job):
-        job_foss_data = StudentFilterFoss.objects.filter(job=job, type="Mandatory").values('foss', 'grade')
-        for foss, grade in job_foss_data:
+         # Retrieve mandatory FOSS requirements for the job
+        job_foss_data = JobFoss.objects.filter(job=job, type="Mandatory").values('foss', 'grade')
+
+        # Check if student meets all mandatory FOSS requirements
+        for requirement in job_foss_data:
+            foss = requirement['foss']
+            grade = requirement['grade']
+            foss = int(foss)
+
+            # Since we are checking mandatory criteria, exit if anyone requirement fails
             if foss not in student_scores.keys():
+                d = list(student_scores.keys())[0]
                 return False
+            # Check if the student has taken the course and achieved at least the required grade
             if student_scores[foss] < grade:
                 return False
             return True
-    
-    def get_recommended_jobs(self): #ToDo Logic For Recommended Jobs
+
+#Final 
+    def get_recommended_jobs(self):
+        # Fetch active jobs and the current user
         available_jobs = JobDetail.get_active_jobs()
         user = self.user
+        print(f"\033[93m available_jobs : {available_jobs} \033[0m")
+        print(f"\033[93m user : {user} \033[0m")
+
+        # Scores are to be compared from moodle ,so get Moodle user details
         mdl_user = MdlUser.objects.get(email=user.email)
         mdl_grades = MdlQuizGrades.objects.filter(userid=mdl_user.id).values('quiz', 'grade')
+
+        # In JRS DB, we are mapping Job requirements with foss id, so it is necessary to map quiz data to foss data
         quiz_ids = [x['quiz'] for x in mdl_grades]
         quiz_foss = FossMdlCourses.objects.filter(mdlquiz_id__in=quiz_ids).values('mdlquiz_id', 'foss__id')
         quiz_foss_map = {}
         for item in quiz_foss:
             quiz_foss_map[item['mdlquiz_id']] = item['foss__id']
+        
+        # Construct a map of FOSS IDs and corresponding grades
         student_scores = {}
         for item in mdl_grades:
             quiz = item['quiz']
             grade = item['grade']
-            fosses = FossMdlCourses.objects.filter(mdlquiz_id=quiz).values_list('foss_id', flat=True)
+            fosses = FossMdlCourses.objects.filter(mdlquiz_id=quiz).values_list('foss_id', flat=True) # this is required because 1 mdlquiz can have 2 similar foss mapped
             for foss in fosses:
-                
                 try:
                     student_scores[foss] = grade
                 except Exception as e:
                     print(e)
+        
+        # Get list of job IDs already applied for
+        applied_jobs = [x.job_detail_id for x in self.get_appiled_jobs()]
+
+        # Filter jobs that the user is qualified for and has not applied to yet
         recommended_jobs = []
         for job in available_jobs:
+            if job.id in applied_jobs:
+                continue
             if self.is_qualified_for_job(student_scores, job):
-                recommended_jobs.add(job)
+                recommended_jobs.append(job)
         return recommended_jobs
     
     class Meta:
@@ -280,7 +311,7 @@ class Company(models.Model):
     emp_name = models.CharField(max_length=200,verbose_name="Company HR Representative Name") #Name of the company representative
     email = models.EmailField(null=True,blank=True) #Email for correspondence
     emp_contact = models.CharField(validators=[phone_regex], max_length=17,verbose_name="Phone Number")
-    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
     # address = models.ForeignKey(Location, on_delete=models.CASCADE)
     # state_c = models.IntegerField(null=True,verbose_name='State (Company Headquarters)',blank=True)
     # city_c = models.IntegerField(null=True,verbose_name='City (Company Headquarters)',blank=True)    
@@ -339,11 +370,13 @@ class JobDetail(models.Model):
         ('pending_approval', 'pending approval'),
         ('published', 'Published'),
         ('closed', 'Closed'),
+        ('deleted', 'Deleted'),
+        ('rejected', 'rejected'),
     ]
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
-    state_job = models.ForeignKey(State, on_delete=models.CASCADE)
-    city_job = models.ForeignKey(City, on_delete=models.CASCADE)
+    state_job = models.ForeignKey(State, on_delete=models.CASCADE, null=True,blank=True)
+    city_job = models.ForeignKey(City, on_delete=models.CASCADE, null=True,blank=True)
     # skills = models.ManyToManyField(Skill, related_name='jobs')
     skills = models.ManyToManyField(Skill, related_name='jobs', null=True, blank=True)
     
@@ -351,7 +384,7 @@ class JobDetail(models.Model):
     salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
     salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
     
-    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
+    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE, null=True,blank=True)
     status = models.CharField(max_length=20, choices=STATUS, default='draft')
     description = RichTextField(null=True,blank=True,verbose_name="Job Description")
     requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
@@ -373,14 +406,15 @@ class JobDetail(models.Model):
     objects = JobDetailManager()
     def __str__(self):
         return self.designation
-    
+    #Final
     @classmethod
     def get_active_jobs(cls):
         jobs = cls.objects.filter(status='published', last_application_date__gte=datetime.date.today())
         return jobs
     
-    def get_total_applicants(self):
-        return JobShortlist.objects.filter(job_detail_id=self.id).count()
+    # @property
+    # def total_applicants(self):
+    #     return JobShortlist.objects.filter(job_detail_id=self.id).count()
     
     class Meta:
         ordering = ['-date_updated']
@@ -510,23 +544,36 @@ class JobShortlist(models.Model): #Record is created when a student applies for 
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
     APPLICATION_STATUS = [
         ('Applied', 'Applied'),
-        ('Shortlisted', 'Shortlisted'),
-        ('Rejected', 'Rejected'),
-        ('Selected', 'Selected'),
+        ('Shortlisted By JRS Admin', 'Shortlisted By JRS Admin'),
+        ('Rejected By JRS Admin', 'Rejected By JRS Admin'),
+        ('Shortlisted By Employer', 'Shortlisted By Employer'),
+        ('Rejected By Employer', 'Rejected By Employer'),
+        ('Job Offered', 'Job Offered'),
+        ('Accepted Offer', 'Accepted Offer'),
+        ('Rejected Offer', 'Rejected Offer'),
     ]
     spk_user=models.IntegerField(null=True)  #spk
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
-    job = models.ForeignKey(Job,on_delete=models.CASCADE)
-    job_detail = models.ForeignKey(JobDetail,on_delete=models.CASCADE)
+    job = models.ForeignKey(Job,on_delete=models.CASCADE, null=True, blank=True)
+    job_detail = models.ForeignKey(JobDetail,on_delete=models.CASCADE, null=True, blank=True)
     date_created = models.DateField(auto_now_add=True, null=True,blank=True)
     date_updated = models.DateTimeField(auto_now=True)
     #0 : student has applied but not yet shortlisted by HR Manager
     #1 : student has applied & shortlisted by HR Manager
     status = models.IntegerField(null=True,blank=True)
-    app_status = models.CharField(max_length=20, choices=APPLICATION_STATUS, default='Applied')
+    app_status = models.CharField(max_length=100, choices=APPLICATION_STATUS, default='Applied')
 
     def __str__(self):
         return str(self.spk_user)+'-'+self.job.title
+
+
+class JobShortlistLog(models.Model):
+    job_shortlist_detail = models.ForeignKey(JobShortlist, on_delete=models.CASCADE)
+    modified_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    previous_status = models.CharField(max_length=100, choices=JobShortlist.APPLICATION_STATUS)
+    status_changed_to = models.CharField(max_length=100, choices=JobShortlist.APPLICATION_STATUS)
 
 class ShortlistEmailStatus(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
