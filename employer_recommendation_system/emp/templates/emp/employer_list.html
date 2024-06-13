@@ -73,7 +73,7 @@
   <tr>
     <td>{{forloop.counter}}</td>
     <td><a href="{% url 'company-detail' slug=company.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ company.name }}</a></td>
-    {% comment %}<td>{{ company.rating }}</td>{% endcomment %}
+    <!-- {% comment %}<td>{{ company.rating }}</td>{% endcomment %} -->
     <td>
       {% for item in company.domain.all %}
         {{item}} {% if not forloop.last %} ,{% endif %}

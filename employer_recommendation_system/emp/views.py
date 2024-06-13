@@ -194,7 +194,8 @@ def handlelogout(request):
 
 def index(request):
     context={}
-    context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:8]
+    # context['companies'] = Company.objects.filter(rating=RATING['DISPLAY_ON_HOMEPAGE'],status=True)[:8]
+    context['companies'] = Company.objects.filter(status=True)[:8]
     l = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:8]
     context['gallery'] = GalleryImage.objects.filter(display_on_homepage=True,active=True)[:8]
     testimo_list=Testimonial.objects.filter(display_on_homepage=True,active=True)[:4]
