@@ -83,6 +83,28 @@
 {% else %}
 <div>No data to display</div>
 {% endif %}
+{% if is_paginated %}
+<div class="d-flex justify-content-between">
+  <div>
+    {% if page_obj.has_previous %}
+    <a href="?{% param_replace page=1 %}" >First</a>
+    {% if page_obj.previous_page_number != 1 %}
+      <a class="page-item" href="?{% param_replace page=page_obj.previous_page_number %}"><span aria-hidden="true">&laquo;</span></a>
+    {% endif %}
+  {% endif %}
+
+  Page {{ page_obj.number }} of {{ paginator.num_pages }}
+
+  {% if page_obj.has_next %}
+    {% if page_obj.next_page_number != paginator.num_pages %}
+      <a href="?{% param_replace page=page_obj.next_page_number %}"><span aria-hidden="true">  &raquo;next page  </span></a>
+    {% endif %}
+    <a href="?{% param_replace page=paginator.num_pages %}"> | Last Page</a>
+  {% endif %}
+  </div>
+  <div class="job-num"><span>Jobs {{ page_obj.start_index }} — {{ page_obj.end_index }}</span></div>
+</div>
+{% endif %}
 
 {% endblock %}
 {% block jquery %}
@@ -94,7 +116,9 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script type="text/javascript">
   $( document ).ready(function() {
-   $('#tb-company').DataTable();
+   $('#tb-company').DataTable({
+      "pageLength": 25   
+    });
    $('.custom-single-select').select2();
    $('[data-bs-toggle="tooltip"]').tooltip();
   });
