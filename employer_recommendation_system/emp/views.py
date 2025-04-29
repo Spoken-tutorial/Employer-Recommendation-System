@@ -383,6 +383,7 @@ class JobListView(FormMixin,ListView):
         company = self.request.GET.get('company', '')
         job_id = self.request.GET.get('id', '')
         if job_id:
+            print(f"\033[92m job id \033[0m")
             queryset = Job.objects.filter(id=job_id)
             if is_manager(self.request.user):
                 return queryset
@@ -390,6 +391,7 @@ class JobListView(FormMixin,ListView):
                 return queryset.filter(status=STATUS['ACTIVE'])
         queries =[place,keyword,company]
         if keyword or company or place:
+            print(f"\033[92m keyword or company or place \033[0m")
             q_kw=q_place=q_com=Job.objects.all()
             if keyword:
                 fossc = FossCategory.objects.filter(foss=keyword)
@@ -407,6 +409,8 @@ class JobListView(FormMixin,ListView):
                 q_com = Job.objects.filter(company__name=company)
             queryset = (q_kw & q_place & q_com)
         if is_manager(self.request.user):
+            print(f"\033[92m is manager \033[0m")
+            print(f"\033[93m len(quer) : {len(queryset)} \033[0m")
             return queryset
         else:
             return queryset.filter(status=STATUS['ACTIVE'])
@@ -414,6 +418,7 @@ class JobListView(FormMixin,ListView):
 class JobListingView(UserPassesTestMixin,ListView):
     template_name = 'emp/job_list_tabular.html'
     model = Job
+    paginate_by = 25
 
     def get_queryset(self):
         queryset = super().get_queryset()
