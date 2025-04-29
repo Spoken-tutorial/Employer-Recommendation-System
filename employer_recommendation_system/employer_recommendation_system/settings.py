@@ -95,6 +95,10 @@ DATABASES = {
         'PASSWORD': DB_PASS,
         'HOST':'127.0.0.1',
         'PORT':'',
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;",
+        },
     },
 
     'spk': {
