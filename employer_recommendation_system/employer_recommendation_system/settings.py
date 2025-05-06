@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-# DEBUG = False
+# DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -232,3 +232,10 @@ GALLERY_TESTIMONIAL = GALLERY_TESTIMONIAL
 CONTACT_MAIL = CONTACT_MAIL
 
 PASS_GRADE=PASS_GRADE
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880 #5 MB
+
+PROFILE_EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'static', 'profile_email_logs')
+LOGIN_URL="https://jrs.spoken-tutorial.org/login/"
+SITE_URL="https://jrs.spoken-tutorial.org/"
+NO_REPLY_SPOKEN_MAIL=NO_REPLY_SPOKEN_MAIL
