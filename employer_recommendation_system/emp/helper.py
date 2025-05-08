@@ -7,6 +7,7 @@ from spoken.helper import is_spk_student_role, is_ILW
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import wraps
+from django.utils import timezone
 
 RATING = {
     'ONLY_VISIBLE_TO_ADMIN_HR':0,
@@ -270,7 +271,7 @@ def is_job_recommended_fossee(job,student):
 
 def get_recommended_jobs(student):
     rec_jobs = []
-    jobs = Job.objects.filter(last_app_date__gte=datetime.datetime.now(),status=STATUS['ACTIVE'])# All active jobs
+    jobs = Job.objects.filter(last_app_date__gte=timezone.now(),status=STATUS['ACTIVE'])# All active jobs
     applied_jobs = get_applied_jobs(student)
     jobs = [x for x in jobs if x not in applied_jobs ]
     

@@ -49,6 +49,7 @@ from .helper import *
 from collections import defaultdict
 import csv
 import os
+import time
 
 @check_user
 def document_view(request,pk):
@@ -149,21 +150,29 @@ def student_homepage(request):
     context={}
     # Top 6 jobs & company to display on student homepage
     company_display = Company.objects.filter(rating=DISPLAY_ON_HOMEPAGE,status=ACTIVE).values('name','logo').order_by('date_updated')[:6]
+    print(f"\033[92m 1 \033[0m")
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
+    print(f"\033[92m 2 \033[0m")
     applied_jobs = get_applied_jobs(rec_student)
     context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
     jobs_to_display = get_jobs_to_display(rec_student) 
+    print(f"\033[92m 3 \033[0m")
     context['jobs_to_display'] = jobs_to_display if len(jobs_to_display)<6 else jobs_to_display[:6]
+    print(f"\033[92m 3.1 \033[0m")
     rec_jobs = get_recommended_jobs(rec_student)
+    print(f"\033[92m 3.2 \033[0m")
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
+    print(f"\033[92m 4 \033[0m")
     active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
+    print(f"\033[92m 5 \033[0m")
     if active_event:
         jobfair = JobFair.objects.get(event=active_event)
         context['active_event'] = active_event
         context['jobfair'] = jobfair
         # context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=rec_student).exists()
         context['is_registered_for_jobfair'] = JobFairAttendance.objects.filter(event=active_event,student=rec_student).exists()
+    print(f"\033[92m 6 \033[0m")
     return render(request,'emp/student_homepage.html',context)
 
 @user_passes_test(is_manager)
@@ -349,11 +358,13 @@ class JobDetailView(PermissionRequiredMixin,DetailView):
         return context
 
 class JobListView(FormMixin,ListView):
+    
     template_name = 'emp/jobs_list.html'
     model = Job
     paginate_by = 8
     form_class = JobSearchForm
     def get_context_data(self, **kwargs):
+        start = time.time()
         context = super().get_context_data(**kwargs)
         context['base_url']=settings.BASE_URL
         if self.request.user.groups.filter(name='MANAGER'):
@@ -375,8 +386,10 @@ class JobListView(FormMixin,ListView):
                     context['non_eligible_jobs'] = list(set(all_jobs).difference(set(eligible_jobs)))
             except:
                 print("No student role assigend to user")
+        print(f"\033[93m job_list context time: {time.time() - start} \033[0m")
         return context
     def get_queryset(self):
+        start = time.time()
         queryset = super().get_queryset()
         place = self.request.GET.get('place', '')
         keyword = self.request.GET.get('keyword', '')
@@ -386,8 +399,10 @@ class JobListView(FormMixin,ListView):
             print(f"\033[92m job id \033[0m")
             queryset = Job.objects.filter(id=job_id)
             if is_manager(self.request.user):
+                print(f"\033[93m 1 get_queryset manager time: {time.time() - start} \033[0m")
                 return queryset
             else:
+                print(f"\033[93m 2 get_queryset manager time: {time.time() - start} \033[0m")
                 return queryset.filter(status=STATUS['ACTIVE'])
         queries =[place,keyword,company]
         if keyword or company or place:
@@ -411,8 +426,10 @@ class JobListView(FormMixin,ListView):
         if is_manager(self.request.user):
             print(f"\033[92m is manager \033[0m")
             print(f"\033[93m len(quer) : {len(queryset)} \033[0m")
+            print(f"\033[93m 3 get_queryset manager time: {time.time() - start} \033[0m")
             return queryset
         else:
+            print(f"\033[93m 4 get_queryset manager time: {time.time() - start} \033[0m")
             return queryset.filter(status=STATUS['ACTIVE'])
 
 class JobListingView(UserPassesTestMixin,ListView):
@@ -421,10 +438,14 @@ class JobListingView(UserPassesTestMixin,ListView):
     paginate_by = 25
 
     def get_queryset(self):
+        start = time.time()
         queryset = super().get_queryset()
+        print(f"\033[92m 1 job_listing get_queryset time : {time.time() - start} \033[0m")
         return queryset
 
     def test_func(self):
+        start = time.time()
+        print(f"\033[92m 2 job_listing get_queryset time : {time.time() - start} \033[0m")
         return is_manager(self.request.user)
 
 class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
@@ -696,9 +717,13 @@ class JobAppStatusListView(UserPassesTestMixin,ListView):
     template_name='emp/job_app_status_list.html'
     model = Job
     def get_context_data(self, **kwargs):
+        start = time.time()
         context = super().get_context_data(**kwargs)
+        print(f"\033[92m 1 JobAppStatusListView get_context_data: {time.time() - start} \033[0m")
         return context
     def test_func(self):
+        start = time.time()
+        print(f"\033[92m 1 JobAppStatusListView test_func: {time.time() - start} \033[0m")
         return is_manager(self.request.user)
 
 
@@ -1383,25 +1408,32 @@ class StudentListView(PermissionRequiredMixin,ListView):
     paginate_by = 500
     
     def get_queryset(self):
+        start = time.time()
         search = self.request.GET.get('name')
         event = self.request.GET.get('event')
         if search:
             if event:
                 students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
+                print(f"\033[92m 1 student-list - get_queryset : {time.time() - start} \033[0m")
                 return Student.objects.filter(id__in=students_id)
+            print(f"\033[92m 2 student-list - get_queryset : {time.time() - start} \033[0m")
             return Student.objects.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
         if event:
             students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
             print(f"\033[92m count students_id ** {len(students_id)}  \033[0m")
+            print(f"\033[92m 3 student-list - get_queryset : {time.time() - start} \033[0m")
             return Student.objects.filter(id__in=students_id).order_by('user__first_name')
+        print(f"\033[92m 4 student-list - get_queryset : {time.time() - start} \033[0m")
         return Student.objects.all().order_by('user__first_name')
     def get_context_data(self, **kwargs):
+        start = time.time()
         context = super().get_context_data(**kwargs)
         context['total_students'] = Student.objects.count()
         event = self.request.GET.get('event')
         if event:
             context['event'] = event
             context['total_event_tudents'] = JobFairAttendance.objects.filter(event_id=event).count()
+        print(f"\033[92m 1 student-list - get_context_data : {time.time() - start} \033[0m")
         return context
 
 @csrf_exempt
