@@ -113,7 +113,20 @@ def display_gender(value):
     return ''
 
 @register.filter()
-def display_foss(value):
+def display_foss(d,value):
+    if value == '0':
+        return 'Any FOSS'
+    if value:
+    # if value is not None:
+        foss_ids = list(map(int,value.split(',')))
+        # foss = [FossCategory.objects.get(id=x).foss for x in foss_ids]
+        foss = [d.get(x, '-') for x in foss_ids]
+        if foss:
+            return ', '.join(foss)
+    return ''
+
+@register.filter()
+def display_foss_names(value):
     if value == '0':
         return 'Any FOSS'
     if value:
@@ -147,12 +160,26 @@ def display_cities(value):
     return ''
 
 @register.filter()
-def display_institute(value):
+def display_institute(d, value):
+    if value:
+    # if value is not None:
+        insti_ids = list(map(int,value.split(',')))
+        # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
+        # type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
+        type_institutes = [d.get(x, '-') for x in insti_ids]
+        if type_institutes:
+            return ', '.join(type_institutes)
+    return ''
+
+
+@register.filter()
+def display_institute_name(value):
     if value:
     # if value is not None:
         insti_ids = list(map(int,value.split(',')))
         # type_institutes = [InstituteType.objects.get(id=x).name for x in insti_ids]
         type_institutes = [x.name for x in InstituteType.objects.filter(id__in=insti_ids)]
+        # type_institutes = [d.get(x, '-') for x in insti_ids]
         if type_institutes:
             return ', '.join(type_institutes)
     return ''
@@ -250,7 +277,7 @@ def get_employees(value):
 
 @register.filter
 def get_item(dictionary, key):
-    return dictionary.get(key) 
+    return dictionary.get(key, '') 
 
 
 @register.filter
@@ -296,4 +323,3 @@ def is_student(student_id):
             return False
     except Exception as e:
         return False
-

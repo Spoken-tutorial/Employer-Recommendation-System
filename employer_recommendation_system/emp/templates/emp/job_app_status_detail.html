@@ -81,25 +81,18 @@
         <thead>
           <tr>
             <th scope="col">Name</th>
-            <th scope="col">Degree</th>
+            <!-- <th scope="col">Degree</th> -->
             <th scope="col">Application Date</th>
             <!-- <th scope="col">Discipline</th> -->
           </tr>
         </thead>
         <tbody>
-          {% for student,date in students_awaiting %}
+          {% for item in students_awaiting %}
           <tr>
             <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
-          <a href="{% url 'student_profile_details' student.id job.id %}" target="_blank">{{student.spk_usr_id | get_student_fullname | title }}</a></td>
-          <td>
-            {% for ed in student.education.all %}
-                {% if forloop.last %} {{ed.degree.name}}, {{ed.acad_discipline.name}} (Grade: {{ed.gpa}} )
-                {% else %}{{ed.degree.name}}, {{ed.acad_discipline.name}} (Grade: {{ed.gpa}} ) | 
-                {% endif %}
-                
-            {% endfor %}
-          </td>
-          <td>{{date}}</td>
+          <a href="{% url 'student_profile_details' item.student_id item.job_id %}" target="_blank">{{item.name }}</a></td>
+         
+          <td>{{item.application_date}}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -139,16 +132,15 @@
     </tr>
   </thead>
   <tbody>
-    {% for student in students_shortlisted %}
+    {% for item in students_shortlisted %}
     <tr>
-      <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+      <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{item.spk_usr_id}}"> 
       <td>{{forloop.counter}}</td>
-      <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
-      <td><a href="{% url 'student_profile_details' student.id 0 %}">{{student.user.get_full_name | title}}</a></td>
+      <td><a href="{% url 'student_profile_details' item.student_id 0 %}">{{name | title}}</a></td>
 
       
-      <td>{{student.spk_usr_id}}</td>
-      <td>{{student.user.email}}</td>
+      <td>{{item.spk_usr_id}}</td>
+      <td>{{item.email}}</td>
     </tr>
   {% empty %}
   {% endfor %}
@@ -174,16 +166,15 @@
         </tr>
       </thead>
       <tbody>
-        {% for student in students_rejected %}
+        {% for item in students_rejected %}
         <tr>
-          <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+          <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{item.spk_usr_id}}"> 
           <td>{{forloop.counter}}</td>
-          <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
-          <td><a href="{% url 'student_profile_details' student.id 0 %}">{{student.user.get_full_name | title}}</a></td>
+          <td><a href="{% url 'student_profile_details' item.student_id 0 %}">{{name | title}}</a></td>
     
           
-          <td>{{student.spk_usr_id}}</td>
-          <td>{{student.user.email}}</td>
+          <td>{{item.spk_usr_id}}</td>
+          <td>{{item.email}}</td>
         </tr>
       {% empty %}
       {% endfor %}
@@ -215,16 +206,15 @@
   </tr>
 </thead>
 <tbody>
-  {% for student in students_shortlisted_comp %}
+  {% for item in students_shortlisted_comp %}
   <tr>
-    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{item.spk_usr_id}}"> 
     <td>{{forloop.counter}}</td>
-    <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
-    <td><a href="{% url 'student_profile_details' student.id 0 %}">{{student.user.get_full_name | title}}</a></td>
+    <td><a href="{% url 'student_profile_details' item.student_id 0 %}">{{name | title}}</a></td>
 
     
-    <td>{{student.spk_usr_id}}</td>
-    <td>{{student.user.email}}</td>
+    <td>{{item.spk_usr_id}}</td>
+    <td>{{item.email}}</td>
   </tr>
 {% empty %}
 {% endfor %}
@@ -254,16 +244,15 @@
   </tr>
 </thead>
 <tbody>
-  {% for student in students_rejected_comp %}
+  {% for item in students_rejected_comp %}
   <tr>
-    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{student.spk_usr_id}}"> 
+    <td><input class="form-check-input select-student me-5" type="checkbox" value="" id="student_{{item.spk_usr_id}}"> 
     <td>{{forloop.counter}}</td>
-    <!-- <td><a href="{% url 'student_profile' pk=student.id  %}">{{student.user.first_name}}</a></td> -->
-    <td><a href="{% url 'student_profile_details' student.id 0 %}">{{student.user.get_full_name | title}}</a></td>
+    <td><a href="{% url 'student_profile_details' item.student_id 0 %}">{{name | title}}</a></td>
 
     
-    <td>{{student.spk_usr_id}}</td>
-    <td>{{student.user.email}}</td>
+    <td>{{item.spk_usr_id}}</td>
+    <td>{{item.email}}</td>
   </tr>
 {% empty %}
 {% endfor %}

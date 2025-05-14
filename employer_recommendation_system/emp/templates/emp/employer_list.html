@@ -60,8 +60,6 @@
   <tr>
     <th>Sr. No</th>
     <th>Company Name</th>
-    <!-- <th>Rating</th> -->
-    <th>Sector</th>
     <th>Location</th>
     <th>HR Representative Name</th>
     <th>Contact</th>
@@ -74,14 +72,10 @@
     <td>{{forloop.counter}}</td>
     <td><a href="{% url 'company-detail' slug=company.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ company.name }}</a></td>
     {% comment %}<td>{{ company.rating }}</td>{% endcomment %}
+   
     <td>
-      {% for item in company.domain.all %}
-        {{item}} {% if not forloop.last %} ,{% endif %}
-      {% endfor %}
-    </td>
-    <td>
-    {% if company.city_c %} {% get_citydetails company.city_c %} {% endif %} , 
-    {% if company.state_c %} {% get_statedetails company.state_c %} {% endif %}
+    {% if company.city_c %} {{ cities|get_item:company.city_c }} {% endif %} , 
+    {% if company.state_c %} {{ states|get_item:company.state_c }} {% endif %}
    </td>
     <td>{{ company.emp_name }}</td>
     <td>{{ company.emp_contact }}</td>

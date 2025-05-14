@@ -30,23 +30,7 @@
                 {{ message|safe }}
             </div>
         {% endfor %}
-<!-- <div class="search-container row">
-    <form action="" method="get" class="col-4">
-      {% csrf_token %}
-      <div class="form-group d-flex">
-          <select class="form-select custom-single-select" aria-label="Default select example" name="name" onchange="this.form.submit()">
-            <option value="{{object_list.0}}">{{object_list.0}}</option>
-            {% for job in companies %}
-            <option value="{{company.0}}">{{job.0}}</option>
-            {% endfor %}
-          </select>
-      <button type="submit" class="search-btn"><i class="fa fa-search"></i></button>
-      </div>
-    </form>
-    <form class="col-4" id="all_companies" action="" method="get">
-      <button type="submit" class="btn btn-outline-secondary btn-sm mx-auto">View all</button>
-    </form>
-</div> -->
+
 
 <hr>
 {% if object_list %}
@@ -71,9 +55,10 @@
     <td><a href="{% url 'job-detail' slug=job.slug %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view or edit ">{{ job.title }}</a></td>
     {% comment %}<td>{{ job.rating }}</td>{% endcomment %}
     <td>{{ job.company.name }}</td>
-    <td>{% get_citydetails job.city_job %}, {% get_statedetails job.state_job %}</td>
+    
+    <td>{{ cities|get_item:job.city_job }}, {{ states|get_item:job.state_job }}</td>
     <td>{{ job.last_app_date }}</td>
-    <td>{{ job.foss | display_foss }}</td>
+    <td>{{ fosses|display_foss:job.foss  }}</td>
     <td>{{ job.job_type }}</td>
   </tr>
   {% endfor %}

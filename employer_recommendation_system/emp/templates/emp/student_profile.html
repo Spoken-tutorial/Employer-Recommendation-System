@@ -30,19 +30,18 @@
             </div>
 {% endfor %}
 <section>
-  {# if request.user|has_group:"STUDENT" #}
-  {% if request.user|is_student %}
+  {% if role == "STUDENT" %}
   <div>
     <div class="d-none">
     <form id="form-job-app" action="{% url 'add_student_job_status' %}" method="POST">
       {% csrf_token %}
     <input type="number" name="job_id" required="" id="id_job_id" value="{{job.id}}">
-    <input type="number" name="student" required="" id="id_student" value="{{request.user.student.id}}">
-    <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{request.user.student.spk_usr_id}}">
+    <input type="number" name="student" required="" id="id_student" value="{{student_id}}">
+    <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{spk_usr_id}}">
     </form> 
   </div>
   <div class="alert alert-warning" role="alert">
-    <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' request.user.student.id %}" class="alert-link text-decoration-underline" >Click here to edit your profile.</a></p>
+    <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' student_id %}" class="alert-link text-decoration-underline" >Click here to edit your profile.</a></p>
     <hr>
     <span><button class="btn btn-success" type="submit" form="form-job-app" type="submit" id="confirm_apply">Confirm Profile & Apply</button></span>
   </div>
@@ -202,7 +201,7 @@
         {% if empty_fields %}
           <p><b>Please add following information to complete the profile:</b></p>
           <p>{{empty_fields}}</p>
-          {% if request.user|has_group:"MANAGER" %}
+          {% if role == "MANAGER" %}
           <p><strong>Notification data : </strong></p>
           <ul>
             {% if notifications %}
