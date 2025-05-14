@@ -304,3 +304,10 @@ def get_state_city_lst():
     states = SpokenState.objects.all()
     cities = SpokenCity.objects.all()
     return states, cities
+
+
+def get_role(user):
+        if user.groups.filter(name='MANAGER').exists():
+            return 'MANAGER'
+        elif list(set(['STUDENT','STUDENT_ILW']).intersection([x.name for x in user.groups.all()])):
+            return 'STUDENT'

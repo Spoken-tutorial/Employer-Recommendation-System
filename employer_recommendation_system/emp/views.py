@@ -264,7 +264,17 @@ class CompanyListView(PermissionRequiredMixin,ListView):
         context['filterset'] = self.collection
         context['form'] = self.collection.form
         context['companies'] = Company.objects.values_list('name')
-        
+        current_page_companies = context['object_list']
+        states = [x.state_c for x in current_page_companies]
+        cities = [x.city_c for x in current_page_companies]
+
+        cities_map = SpokenCity.objects.filter(id__in=cities).values('id', 'name')
+        states_map = SpokenState.objects.filter(id__in=states).values('id', 'name')
+        c = {c['id']: c['name'] for c in cities_map}
+        s = {s['id']: s['name'] for s in states_map}
+
+        context['cities'] = c
+        context['states'] = s
         return context
     
     def get_queryset(self):
@@ -363,9 +373,47 @@ class JobListView(FormMixin,ListView):
     model = Job
     paginate_by = 8
     form_class = JobSearchForm
+
+    def is_convertible_to_int(self,val):
+        try:
+            int(val)
+            return True
+        except:
+            return False
+
     def get_context_data(self, **kwargs):
         start = time.time()
         context = super().get_context_data(**kwargs)
+        current_page_jobs = context['object_list']
+
+        f = [ x.foss for x in current_page_jobs]
+        s = ','.join(f)
+        s = list(s.split(','))
+        s = [ x for x in s if self.is_convertible_to_int(x)]
+        
+        fosses = FossCategory.objects.filter(id__in=s).values('id', 'foss')
+        fosses_data = {f['id']: f['foss'] for f in fosses}
+        context['fosses'] = fosses_data
+
+        i = [ x.institute_type for x in current_page_jobs]
+        s = ','.join(i)
+        s = list(s.split(','))
+        s = [ x for x in s if self.is_convertible_to_int(x)]
+        types = InstituteType.objects.filter(id__in=s).values('id', 'name')
+        types_data = {f['id']: f['name'] for f in types}
+        context['types'] = types_data
+
+        cities = [ x.city_job for x in current_page_jobs]+ [x.city for x in current_page_jobs]
+        states = [ x.state_job for x in current_page_jobs] + [x.state for x in current_page_jobs]
+        cities_map = SpokenCity.objects.filter(id__in=cities).values('id', 'name')
+        states_map = SpokenState.objects.filter(id__in=states).values('id', 'name')
+        c = {c['id']: c['name'] for c in cities_map}
+        s = {s['id']: s['name'] for s in states_map}
+
+        context['cities'] = c
+        context['states'] = s
+        context['role'] = get_role(self.request.user)
+        
         context['base_url']=settings.BASE_URL
         if self.request.user.groups.filter(name='MANAGER'):
             context['grade_filter_url'] = settings.GRADE_FILTER
@@ -390,23 +438,19 @@ class JobListView(FormMixin,ListView):
         return context
     def get_queryset(self):
         start = time.time()
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('company', 'job_type', 'domain').prefetch_related('degree', 'discipline')
         place = self.request.GET.get('place', '')
         keyword = self.request.GET.get('keyword', '')
         company = self.request.GET.get('company', '')
         job_id = self.request.GET.get('id', '')
         if job_id:
-            print(f"\033[92m job id \033[0m")
             queryset = Job.objects.filter(id=job_id)
             if is_manager(self.request.user):
-                print(f"\033[93m 1 get_queryset manager time: {time.time() - start} \033[0m")
                 return queryset
             else:
-                print(f"\033[93m 2 get_queryset manager time: {time.time() - start} \033[0m")
                 return queryset.filter(status=STATUS['ACTIVE'])
         queries =[place,keyword,company]
         if keyword or company or place:
-            print(f"\033[92m keyword or company or place \033[0m")
             q_kw=q_place=q_com=Job.objects.all()
             if keyword:
                 fossc = FossCategory.objects.filter(foss=keyword)
@@ -424,12 +468,8 @@ class JobListView(FormMixin,ListView):
                 q_com = Job.objects.filter(company__name=company)
             queryset = (q_kw & q_place & q_com)
         if is_manager(self.request.user):
-            print(f"\033[92m is manager \033[0m")
-            print(f"\033[93m len(quer) : {len(queryset)} \033[0m")
-            print(f"\033[93m 3 get_queryset manager time: {time.time() - start} \033[0m")
             return queryset
         else:
-            print(f"\033[93m 4 get_queryset manager time: {time.time() - start} \033[0m")
             return queryset.filter(status=STATUS['ACTIVE'])
 
 class JobListingView(UserPassesTestMixin,ListView):
@@ -439,13 +479,31 @@ class JobListingView(UserPassesTestMixin,ListView):
 
     def get_queryset(self):
         start = time.time()
-        queryset = super().get_queryset()
-        print(f"\033[92m 1 job_listing get_queryset time : {time.time() - start} \033[0m")
+        queryset = super().get_queryset().select_related('company', 'job_type')
         return queryset
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_page_jobs = context['object_list']
+        cities = list(current_page_jobs.values_list('city_job', flat=True)) 
+        states = list(current_page_jobs.values_list('state_job', flat=True))
+        cities_map = SpokenCity.objects.filter(id__in=cities).values('id', 'name')
+        states_map = SpokenState.objects.filter(id__in=states).values('id', 'name')
+        c = {c['id']: c['name'] for c in cities_map}
+        s = {s['id']: s['name'] for s in states_map}
+
+        context['cities'] = c
+        context['states'] = s
+        fosses = ','.join(list(current_page_jobs.values_list('foss', flat=True)))
+        fosses = set(int(x) for x in fosses.split(','))
+        fosses = FossCategory.objects.filter(id__in=fosses).values('id', 'foss')
+        fosses_data = {f['id']: f['foss'] for f in fosses}
+        context['fosses'] = fosses_data
+        return context
+    
+    
     def test_func(self):
         start = time.time()
-        print(f"\033[92m 2 job_listing get_queryset time : {time.time() - start} \033[0m")
         return is_manager(self.request.user)
 
 class JobUpdate(PermissionRequiredMixin,SuccessMessageMixin,UpdateView):
@@ -716,6 +774,12 @@ def update_job_app_status(job,student,spk_user_id):
 class JobAppStatusListView(UserPassesTestMixin,ListView):
     template_name='emp/job_app_status_list.html'
     model = Job
+    
+    def get_queryset(self):
+        start = time.time()
+        queryset = super().get_queryset().select_related('company', 'job_type', 'domain').prefetch_related('degree', 'discipline').annotate(application_count=Count('jobshortlist'))
+        # queryset = super().get_queryset()
+        return queryset
     def get_context_data(self, **kwargs):
         start = time.time()
         context = super().get_context_data(**kwargs)
@@ -731,8 +795,56 @@ class JobAppStatusListView(UserPassesTestMixin,ListView):
 def job_app_details(request,id):
     context = {}
     job = Job.objects.get(id=id)
+    # students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id).select_related('student') if x.status==0]
+    students_awaiting = []
+    students_shortlisted = []
+    students_rejected = []
+    students_shortlisted_comp = []
+    students_rejected_comp = []
+    query = JobShortlist.objects.filter(job_id=id).select_related('student__user')
+    for item in query:
+        d = {
+            'student_id' : item.student_id,
+            'job_id': item.job_id,
+            'name': item.student.user.get_full_name(),
+            'application_date': item.date_created,
+            'spk_usr_id': item.student.spk_usr_id,
+            'email': item.student.user.email
+        }
+        if item.status == 0:
+            students_awaiting.append(d)
+        elif item.status == 1:
+            students_shortlisted.append(d)
+        elif item.status == 2:
+            students_rejected.append(d)
+        elif item.status == 3:
+            students_shortlisted_comp.append(d)
+        elif item.status == 4:
+            students_rejected_comp.append(d)
+    print(f"\033[92m students_awaiting : {students_awaiting} \033[0m")
+    context['students_awaiting'] = students_awaiting
+
+
+    # students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
+    # students_rejected = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==2]
+    # students_shortlisted_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==3] #shortlisted by company
+    # students_rejected_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==4] #rejected by company
+    context['job'] = job
+    context['students_awaiting'] = students_awaiting
+    context['students_shortlisted'] = students_shortlisted
+    context['students_rejected'] = students_rejected
+    context['students_shortlisted_comp'] = students_shortlisted_comp
+    context['students_rejected_comp'] = students_rejected_comp
+    context['mass_mail']=settings.MASS_MAIL
+
+    return render(request,'emp/job_app_status_detail.html',context)
+
+@user_passes_test(is_manager)
+def job_app_details1(request,id):
+    context = {}
+    job = Job.objects.get(id=id)
     # students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
-    students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+    students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id).select_related('student') if x.status==0]
     students_awaiting1 = [x.student.spk_student_id for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
     ta = TestAttendance.objects.filter(student_id__in=students_awaiting1)
     ta = ta.values('student_id','mdluser_id','mdlcourse_id','mdlquiz_id')
@@ -911,18 +1023,24 @@ def getFieldsInfo(student):
 
 @access_profile
 def student_profile_details(request,id,job):
+    print(f"\033[95m student_profile_details ****** \033[0m")
     context = {}
     if job:
         context['job_id']=job
         job_obj = Job.objects.get(id=job)
         context['job']=job_obj
-    student = Student.objects.get(id=id)
+    student = Student.objects.select_related('user').prefetch_related('projects').get(id=id)
+    context['role']=get_role(request.user)
+    context['spk_usr_id'] = student.spk_usr_id
+    context['student_id']=student.id
+
+    # student = Student.objects.get(id=id)
     context['student']=student
     context['MEDIA_URL']=settings.MEDIA_URL
     context['scores']=fetch_student_scores(student)
     context['ilw_scores']=fetch_ilw_scores(student)
-    context['current_education'] = student.education.filter(order=CURRENT_EDUCATION)
-    context['past_education'] = student.education.filter(order=PAST_EDUCATION).first()
+    context['current_education'] = student.education.filter(order=CURRENT_EDUCATION).select_related('degree', 'acad_discipline')
+    context['past_education'] = student.education.filter(order=PAST_EDUCATION).select_related('degree', 'acad_discipline').first()
     complete,empty_fields = getFieldsInfo(student)
     context['profile_completed'] = False if empty_fields else True
     context['skill_groups'] = SkillGroup.objects.prefetch_related(Prefetch('skill_set',queryset=Skill.objects.filter(student=student)))
@@ -930,6 +1048,9 @@ def student_profile_details(request,id,job):
     context['complete']=complete
     context['empty_fields']=', '.join(empty_fields)
     context['notifications'] = Notifications.objects.filter(user = student.user)
+    # context['institute']=""
+    # if student.spk_institute:
+    #     context['institute'] = AcademicCenter.objects.get(id=student.spk_institute).institution_name
     return render(request,'emp/student_profile.html',context)
 
 def student_profile_details_spk(request,id):
@@ -1411,20 +1532,23 @@ class StudentListView(PermissionRequiredMixin,ListView):
         start = time.time()
         search = self.request.GET.get('name')
         event = self.request.GET.get('event')
+        queryset = super().get_queryset().select_related('user').order_by('user__first_name')
         if search:
             if event:
                 students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
                 print(f"\033[92m 1 student-list - get_queryset : {time.time() - start} \033[0m")
-                return Student.objects.filter(id__in=students_id)
+                return queryset.filter(id__in=students_id)
             print(f"\033[92m 2 student-list - get_queryset : {time.time() - start} \033[0m")
-            return Student.objects.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
+            return queryset.filter(Q(user__first_name__icontains=search)|Q(user__last_name__icontains=search)|Q(user__email__icontains=search))
         if event:
             students_id = [x.student_id for x in JobFairAttendance.objects.filter(event_id=event)]
             print(f"\033[92m count students_id ** {len(students_id)}  \033[0m")
             print(f"\033[92m 3 student-list - get_queryset : {time.time() - start} \033[0m")
-            return Student.objects.filter(id__in=students_id).order_by('user__first_name')
+            return queryset.filter(id__in=students_id).order_by('user__first_name')
         print(f"\033[92m 4 student-list - get_queryset : {time.time() - start} \033[0m")
-        return Student.objects.all().order_by('user__first_name')
+        # queryset = Student.objects.all().order_by('user__first_name')
+        
+        return queryset
     def get_context_data(self, **kwargs):
         start = time.time()
         context = super().get_context_data(**kwargs)

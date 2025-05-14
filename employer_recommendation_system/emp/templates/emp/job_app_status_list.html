@@ -26,7 +26,6 @@
 <table class="table table-striped" id="shortlisted">
   <thead>
     <tr>
-      <!-- <th scope="col">#Sr</th> -->
       <th scope="col">Job Id</th>
       <th scope="col">Job Title</th>
       <th scope="col">Company</th>
@@ -38,23 +37,14 @@
   <tbody>
   	{% for job in object_list %}
   	<tr>
-      <!-- <td scope="row">{{forloop.counter}}</td> -->
       <td>{{job.id}}</td>
       <td><a href="{% url 'job-app-detail' id=job.id  %}" data-bs-toggle="tooltip" data-bs-placement="top" title="Click to view/shortlist students">{{job.title}}</a></td>
       <td>{{job.company.name}}</td>
-      <td><a href="{% url 'job-app-detail' id=job.id  %}">{% application_count job %}</a></td>
+      <td><a href="{% url 'job-app-detail' id=job.id  %}">{{job.application_count}}</a></td>
       <td>{{job.last_app_date}}</td>
       <td>{{job.status}}</td>
-      <!-- <td>
-      	{% if item.status == 1 %}
-      	<span style="color: orange;"><i class="far fa-clock"></i></span>
-      	{% else %}
-      	<span style="color: green;"><i class="far fa-check-circle"></i></span>
-      	{% endif %}
-      </td> -->
     </tr>
 	{% empty %}
-    <!-- <li>No jobs yet.</li> -->
 	{% endfor %}
   </tbody>
 </table>

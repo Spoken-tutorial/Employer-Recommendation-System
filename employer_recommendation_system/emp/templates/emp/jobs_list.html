@@ -173,7 +173,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
     style=" height: 50px;display: inline;">
     {% endif %}
           <div class="flex-grow-1"><strong class="mb-1">{{job.title}}</strong>
-            <div class="col-10 mb-1 small">{{job.company.name}}<br>{% get_citydetails job.city_job %}, {% get_statedetails job.state_job %}</div>
+            <div class="col-10 mb-1 small">{{job.company.name}}<br>{{ cities|get_item:job.city_job }}, {{ states|get_item:job.state_job }}</div>
           </div>
           <small><i class="bi bi-bookmark"></i></small>
         </div>
@@ -191,7 +191,7 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
     {% else %}
     <div class="tab-pane fade show mt-3" id="job_detail_{{job.id}}" role="tabpanel" aria-labelledby="v-pills-home-tab">
     {% endif %}
-    {% if request.user|has_group:"MANAGER" %}
+    {% if role == "MANAGER" %}
     
     <div class="alert alert-warning mt-2" role="alert">
   To notify students for the job; please copy <span class="fw-bold">JOB ID : </span> <span class="fw-bold text-decoration-underline" id="job">{{job.id}}</span> & <a href="{{grade_filter_url}}" class="alert-link text-decoration-underline" target="_blank">login here</a>. <br>
@@ -218,17 +218,17 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                 <div class="flex-grow-1">
                   <p>{{job.company.name}}<br>
              <b>{{job.title}}</b> <br>
-              {% get_statedetails job.state_job %}, {% get_citydetails job.city_job %}</p>
+              {{ cities|get_item:job.city_job }}, {{ states|get_item:job.state_job }}</p>
                 </div>
                 <div class="mt-1">
-                  {% if request.user|has_group:"MANAGER" %}
+                  {% if role == "MANAGER" %}
 
           <!-- <a href="https://spoken-tutorial.org/accounts/login/?next=/software-training/student-grade-filter/?id={{job.id}}" class="btn btn-success" target="_blank"><i class="bi bi-cursor "></i> Notify</a> -->
           <a class="btn btn-warning" href="{% url 'update-job-detail' slug=job.slug %}"><i class="bi bi-pencil"></i> Edit</a>
           {% endif %}
 
          
-          {% if request.user|is_student %}
+          {% if role == "STUDENT" %}
           
           <!-- <span class="badge bg-danger " id="e_{{job.id}}" style="display: none;">Not Eligible</span><br>
                  <small class="text-muted " id="t_{{job.id}}" style="display: none;">Your profile does not meet the job requirements.
@@ -257,7 +257,8 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                   <div class="card border-o">
   <div class="card-body">
     <p class="mb-0"><i class="bi bi-calendar-event c-icon"></i> Last Application Date : {{job.last_app_date | default_if_none:''}}<br>
-    <i class="bi bi-clipboard-data c-icon"></i> Skills : {{job.foss | display_foss}}</p>
+    
+    <i class="bi bi-clipboard-data c-icon"></i> Skills :{{ fosses|display_foss:job.foss  }}</p>
   </div>
 </div>
                 </div>
@@ -300,10 +301,11 @@ div#cke tbody,div#cke td,div#cke tfoot,div#cke th,div#cke thead,div#cke tr{
                       {% endif %}
                     </li>
                     
-                    <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSSes :<br>{{job.foss | display_foss}}<hr>
-                      {% if job.state %}<span><b>State : </b>{{job.state | display_states}}</span><br>{% endif %}
-                      {% if job.city %}<span><b>City : </b>{{job.city | display_cities}}</span><br>{% endif %}
-                      {% if job.institute_type %}<span><b>Institution Type : </b>{{job.institute_type | display_institute}}</span><br>{% endif %}
+                    
+                    <li class="list-group-item">Spoken Tutorial Test Grade should be <b>greater than {{job.grade}}</b> in one of the following FOSSes :<br>{{ fosses|display_foss:job.foss  }}<hr>
+                      {% if job.state %}<span><b>State : </b>{{ states|get_item:job.state }}</span><br>{% endif %}
+                      {% if job.city %}<span><b>City : </b>{{ cities|get_item:job.city }}</span><br>{% endif %}
+                      {% if job.institute_type %}<span><b>Institution Type : </b>{{ types|display_institute:job.institute_type  }}</span><br>{% endif %}
                       {% if job.degree.all %}<span><b>Degree : </b>
                         {% for item in job.degree.all %}
                         {{item}}{% if not forloop.last %}, {% endif %}
