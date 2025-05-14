@@ -40,11 +40,18 @@
     <input type="number" name="spk_user_id" required="" id="id_spk_user_id" value="{{spk_usr_id}}">
     </form> 
   </div>
+  {% if student.resume %}
   <div class="alert alert-warning" role="alert">
     <p>The following profile will be submitted to recruiter. <a href="{% url 'student_profile' student_id %}" class="alert-link text-decoration-underline" >Click here to edit your profile.</a></p>
     <hr>
     <span><button class="btn btn-success" type="submit" form="form-job-app" type="submit" id="confirm_apply">Confirm Profile & Apply</button></span>
   </div>
+  {% else %}
+  <div class="alert alert-danger" role="alert">
+    <p>Please note uploading a resume is mandatory to apply for jobs. <a href="{% url 'student_profile' student_id %}" class="alert-link text-decoration-underline" >Click here to upload your resume & update the profile.</a></p>
+    <hr>
+  </div>
+  {% endif %}
 </div>
     
   {% endif %}
