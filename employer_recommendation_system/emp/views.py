@@ -3,8 +3,8 @@ from django.contrib.auth import logout
 
 from events.models import *
 from .models import *
-from spoken.models import TestAttendance, FossMdlCourses,FossCategory, SpokenState, SpokenCity
-from moodle.models import MdlQuizGrades,MdlUser
+from spoken.models import TestAttendance, FossMdlCourses,FossCategory, SpokenState, SpokenCity, SpokenStudent, StudentMaster
+from moodle.models import MdlQuizGrades,MdlUser, MdlQuiz
 from django.views.generic.edit import UpdateView
 
 from emp.forms import StudentGradeFilterForm, EducationForm,StudentForm,DateInput,ContactForm
@@ -50,6 +50,7 @@ from collections import defaultdict
 import csv
 import os
 import time
+import openpyxl
 
 @check_user
 def document_view(request,pk):
@@ -1692,3 +1693,121 @@ def update_jobfair_student_status(request):
         except Exception as e:
             print(f"Exception : {e}")
             return JsonResponse({'error': 'Error occured while enrolling.'}, status=400)
+        
+
+def get_applicants_details(request, job_id):
+    students = User.objects.filter(id__lte=1000)
+    student_ids = JobShortlist.objects.filter(job_id = job_id).values_list('student_id', flat=True)
+    jrs_students = Student.objects.filter(id__in=student_ids).prefetch_related('education', 'projects').select_related('user')
+
+    #dictionary : key = spk_student_id, value = student profile
+    d = {}
+    spk_student_ids = []
+    scheme = request.scheme  # 'http' or 'https'
+    domain = request.get_host()
+    full_domain = f"{scheme}://{domain}"
+
+    student_emails = []
+    for item in jrs_students:
+        spk_student_ids.append(item.spk_student_id)
+        student_emails.append(item.user.email)
+        # d[item.spk_student_id] = {
+        d[item.user.email] = {
+            'phone' : item.phone,
+            'alternate_email' : item.alternate_email,
+            'address 1' : item.address,
+            'about' : item.about,
+            'github' : item.github,
+            'linkedin' : item.linkedin,
+            'resume' : f"{full_domain}{item.resume.name}",
+            'certifications' : item.certifications,
+            'projects' : '\n\n'.join([ f"url: {project.url}\ndesc: {project.desc}" for project in item.projects.all()])
+        }
+
+    sm = StudentMaster.objects.filter(student_id__in=spk_student_ids).select_related('student', 'student__user', 'batch', 'batch__academic', 'batch__academic__state', 'batch__academic__city','batch__department','batch__academic__institution_type' )
+    
+    for item in sm:
+        key = item.student.user.email
+        d[key]['gender'] = item.student.gender
+        d[key]['institution'] = item.batch.academic.institution_name
+        d[key]['institution_state'] = item.batch.academic.state.name
+        d[key]['institution_city'] = item.batch.academic.city.name
+        d[key]['department'] = item.batch.department.name
+        d[key]['admission_year'] = item.batch.year
+        d[key]['institution_type'] = item.batch.academic.institution_type.name
+        d[key]['institution_type'] = item.batch.academic.institution_type.name
+        d[key]['name'] = f"{item.student.user.first_name} {item.student.user.last_name}"
+        d[key]['email'] = f"{item.student.user.email}"
+        d[key]['grades'] = f""
+        
+    
+    mdl_users = MdlUser.objects.filter(email__in=student_emails).values('id', 'email')
+    print(f"\033[92m mdl_users : {mdl_users} \033[0m")
+    m = {} # key: moodle user id, val: moodle email
+    for item in mdl_users:
+        m[item['id']] = item['email']
+    
+    mdl_user_ids = [x['id'] for x in mdl_users]
+    grades = MdlQuizGrades.objects.filter(userid__in=mdl_user_ids)
+    quiz_ids = [ x.quiz for x in grades]
+    
+
+    quizes = MdlQuiz.objects.using('moodle').filter(id__in=quiz_ids).values('id', 'name')
+    q = {} # key: quiz id, val : quiz name
+    for item in quizes:
+        q[item['id']] = item['name']
+
+
+    g = {} #key: moodle user id, val: quiz name + grade
+    for item in grades:
+        key = item.userid.id
+        if key in g.keys():
+            val = g[item.userid.id]
+            if len(val) !=0 :
+                g[key] = val.append(f"{q[item.quiz]} : {item.grade}")
+                g[key] = val + [f"{q[item.quiz]} : {item.grade}"]
+            else:
+                g[key] = [f"{q[item.quiz]} : {item.grade}"]
+        else:
+            g[key] = [f"{q[item.quiz]} : {item.grade}"]
+
+    for key, val in g.items():
+        # print(f"\033[95m g key : ****** {type(key)} \033[0m")
+        # print(f"\033[95m key : ****** {val} \033[0m")
+        
+        try:
+            new_key = f"{m[key]}"
+            val = set(val)
+            d[new_key]['grades'] = "\n".join(val)
+        except Exception as e:
+            print(f"\033[91m exception : {e} \033[0m")
+            # d[m[new_key]]['grades'] = ""
+        
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Job 1"
+
+    #Headers
+    columns = ['name', 'email', 'alternate_email', 'phone', 'gender',  
+               'department', 'admission_year', 'institution', 'institution_type', 'institution_state', 'institution_city',
+               'github', 'linkedin', 'resume', 'certifications', 
+                'projects',  'about', 'address 1', 'grades']
+    ws.append(columns)
+   
+    for key, value in d.items():
+        try:
+            ws.append([value['name'], value['email'], value['alternate_email'], value['phone'], value['gender'], 
+                    value['department'], value['admission_year'], value['institution'], value['institution_type'], value['institution_state'], value['institution_city'],
+                    value['github'], value['linkedin'], value['resume'], value['certifications'],
+                    value['projects'], value['about'], value['address 1'], value['grades']])
+        except Exception as e:
+            print(f"\033[91m error : {value['alternate_email']} \033[0m")
+            print(e)
+            ws.append([f"Error for fetching data for spoken student id : {key}, {value['alternate_email']}"])
+    
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=students.xlsx'
+
+    wb.save(response)
+    return response
+

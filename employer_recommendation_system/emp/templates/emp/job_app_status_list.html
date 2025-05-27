@@ -31,7 +31,7 @@
       <th scope="col">Company</th>
       <th scope="col">#Applications</th>
       <th scope="col">Last Application Date</th>
-      <th scope="col">Status</th>
+      <th scope="col">Student details</th>
     </tr>
   </thead>
   <tbody>
@@ -42,7 +42,8 @@
       <td>{{job.company.name}}</td>
       <td><a href="{% url 'job-app-detail' id=job.id  %}">{{job.application_count}}</a></td>
       <td>{{job.last_app_date}}</td>
-      <td>{{job.status}}</td>
+      <!-- <td>{{job.status}}</td> -->
+      <td><a href="{% url 'get_applicants_details' job.id %}"> <i class="fas fa-download"></i></a></td>
     </tr>
 	{% empty %}
 	{% endfor %}
