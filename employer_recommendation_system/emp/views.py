@@ -1721,7 +1721,19 @@ def get_applicants_details(request, job_id):
             'linkedin' : item.linkedin,
             'resume' : f"{full_domain}{item.resume.name}",
             'certifications' : item.certifications,
-            'projects' : '\n\n'.join([ f"url: {project.url}\ndesc: {project.desc}" for project in item.projects.all()])
+            'projects' : '\n\n'.join([ f"url: {project.url}\ndesc: {project.desc}" for project in item.projects.all()]),
+
+            'gender': '-',
+            'institution': '-',
+            'institution_state': '-',
+            'institution_city': '-',
+            'department': '-',
+            'admission_year': '-',
+            'institution_type': '-',
+            'name': '-',
+            'email': '-',
+            'grades': '-'
+
         }
 
     sm = StudentMaster.objects.filter(student_id__in=spk_student_ids).select_related('student', 'student__user', 'batch', 'batch__academic', 'batch__academic__state', 'batch__academic__city','batch__department','batch__academic__institution_type' )
@@ -1735,14 +1747,13 @@ def get_applicants_details(request, job_id):
         d[key]['department'] = item.batch.department.name
         d[key]['admission_year'] = item.batch.year
         d[key]['institution_type'] = item.batch.academic.institution_type.name
-        d[key]['institution_type'] = item.batch.academic.institution_type.name
         d[key]['name'] = f"{item.student.user.first_name} {item.student.user.last_name}"
         d[key]['email'] = f"{item.student.user.email}"
         d[key]['grades'] = f""
         
     
     mdl_users = MdlUser.objects.filter(email__in=student_emails).values('id', 'email')
-    print(f"\033[92m mdl_users : {mdl_users} \033[0m")
+    
     m = {} # key: moodle user id, val: moodle email
     for item in mdl_users:
         m[item['id']] = item['email']
