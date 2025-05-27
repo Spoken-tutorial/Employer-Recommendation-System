@@ -78,4 +78,5 @@ urlpatterns = [
     
     ################### public urls
     path('companies',CompanyList.as_view(),name='companies'),
+    path('data/applicants/<int:job_id>/',get_applicants_details,name='get_applicants_details'),
 ]
