@@ -104,7 +104,7 @@
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
-     <td>{{item.grade}}</td>
+     <td>{{ item.grade|floatformat:"-2" }}</td>
      <td>{{item.updated}}</td>
    </tr>
    {% endfor %}
@@ -134,7 +134,7 @@
        {% for item in ilw_scores %}
     <tr>
       <td>{{item.name}}</td>
-      <td>{{item.grade}}</td>
+      <td>{{ item.grade|floatformat:"-2" }}</td>
       <td>{{item.mdl.updated}}</td>
     </tr>
     {% endfor %}
@@ -175,8 +175,10 @@
   </li>
   <li class="list-group-item list-group-item-info"><span>Links</span></li>
   <li class="list-group-item">
-  	<b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><span>{{student.github|default:'-'}}</span><br>
-  	<b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><span>{{student.linkedin|default:'-'}}</span>
+  	<!-- <b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><span>{{student.github|default:'-'}}</span><br>
+  	<b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><span>{{student.linkedin|default:'-'}}</span> -->
+  	<b><i class="bi bi-github c-icon"></i><span class="me-1"> Github </span></b><a href="{{student.github|default:'-'}}" target="_blank">{{student.github|default:'-'}}</a><br>
+    <b><i class="bi bi-linkedin c-icon"></i><span class="me-1"> LinkedIn </span></b><a href="{{student.linkedin|default:'-'}}" target="_blank">{{student.linkedin|default:'-'}}</a>
   </li>
   <li class="list-group-item list-group-item-info"><span>Certifications</span></li>
   <li class="list-group-item">

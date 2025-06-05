@@ -103,28 +103,30 @@ div#cke table{
     {% for job in rec_jobs %}
     <div class="col-lg-3 col-sm-12 py-3">  
       <div class="card" style="width: 18rem;height: 100%;">
-        <div class="card-body">
+        <div class="card-body d-flex flex-column">
           <div class="d-flex justify-content-between">
-            {% if job.company.logo %}
-            <img class="card-img-top me-2" src="{{ job.company.logo.url|default_if_none:'#' }}" alt="Card image cap" style="width: auto;height: 60px;">
-            {% endif %}
             <div class="me-auto">
            <span class="card-title fw-bold"><a href="{% url 'job-list' %}?id={{job.id}}">{{job.title}}</a></span><br>
-            <small style="color: rgba(0,0,0,0.6)">{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}
+            
+            <small style="color: rgba(0,0,0,0.6)">{{ cities|get_item:job.city_job }} , {{ states|get_item:job.state_job }}
+
+              
           </small>
             </div>
           </div>
           <hr>
-          <p class="card-text mb-5">{{job.description | safe | slice:":255"}}...</p>
-          <div class="row">
+          <p class="card-text ">{{job.description | safe | slice:":255"}}...</p>
+          <div class="mt-auto">
+            <div class="row">
             <div class="col-6">
-            <a href="#" class="btn btn-info post-apply disabled" style="display: none;" id="applied_{{job.id}}"><i class="fas fa-check mr-3"></i>Applied</a>
-          <a class="btn btn-info pre-apply " href="{% url 'student_profile_details' request.user.student.id job.id %}" id="apply_{{job.id}}">Apply</a>    
+              <a class="btn btn-info" href="{% url 'student_profile_details' request.user.student.id job.id %}" id="apply_{{job.id}}">Apply</a>    
             </div>
             <div class="col-6">
-              <a class="btn btn-outline-secondary " href="{% url 'job-list' %}?id={{job.id}}" id="apply_{{job.id}}">View Details</a>    
+              <a class="btn btn-info " href="{% url 'job-list' %}?id={{job.id}}" id="apply_{{job.id}}">View Details</a>    
             </div>
           </div>
+          </div>
+          
         </div>
         </div>
     </div>
@@ -181,7 +183,7 @@ div#cke table{
             {% endif %}
             <div class="me-auto">
            <span class="card-title fw-bold">{{job.title}}</span><br>
-            <small style="color: rgba(0,0,0,0.6)">{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}
+            <small style="color: rgba(0,0,0,0.6)">{{ cities|get_item:job.city_job }} , {{ states|get_item:job.state_job }}
           </small>
             </div>
           </div>
