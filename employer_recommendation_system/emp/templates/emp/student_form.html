@@ -127,7 +127,7 @@
       {% for item in scores %}
    <tr>
      <td>{{item.name}}</td>
-     <td>{{item.grade}}</td>
+     <td>{{ item.grade|floatformat:"-2" }}</td>
      <td>{{item.updated}}</td>
    </tr>
    {% endfor %}
@@ -261,8 +261,8 @@
         <span>Upload only .pdf file</span>
         {{ form.resume | as_crispy_field }}
       </div>
-      <div class="col-sm-2 mb-3">
-        {% if form.resume.value %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">View Resume</a> {% endif %}
+      <div class="col-sm-4 mb-3">
+        {% if form.resume.value %} <a class="btn btn-warning" href="{% url 'document_view' pk=request.user.id %}?type=resume" target="_blank">Click to view Resume</a> {% endif %}
       </div>
     	<!-- Add Education 1 -->
     	<div class="col-sm-4 mb-3"></div>
