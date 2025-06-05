@@ -108,10 +108,9 @@ div#cke table{
             <div class="me-auto">
            <span class="card-title fw-bold"><a href="{% url 'job-list' %}?id={{job.id}}">{{job.title}}</a></span><br>
             
-            <small style="color: rgba(0,0,0,0.6)">{{ cities|get_item:job.city_job }} , {{ states|get_item:job.state_job }}
-
-              
-          </small>
+            <small style="color: rgba(0,0,0,0.6)">
+              {% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}
+            </small>
             </div>
           </div>
           <hr>
@@ -183,8 +182,7 @@ div#cke table{
             {% endif %}
             <div class="me-auto">
            <span class="card-title fw-bold">{{job.title}}</span><br>
-            <small style="color: rgba(0,0,0,0.6)">{{ cities|get_item:job.city_job }} , {{ states|get_item:job.state_job }}
-          </small>
+            <small style="color: rgba(0,0,0,0.6)">{% get_citydetails job.city_job %} , {% get_statedetails job.state_job %}</small>
             </div>
           </div>
           <div id="cke" class="card-text mb-5" style="width: 100%;">
