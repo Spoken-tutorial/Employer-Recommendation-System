@@ -48,11 +48,16 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'api',
+    'corsheaders',
+    'rest_framework',
+    'filters',
     # 'crispy_bootstrap4'
 
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -239,3 +244,18 @@ PROFILE_EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'static', 'profile_email_logs')
 LOGIN_URL="https://jrs.spoken-tutorial.org/login/"
 SITE_URL="https://jrs.spoken-tutorial.org/"
 NO_REPLY_SPOKEN_MAIL=NO_REPLY_SPOKEN_MAIL
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True  # Temporarily allow for dev

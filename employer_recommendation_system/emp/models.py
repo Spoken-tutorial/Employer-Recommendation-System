@@ -9,6 +9,8 @@ import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
+from filters.models import *
+from filters.models import Discipline as DisciplineFilter, Degree as DegreeFilter
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
@@ -271,6 +273,7 @@ class Foss(models.Model):
         return self.foss
 
 class Job(models.Model):
+    JOB_STATUS = [(0, 'Draft'), (1, 'Pending Approval'), (2, 'Active'), (3, 'Rejected') ,(4, 'Expired')]
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
     state_job = models.IntegerField(null=True,blank=False)  
@@ -284,7 +287,7 @@ class Job(models.Model):
     salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
     date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
     date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
-    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
+    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE, blank=True, null=True)
     # 0: Job is inactive(added but not visible to students)
     # 1: Job is active(added & available to students for apply)
     # 2: Job Application Date is over
@@ -297,7 +300,7 @@ class Job(models.Model):
     gender = models.CharField(max_length=10,choices=GENDER,default='a')
     company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
     slug = models.SlugField(max_length = 250, null = True, blank = True)
-    last_app_date = models.DateTimeField(verbose_name="Last Application Date")
+    last_app_date = models.DateTimeField(verbose_name="Last Application Date", blank=True, null=True)
     rating = models.IntegerField(null=True,blank=True,verbose_name="Visibility")
     foss = models.CharField(max_length=200)
     # institute_type = models.CharField(max_length=200,null=True,blank=True)
@@ -314,6 +317,26 @@ class Job(models.Model):
     degree = models.ManyToManyField(Degree,blank=True,related_name='degrees', null=True)
     discipline = models.ManyToManyField(Discipline,blank=True,related_name='disciplines', null=True)
     job_foss = models.ManyToManyField(Foss,null=True,blank=True,related_name='fosses')
+
+
+    #modified fields
+    state_of_job = models.ForeignKey(State, on_delete=models.PROTECT, blank=True, null=True)
+    city_of_job = models.ForeignKey(City, on_delete=models.PROTECT, blank=True, null=True)
+    job_status = models.IntegerField(choices=JOB_STATUS, max_length=255, default=0)
+    #filters
+    courses = models.ManyToManyField(FossCategory, related_name='jobs', blank=True)
+    course_groups = models.ManyToManyField(FossSuperCategory, related_name='jobs',  blank=True)
+    degrees = models.ManyToManyField(DegreeFilter, related_name='jobs', blank=True)
+    disciplines = models.ManyToManyField(DisciplineFilter, related_name='jobs', blank=True)
+    graduation_years = models.ManyToManyField(GraduationYear, related_name='jobs', blank=True)
+    institute_types = models.ManyToManyField(InstituteType, related_name='jobs', blank=True)
+    states = models.ManyToManyField(State, related_name='jobs',  blank=True)
+    cities = models.ManyToManyField(City, related_name='jobs',  blank=True)
+    #new fields
+    added_by = models.ForeignKey(User, on_delete=models.PROTECT)
+
+
+
     def __str__(self):
         return self.title
 
@@ -330,8 +353,24 @@ class Job(models.Model):
     class Meta:
         ordering = [('-date_updated')]
 
+class JobShortlistLog(models.Model):
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
+    job = models.ForeignKey(Job,on_delete=models.CASCADE)
+    initial_status = models.IntegerField()
+    final_status = models.IntegerField()
+    status_changed_by = models.ForeignKey(User, on_delete=models.PROTECT)
+    created = models.DateField(auto_now_add=True, null=True,blank=True)
+    updated = models.DateTimeField(auto_now=True)
+
 
 class JobShortlist(models.Model): #Record is created when a student applies for a job, with status 0.The status changes to 1 when HR further shortlists it.
+    JOB_APPLICATION_STATUS = [
+        (0, 'in process'), # application received
+        (1, 'approved by admin'),
+        (2, 'rejected by admin'),
+        (3, 'approved'), # by employer
+        (4, 'rejected'), # by employer
+    ]
     # user=models.ForeignKey(User,on_delete=models.CASCADE)
     spk_user=models.IntegerField(null=True)  #spk
     student=models.ForeignKey(Student,on_delete=models.CASCADE)  #rec
@@ -341,7 +380,8 @@ class JobShortlist(models.Model): #Record is created when a student applies for 
     #0 : student has applied but not yet shortlisted by HR Manager
     #1 : student has applied & shortlisted by HR Manager
     status = models.IntegerField(null=True,blank=True)
-
+    application_status = models.IntegerField(choices=JOB_APPLICATION_STATUS,null=True,blank=True, default=0)
+    
     def __str__(self):
         return str(self.spk_user)+'-'+self.job.title
 
@@ -410,3 +450,43 @@ class Feedback(models.Model):
     message = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
+
+class Employer(models.Model):
+    EMPLOYER_STATUS = [
+        (0, 'inactive'),
+        (1, 'active')
+    ]
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE,
+        related_name='employer'
+    )
+    phone = models.CharField(validators=[phone_regex], max_length=17)
+    company = models.ForeignKey(Company, on_delete=models.PROTECT)
+    added_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='employers_added'
+    )
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='employers_approved',
+        help_text="User who approved this employer (null if self-approved via email)"
+    )
+    # is_approved = models.BooleanField(default=False)
+    approved_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    status = models.IntegerField(choices=EMPLOYER_STATUS, default=0)
+
+    def is_self_registered(self):
+        return self.user == self.added_by
+
+    def is_self_approved(self):
+        return self.approved_by is None and self.is_approved
+
+    def __str__(self):
+        return self.name

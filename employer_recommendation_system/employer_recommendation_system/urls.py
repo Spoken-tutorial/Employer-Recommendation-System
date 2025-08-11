@@ -27,6 +27,10 @@ urlpatterns = [
     path('',include('emp.urls')),
     path('',include('moodle.urls')),
     path('',include('accounts.urls')),
+    path('api/student/',include('api.urls.student')),
+    path('api/employer/',include('api.urls.employer')),
+    path('api/admin/',include('api.urls.admin')),
+    path('api/common/',include('api.urls.common')),
     
     # ]
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
