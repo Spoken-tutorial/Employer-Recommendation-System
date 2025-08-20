@@ -80,8 +80,7 @@ export default function StudentProfileForm() {
     linkedin: "",
     resume: null,
     grades: {},
-    certifications: "",
-    phone: "",
+    certifications: ""
   });
 
   // Handle form field changes
