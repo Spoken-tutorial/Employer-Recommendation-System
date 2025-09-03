@@ -2,7 +2,7 @@ import { WorkOutline, CalendarToday, Numbers, BusinessCenter} from "@mui/icons-m
 import { Box, TextField, InputAdornment, Typography, MenuItem, Divider, useTheme} from "@mui/material";
 import ReactQuill from "react-quill";
 
-export default function JobForm({form, errors, handleJobInputChange}){
+export default function JobForm({ form, errors, handleJobInputChange, handleQuillChange, showCompany = false, companyOptions = [] }){
     const theme = useTheme();
 
     //   const handleJobInputChange = (e) => {
@@ -26,11 +26,25 @@ export default function JobForm({form, errors, handleJobInputChange}){
              
               <Divider sx={{ mb: 2 }} />
               <Box display="flex" gap={2} mb={2}>
+                {showCompany && (
+                  <TextField
+                    label="Company"
+                    name="company"
+                    size="small"
+                    fullWidth
+                    required
+                    value={form.job?.company ?? ""}
+                    onChange={handleJobInputChange}
+                    error={Boolean(errors.job?.company)}
+                    helperText={errors.job?.company}
+                  />
+                )}
                 <TextField
                   label="Job Designation"
                   name="designation"
                   size="small"
                   fullWidth
+                  required
                   value={form.job?.designation}
                   onChange={handleJobInputChange}
                   InputProps={{
@@ -49,7 +63,8 @@ export default function JobForm({form, errors, handleJobInputChange}){
                   name="domain"
                   size="small"
                   fullWidth
-                  value={form.job?.domain}
+                  required
+                  value={form.job?.domain ?? ""}
                   onChange={handleJobInputChange}
                   InputProps={{
                     startAdornment: (
@@ -117,7 +132,7 @@ export default function JobForm({form, errors, handleJobInputChange}){
                   type="number"
                   size="small"
                   fullWidth
-                  value={form.job?.num_vacancies}
+                  value={form.job?.salary_range_min}
                   onChange={handleJobInputChange}
                   InputProps={{
                     startAdornment: (
@@ -127,8 +142,8 @@ export default function JobForm({form, errors, handleJobInputChange}){
                     ),
                     inputProps: { min: 1 },
                   }}
-                  error={Boolean(errors.job?.num_vacancies)}
-                  helperText={errors.job?.num_vacancies}
+                  error={Boolean(errors.job?.salary_range_min)}
+                  helperText={errors.job?.salary_range_min}
                 />
                 <TextField
                   label="Maximum Salary"
@@ -136,7 +151,7 @@ export default function JobForm({form, errors, handleJobInputChange}){
                   type="number"
                   size="small"
                   fullWidth
-                  value={form.job?.num_vacancies}
+                  value={form.job?.salary_range_max}
                   onChange={handleJobInputChange}
                   InputProps={{
                     startAdornment: (
@@ -146,13 +161,13 @@ export default function JobForm({form, errors, handleJobInputChange}){
                     ),
                     inputProps: { min: 1 },
                   }}
-                  error={Boolean(errors.job?.num_vacancies)}
-                  helperText={errors.job?.num_vacancies}
+                  error={Boolean(errors.job?.salary_range_max)}
+                  helperText={errors.job?.salary_range_max}
                 />
                 
               </Box>
               <Box mt={3} mb={2}>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }} component="label">
                   Job Description
                 </Typography>
                 <ReactQuill
@@ -164,7 +179,7 @@ export default function JobForm({form, errors, handleJobInputChange}){
                 />
               </Box>
               <Box mb={2}>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }} component="label">
                   Job Requirements
                 </Typography>
                 <ReactQuill
@@ -176,7 +191,7 @@ export default function JobForm({form, errors, handleJobInputChange}){
                 />
               </Box>
               <Box mb={2}>
-                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }} component="label">
                   Key Job Responsibilities
                 </Typography>
                 <ReactQuill

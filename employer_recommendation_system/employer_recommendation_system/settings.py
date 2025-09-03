@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = SECRET_KEY
+SECRET_KEY = "x$*nygz^9rje6g4e8w9a@u6!wi5%*zg(7x2lqd)=z@t#=u(tm$"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
@@ -115,14 +115,14 @@ DATABASES = {
         'PORT':'',
     },
 
-    'moodle': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': MDB,
-        'USER': MDB_USER,
-        'PASSWORD': MDB_PASS,
-        'HOST': MDB_HOST,
-        'PORT':'',
-    },
+    #'moodle': {
+     #   'ENGINE': 'django.db.backends.mysql',
+     #   'NAME': MDB,
+     #   'USER': MDB_USER,
+     #   'PASSWORD': MDB_PASS,
+     #   'HOST': MDB_HOST,
+    #    'PORT':'',
+   # },
 
     'OPTIONS': {
          "init_command": "SET foreign_key_checks = 0;",
