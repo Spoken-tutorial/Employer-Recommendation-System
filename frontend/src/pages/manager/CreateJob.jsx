@@ -1,7 +1,7 @@
 import { Box, Button, Card, CardContent, Container, Typography, useTheme } from "@mui/material";
 import JobForm from "../../components/common/JobForm";
 import JobFiltersForm from "../../components/common/JobFiltersForm";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,47 @@ export default function ManagerCreateJob() {
     const [form, setForm] = useState({ job: {} });
     const [errors, setErrors] = useState({ job: {}, error: null });
     const [success, setSuccess] = useState(null);
+    const [companies, setCompanies] = useState([]);
+
+    // load companies for dropdown
+    const reloadCompanies = async () => {
+        try {
+            const acc = [];
+            let url = "admin/manager/companies"; 
+            let guard = 0; 
+            while (url && guard < 100) {
+                const resp = await axiosInstance.get(url);
+                const payload = resp?.data;
+                const chunk = Array.isArray(payload)
+                    ? payload
+                    : Array.isArray(payload?.results)
+                    ? payload.results
+                    : Array.isArray(payload?.companies)
+                    ? payload.companies
+                    : Array.isArray(payload?.data)
+                    ? payload.data
+                    : [];
+                acc.push(...chunk);
+                url = payload && typeof payload === 'object' ? payload.next : null; 
+                guard += 1;
+            }
+            // dedupe and map
+            const unique = new Map();
+            acc.forEach((c) => {
+                const id = c.id ?? c.pk;
+                const name = c.name;
+                if (id && name && !unique.has(id)) unique.set(id, { id, name });
+            });
+            const all = Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+            setCompanies(all);
+        } catch (_) {
+            
+        }
+    };
+
+    useEffect(() => {
+        reloadCompanies();
+    }, []);
 
     // input change for job fields
     const handleJobInputChange = (e) => {
@@ -24,7 +65,7 @@ export default function ManagerCreateJob() {
         }));
     };
 
-    // for filters 
+    // filters
     const handleFiltersInputChange = (e) => {
         const { name, value } = e.target;
         setForm((prev) => ({
@@ -51,88 +92,14 @@ export default function ManagerCreateJob() {
         e.preventDefault();
         try {
             const url = "admin/manager/jobs/add";
-            // build the needed payload
+            // build the payload
             const raw = form.job || {};
             const toInt = (v) => {
                 const n = Number(v);
                 return Number.isFinite(n) ? n : undefined;
             };
-            const extractId = (obj) => {
-                const cands = [obj?.id, obj?.pk, obj?.company_id, obj?.slug];
-                for (const c of cands) {
-                    const n = Number(c);
-                    if (Number.isFinite(n)) return n;
-                }
-                return undefined;
-            };
-            const getList = (payload) => {
-                if (Array.isArray(payload)) return payload;
-                if (Array.isArray(payload?.results)) return payload.results;
-                if (Array.isArray(payload?.data)) return payload.data;
-                if (Array.isArray(payload?.companies)) return payload.companies;
-                return [];
-            };
-
-
-            let resolvedCompanyId;
-            if (raw.company !== undefined && raw.company !== null && String(raw.company).trim() !== "") {
-                const compStr = String(raw.company).trim();
-                if (/^\d+$/.test(compStr)) {
-                    resolvedCompanyId = Number(compStr);
-                } else {
-                    try {
-                        const listResp = await axiosInstance.get("admin/manager/companies");
-                        const companies = getList(listResp.data);
-                        const match = companies.find((c) => (c.name || "").toLowerCase().trim() === compStr.toLowerCase());
-                        if (match) {
-                            const idLike = extractId(match);
-                            if (Number.isFinite(idLike)) resolvedCompanyId = idLike;
-                        } else {
-                            // Auto-create company with minimal valid defaults
-                            const createPayload = {
-                                name: compStr,
-                                emp_name: compStr, 
-                                emp_contact: "1234567890", 
-                                address: "Address not provided",
-
-                            };
-                            try {
-                                const createResp = await axiosInstance.post("admin/manager/companies/add", createPayload);
-                                let newId = extractId(createResp.data || {});
-                                if (!Number.isFinite(newId)) {
-                                    // fallback
-                                    try {
-                                        const afterResp = await axiosInstance.get("admin/manager/companies");
-                                        const list = getList(afterResp.data);
-                                        const created = list.find((c) => (c.name || "").toLowerCase().trim() === compStr.toLowerCase());
-                                        const idLike = extractId(created || {});
-                                        if (Number.isFinite(idLike)) newId = idLike;
-                                    } catch (_) {
-                                        
-                                    }
-                                }
-                                if (Number.isFinite(newId)) {
-                                    resolvedCompanyId = newId;
-                                }
-                            } catch (createErr) {
-                                // surface company creation errors to the form
-                                const server = createErr.response?.data;
-                                const msg = typeof server === 'object' ? (server.detail || Object.values(server)[0]) : 'Failed to create company';
-                                setErrors((prev) => ({ ...prev, job: { ...prev.job, company: String(msg) } }));
-                                return;
-                            }
-                        }
-                    } catch (lookupErr) {
-                        
-                    }
-                }
-            }
-
-
-            if (resolvedCompanyId) {
-                setErrors((prev) => ({ ...prev, job: { ...prev.job, company: undefined } }));
-                setForm((prev) => ({ ...prev, job: { ...prev.job, company: String(resolvedCompanyId) } }));
-            }
+            // company selection from dropdown
+            const resolvedCompanyId = /^\d+$/.test(String(raw.company ?? '').trim()) ? Number(String(raw.company).trim()) : undefined;
 
             const payload = {};
             if (raw.designation) payload.designation = raw.designation;
@@ -159,7 +126,8 @@ export default function ManagerCreateJob() {
             await axiosInstance.post(url, payload);
             setSuccess("Job created successfully!");
             setErrors({ job: {}, error: null });
-            // redirect to jobs list and trigger success snackbar
+
+            // redirect to jobs list and trigger snackbar
             navigate("/manager/jobs", { state: { created: "job" } });
         } catch (error) {
             const server = error.response?.data;
@@ -189,16 +157,20 @@ export default function ManagerCreateJob() {
                             errors={errors}
                 handleJobInputChange={handleJobInputChange}
                 handleQuillChange={handleQuillChange}
-                showCompany
+                    showCompany
+                    companyOptions={companies}
+                onCompanyOpen={reloadCompanies}
                         />
                     </CardContent>
                 </Card>
                 <Card sx={{ mb: 4, borderLeft: `6px solid ${theme.palette.success.main}` }}>
                     <CardContent>
-                        <JobFiltersForm
-                form={form}
-                handleFiltersInputChange={handleFiltersInputChange}
-                        />
+            <JobFiltersForm
+        form={form}
+        errors={errors}
+        setForm={setForm}
+        handleFiltersInputChange={handleFiltersInputChange}
+            />
                     </CardContent>
                 </Card>
                                 <Box display="flex" justifyContent="center" mt={4} gap={2}>

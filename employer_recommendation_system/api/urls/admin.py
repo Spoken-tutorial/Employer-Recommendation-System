@@ -3,7 +3,14 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from api.views.auth import CustomTokenObtainPairView 
 
 from api.views.admin import ManagerDashboardView
-from api.views.admin import ManagerJobsListView, ManagerJobCreateView, ManagerCompaniesListView, ManagerCompanyCreateView
+from api.views.admin import (
+    ManagerJobsListView,
+    ManagerJobCreateView,
+    ManagerCompaniesListView,
+    ManagerCompanyCreateView,
+    ManagerCompanyDetailView,
+    ManagerCompanyUpdateView,
+)
 from api.views.employer import JobDetailView, JobUpdateView
 
 urlpatterns = [
@@ -16,4 +23,6 @@ urlpatterns = [
     path('manager/jobs/edit/<int:pk>/', JobUpdateView.as_view(), name='manager-job-update'),
     path('manager/companies', ManagerCompaniesListView.as_view(), name='manager-companies-list'),
     path('manager/companies/add', ManagerCompanyCreateView.as_view(), name='manager-company-create'),
+    path('manager/companies/<int:pk>/', ManagerCompanyDetailView.as_view(), name='manager-company-detail'),
+    path('manager/companies/edit/<int:pk>/', ManagerCompanyUpdateView.as_view(), name='manager-company-update'),
 ]

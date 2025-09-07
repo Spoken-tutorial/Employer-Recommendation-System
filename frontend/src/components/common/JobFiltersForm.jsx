@@ -29,10 +29,10 @@ import {
 import { useState } from "react";
 import Select from "react-select";
 
-export default function JobFiltersForm({form, errors}){
+export default function JobFiltersForm({form, errors, setForm}){
     const theme = useTheme();
 
-     // Custom styles for react-select to match theme
+     
   const selectStyles = {
     control: (base) => ({
       ...base,
@@ -59,7 +59,7 @@ export default function JobFiltersForm({form, errors}){
     }),
   };
 
-    // Example options (replace with your actual data)
+    
   const courseOptions = [
     { value: "B.Tech", label: "B.Tech" },
     { value: "M.Tech", label: "M.Tech" },
@@ -91,7 +91,7 @@ export default function JobFiltersForm({form, errors}){
     { value: "Bangalore", label: "Bangalore" },
   ];
 
-    const handleEligibilityChange = (field) => (selected) => {
+  const handleEligibilityChange = (field) => (selected) => {
     setForm((prev) => ({
       ...prev,
       eligibility: {

@@ -20,6 +20,7 @@ class CompanySerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
         fields = [
+            'id',
             'name',
             'emp_name',
             'emp_contact',
@@ -37,7 +38,7 @@ class CompanySerializer(serializers.ModelSerializer):
             'slug',
             'rating',
         ]
-    read_only_fields = ['added_by', 'slug', 'status', 'rating']
+    read_only_fields = ['id', 'added_by', 'slug', 'status', 'rating']
 
 class JobCreateSerializer(serializers.ModelSerializer):
     
@@ -123,7 +124,7 @@ class JobListSerializer(serializers.ModelSerializer):
 class JobDisplaySerializer(serializers.ModelSerializer):
     last_app_date_human = serializers.SerializerMethodField()
     num_applicants = serializers.SerializerMethodField()
-    domain = serializers.StringRelatedField() #This will return the __str__() representation of the related object.
+    domain = serializers.StringRelatedField() 
     state_of_job = serializers.StringRelatedField()
     city_of_job = serializers.StringRelatedField()
     job_type = serializers.StringRelatedField()
@@ -186,9 +187,7 @@ class JobDisplaySerializer(serializers.ModelSerializer):
         
     def get_num_applicants(self, obj):
         return JobShortlist.objects.filter(job=obj).count()
-        # extra_kwargs = {
-        #     'job_status': {'read_only': True}
-        # }
+       
     def get_applicants(self, obj):
         try:
             print(f"\033[95m getting applicants ************ {obj}\033[0m")
@@ -204,7 +203,7 @@ class JobDisplaySerializer(serializers.ModelSerializer):
                 spk_usr_ids.append(item.student.spk_usr_id)
             print(f"\033[93m 1 ******************** \033[0m")
             sm = StudentMaster.objects.filter(student__user_id__in=spk_usr_ids).select_related('student', 'student__user', 'batch', 'batch__department', 'batch__academic')
-            # students = SpokenStudent.objects.filter(user__in=spk_usr_ids).select_related('studentmaster', 'studentmaster__batch', 'studentmaster__batch__department' )
+            
             print(f"\033[93m 2 ******************** \033[0m")
             for item in sm:
                 print(item)
@@ -226,7 +225,7 @@ class CompanyRegisterSerializer(serializers.Serializer):
     company = CompanySerializer()
     job = JobCreateSerializer(required=False, allow_null=True)
     employer = EmployerSerializer()
-    # user = UserSerializer()  # for manager registration
+    # for manager registration
 
     def to_representation(self, instance):
         print(f"\033[95m instance \033[0m")
@@ -234,7 +233,7 @@ class CompanyRegisterSerializer(serializers.Serializer):
             'company': CompanySerializer(instance['company']).data,
             'employer': EmployerSerializer(instance['employer']).data,
             'job': JobDisplaySerializer(instance['job']).data,
-            # 'user': UserSerializer(instance['user']).data  # Remove user from output
+            
         }
 
 
@@ -242,28 +241,28 @@ class CompanyRegisterSerializer(serializers.Serializer):
         print(f"\033[95m create of CompanyRegisterSerializer \033[0m")
         # Extract Data
         company_data = validated_data.pop('company')
-    # user_data = validated_data.pop('user')  # Remove user extraction
+    
         employer_data = validated_data.pop('employer')
         job_data = validated_data.pop('job', None)
         
         try:
             with transaction.atomic():
-                # 1. Handle domain separately
+                
                 domain_list = company_data.pop('domain', [])
-                # 2. Create Company without domain
+                
                 company = Company.objects.create(**company_data)
-                # 3. Set domain many-to-many
+                
                 if domain_list:
                     company.domain.set(domain_list)
 
-                # 4. Create Employer (no user)
+                
                 employer = Employer.objects.create(
                     company=company, **employer_data
                 )
                 employer.approved_by = None
                 employer.save()
                 print(f"\033[92m created employer \033[0m")
-                # 6. Create Job
+                
                 if job_data != None:
                     courses = job_data.pop('courses', None)
                     course_groups = job_data.pop('course_groups', None)
@@ -302,6 +301,9 @@ class CompanyRegisterSerializer(serializers.Serializer):
 
 
 class JobUpdateSerializer(serializers.ModelSerializer):
+    last_app_date_human = serializers.SerializerMethodField(read_only=True)
+    num_applicants = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = Job
         fields = [
@@ -338,7 +340,15 @@ class JobUpdateSerializer(serializers.ModelSerializer):
             'last_app_date_human',
             'num_applicants'
         ]
-        read_only_fields = ['id']
+        read_only_fields = ['id', 'last_app_date_human', 'num_applicants']
+
+    def get_last_app_date_human(self, obj):
+        if obj.last_app_date:
+            return obj.last_app_date.strftime("%d %b %Y, %I:%M %p")
+        return None
+
+    def get_num_applicants(self, obj):
+        return JobShortlist.objects.filter(job=obj).count()
 
 class TeamSerializer(serializers.ModelSerializer):
     class Meta:

@@ -2,18 +2,8 @@ import { WorkOutline, CalendarToday, Numbers, BusinessCenter} from "@mui/icons-m
 import { Box, TextField, InputAdornment, Typography, MenuItem, Divider, useTheme} from "@mui/material";
 import ReactQuill from "react-quill";
 
-export default function JobForm({ form, errors, handleJobInputChange, handleQuillChange, showCompany = false, companyOptions = [] }){
+export default function JobForm({ form, errors, handleJobInputChange, handleQuillChange, showCompany = false, companyOptions = [], onCompanyOpen }){
     const theme = useTheme();
-
-    //   const handleJobInputChange = (e) => {
-    //     setForm((prev) => ({
-    //     ...prev,
-    //     job: {
-    //         ...prev.job,
-    //         [e.target.name]: e.target.value,
-    //     },
-    //     }));
-    // };
 
     return (
         <section>
@@ -28,6 +18,7 @@ export default function JobForm({ form, errors, handleJobInputChange, handleQuil
               <Box display="flex" gap={2} mb={2}>
                 {showCompany && (
                   <TextField
+                    select
                     label="Company"
                     name="company"
                     size="small"
@@ -35,9 +26,22 @@ export default function JobForm({ form, errors, handleJobInputChange, handleQuil
                     required
                     value={form.job?.company ?? ""}
                     onChange={handleJobInputChange}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <BusinessCenter sx={{ color: theme.palette.info.main }} />
+                        </InputAdornment>
+                      ),
+                    }}
                     error={Boolean(errors.job?.company)}
                     helperText={errors.job?.company}
-                  />
+                    SelectProps={{ onOpen: onCompanyOpen }}
+                  >
+                    <MenuItem value="">Select Company</MenuItem>
+                    {companyOptions.map((c) => (
+                      <MenuItem key={c.id} value={String(c.id)}>{c.name}</MenuItem>
+                    ))}
+                  </TextField>
                 )}
                 <TextField
                   label="Job Designation"

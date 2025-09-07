@@ -16,7 +16,7 @@ urlpatterns = [
     
     path('manager',views.manager_homepage,name="manager"),
     path('shortlist_student',views.shortlist_student,name='shortlist_student'),
-    ################### company urls : currently only accessible to MANAGER Role : Set conditions via admin
+    
     path('add_company/', CompanyCreate.as_view(), name='add_company'),
     path('<slug:slug>/update-company/', CompanyUpdate.as_view(), name='update-company-detail'),
     path('company_list/', CompanyListView.as_view(), name='company-list'),

@@ -56,6 +56,7 @@ class ManagerJobCreateView(generics.CreateAPIView):
 class ManagerCompaniesListView(generics.ListAPIView):
 	permission_classes = [AllowAny]  # removed admin only restriction for now
 	serializer_class = CompanySerializer
+	pagination_class = None  # return all companies for dropdowns
 
 	def get_queryset(self):
 		return Company.objects.all()  # show companies data from the table
@@ -68,3 +69,15 @@ class ManagerCompanyCreateView(generics.CreateAPIView):
 			User.objects.filter(is_superuser=True).first() or User.objects.first()
 		)
 		serializer.save(added_by=user)
+
+class ManagerCompanyDetailView(generics.RetrieveAPIView):
+	"""Retrieve a single company by id for manager UI."""
+	permission_classes = [AllowAny]
+	serializer_class = CompanySerializer
+	queryset = Company.objects.all()
+
+class ManagerCompanyUpdateView(generics.UpdateAPIView):
+	"""Update a company by id for manager UI."""
+	permission_classes = [AllowAny]
+	serializer_class = CompanySerializer
+	queryset = Company.objects.all()
