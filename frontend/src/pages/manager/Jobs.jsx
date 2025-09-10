@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useLocation, useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import { useEffect, useRef, useState } from "react";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 
 const statusMap = {
   0: "draft",
@@ -59,7 +59,7 @@ export default function ManagerJobs() {
       const pageForBlock = blockIndex + 1; 
       try {
         const url = "admin/manager/jobs";
-        const response = await axiosInstance.get(url, { params: { page: pageForBlock, page_size: blockSize } });
+  const response = await axiosManager.get(url, { params: { page: pageForBlock, page_size: blockSize } });
         const payload = response?.data;
         const raw = Array.isArray(payload)
           ? payload
@@ -105,7 +105,7 @@ export default function ManagerJobs() {
     const pageForBlock = blockIndex + 1;
     try {
       const url = "admin/manager/jobs";
-      const response = await axiosInstance.get(url, { params: { page: pageForBlock, page_size: blockSize } });
+  const response = await axiosManager.get(url, { params: { page: pageForBlock, page_size: blockSize } });
       const payload = response?.data;
       const raw = Array.isArray(payload)
         ? payload

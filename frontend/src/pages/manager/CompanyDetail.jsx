@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, Card, CardContent, Container, Typography, useTheme } from "@mui/material";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 import CompanyForm from "../../components/common/CompanyForm";
 
 export default function ManagerCompanyDetail() {
@@ -18,7 +18,7 @@ export default function ManagerCompanyDetail() {
         const fetchCompany = async () => {
             try {
                 const url = `admin/manager/companies/${company_id}/`;
-                const { data } = await axiosInstance.get(url);
+                const { data } = await axiosManager.get(url);
 
                 const toIdList = (v) => {
                     if (!v) return "";
@@ -118,7 +118,7 @@ export default function ManagerCompanyDetail() {
                 if (arr.length) payload.domain = arr;
             }
 
-            await axiosInstance.patch(url, payload);
+            await axiosManager.patch(url, payload);
             setSuccess("Company updated successfully!");
             setErrors({ company: {}, error: null });
             navigate("/manager/companies", { state: { updated: "company" } });

@@ -2,7 +2,7 @@ import { Container, Typography, Button, Box, IconButton, Link, Snackbar } from "
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useState, useEffect } from "react";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 import DataTable from "react-data-table-component";
 import { useLocation, useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
@@ -28,7 +28,7 @@ export default function ManagerCompanies() {
         const fetchBlock = async (blockIndex) => {
             const pageForBlock = blockIndex + 1; 
             try {
-                const response = await axiosInstance.get("admin/manager/companies", { params: { page: pageForBlock, page_size: blockSize } });
+                const response = await axiosManager.get("admin/manager/companies", { params: { page: pageForBlock, page_size: blockSize } });
                 const payload = response?.data;
                 const raw = Array.isArray(payload)
                     ? payload
@@ -67,7 +67,7 @@ export default function ManagerCompanies() {
         setPageLoading(true);
         const pageForBlock = blockIndex + 1;
         try {
-            const response = await axiosInstance.get("admin/manager/companies", { params: { page: pageForBlock, page_size: blockSize } });
+            const response = await axiosManager.get("admin/manager/companies", { params: { page: pageForBlock, page_size: blockSize } });
             const payload = response?.data;
             const raw = Array.isArray(payload)
                 ? payload

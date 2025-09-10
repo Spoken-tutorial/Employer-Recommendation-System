@@ -3,7 +3,7 @@ import { useTheme } from "@mui/material";
 import CompanyForm from "../../components/common/CompanyForm";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 
 export default function ManagerAddCompany() {
     const theme = useTheme();
@@ -67,7 +67,7 @@ export default function ManagerAddCompany() {
             } else if (Array.isArray(c.domain)) {
                 payload.domain = c.domain.filter((v) => Number.isFinite(Number(v))).map((v) => Number(v));
             }
-            await axiosInstance.post(url, payload);
+            await axiosManager.post(url, payload);
             setSuccess("Company added successfully!");
             setErrors({ company: {} });
             navigate("/manager/companies", { state: { created: "company" } });

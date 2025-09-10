@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, Card, CardContent, Container, Typography, useTheme } from "@mui/material";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 import JobForm from "../../components/common/JobForm";
 import JobFiltersForm from "../../components/common/JobFiltersForm";
 
@@ -23,7 +23,7 @@ export default function ManagerEditJob() {
             let url = "admin/manager/companies";
             let guard = 0;
             while (url && guard < 100) {
-                const resp = await axiosInstance.get(url);
+                const resp = await axiosManager.get(url);
                 const payload = resp?.data;
                 const chunk = Array.isArray(payload)
                     ? payload
@@ -56,7 +56,7 @@ export default function ManagerEditJob() {
         const fetchJob = async () => {
             try {
                 const url = `admin/manager/jobs/${job_id}/`;
-                const { data } = await axiosInstance.get(url);
+                const { data } = await axiosManager.get(url);
                 
                 setCompanyName(data.company || "");
                 const parseDate = (iso) => {
@@ -158,7 +158,7 @@ export default function ManagerEditJob() {
                 if (raw.last_app_date) payload.last_app_date = `${raw.last_app_date}T00:00:00Z`;
                 if (raw.job_status !== undefined) payload.job_status = raw.job_status;
 
-                await axiosInstance.patch(url, payload);
+                await axiosManager.patch(url, payload);
             setSuccess("Job updated successfully!");
             setErrors({ job: {}, error: null });
             navigate("/manager/jobs", { state: { updated: "job" } });

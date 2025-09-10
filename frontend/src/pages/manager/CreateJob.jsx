@@ -2,7 +2,7 @@ import { Box, Button, Card, CardContent, Container, Typography, useTheme } from 
 import JobForm from "../../components/common/JobForm";
 import JobFiltersForm from "../../components/common/JobFiltersForm";
 import { useEffect, useState } from "react";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 import { useNavigate } from "react-router-dom";
 
 export default function ManagerCreateJob() {
@@ -20,7 +20,7 @@ export default function ManagerCreateJob() {
             let url = "admin/manager/companies"; 
             let guard = 0; 
             while (url && guard < 100) {
-                const resp = await axiosInstance.get(url);
+                const resp = await axiosManager.get(url);
                 const payload = resp?.data;
                 const chunk = Array.isArray(payload)
                     ? payload
@@ -123,7 +123,7 @@ export default function ManagerCreateJob() {
 
             if (!payload.company) payload.company = null;
 
-            await axiosInstance.post(url, payload);
+            await axiosManager.post(url, payload);
             setSuccess("Job created successfully!");
             setErrors({ job: {}, error: null });
 

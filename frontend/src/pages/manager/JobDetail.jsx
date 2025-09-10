@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Typography } from "@mui/material";
-import axiosInstance from "../../api/axiosInstance";
+import axiosManager from "../../api/axiosManager";
 
 export default function ManagerJobDetail() {
     const { job_id } = useParams();
@@ -12,7 +12,7 @@ export default function ManagerJobDetail() {
         const fetchJob = async () => {
             try {
                 const url = `admin/manager/jobs/${job_id}/`;
-                const response = await axiosInstance.get(url);
+                const response = await axiosManager.get(url);
                 setJob(response.data);
             } catch (error) {
                 setError("Failed to fetch job details");
