@@ -112,7 +112,6 @@ class JobListSerializer(serializers.ModelSerializer):
         fields = ['id', 'designation', 'job_status', 'last_app_date_human', 'num_applicants']
 
     def get_last_app_date_human(self, obj):
-        print(f"\033[95m last_app_date_human \033[0m")
         if obj.last_app_date:
             return obj.last_app_date.strftime("%d %b %Y, %I:%M %p")
         return None
@@ -180,7 +179,6 @@ class JobDisplaySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'job_status']
 
     def get_last_app_date_human(self, obj):
-        print(f"\033[95m last_app_date_human \033[0m")
         if obj.last_app_date:
             return obj.last_app_date.strftime("%d %b %Y, %I:%M %p")
         return None
