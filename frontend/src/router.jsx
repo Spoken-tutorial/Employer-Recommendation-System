@@ -6,6 +6,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import StudentLayout from './layouts/StudentLayout.jsx';
 import EmployerLayout from './layouts/EmployerLayout.jsx';
 import AdminLayout from './layouts/AdminLayout.jsx';
+import ManagerLayout from './layouts/ManagerLayout.jsx';
 
 // Pages
 import StudentDashboard from './pages/student/Dashboard.jsx';
@@ -29,6 +30,14 @@ import Students from './pages/admin/Students.jsx';
 import Mail from './pages/admin/Mail.jsx';
 import CompanyDetail from './pages/admin/CompanyDetail.jsx';
 import StudentFilter from './pages/employer/StudentFilter.jsx';
+import ManagerHome from './pages/manager/Home.jsx';
+import ManagerJobs from './pages/manager/Jobs.jsx';
+import ManagerCreateJob from './pages/manager/CreateJob.jsx';
+import ManagerEditJob from './pages/manager/EditJob.jsx';
+import ManagerJobDetail from './pages/manager/JobDetail.jsx';
+import ManagerCompanies from './pages/manager/Companies.jsx';
+import ManagerAddCompany from './pages/manager/AddCompany.jsx';
+import ManagerCompanyDetail from './pages/manager/CompanyDetail.jsx';
 
 const router = createBrowserRouter([
   {
@@ -91,6 +100,20 @@ const router = createBrowserRouter([
       { path: 'mail', element: <Mail /> },
       // Add more admin routes here
     ],
+  },
+  {
+    path: '/manager',
+    element: <ManagerLayout />,
+    children: [
+      { path: '', element: <ManagerHome /> },
+      { path: 'jobs', element: <ManagerJobs /> },
+      { path: 'jobs/add', element: <ManagerCreateJob /> },
+  { path: 'jobs/edit/:job_id', element: <ManagerEditJob /> },
+  { path: 'jobs/:job_id', element: <ManagerEditJob /> },
+      { path: 'companies', element: <ManagerCompanies /> },
+      { path: 'company/add', element: <ManagerAddCompany /> },
+      { path: 'company/:company_id', element: <ManagerCompanyDetail /> },
+    ]
   },
   {
     path: '*', // Catch-all route for undefined paths

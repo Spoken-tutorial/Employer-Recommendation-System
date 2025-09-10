@@ -32,7 +32,7 @@ export default function EditJob(){
 
                 <Card sx={{ mb: 4, borderLeft: `6px solid ${theme.palette.success.main}` }}>
                     <CardContent>
-                        <JobFiltersForm form={form}/>
+                        <JobFiltersForm form={form} errors={errors} setForm={setForm}/>
                     </CardContent>
                 </Card>
 

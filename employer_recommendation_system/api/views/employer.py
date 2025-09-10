@@ -11,7 +11,6 @@ from api.serializers.employer import *
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-
 class RegisterCompanyAPIView(generics.CreateAPIView):
 #     queryset = Company.objects.all()
     serializer_class = CompanyRegisterSerializer
