@@ -10,7 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     
-        <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <AuthProvider>
         <App />

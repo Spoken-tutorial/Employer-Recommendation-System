@@ -6,6 +6,8 @@ import axiosManager from "../../api/axiosManager";
 import DataTable from "react-data-table-component";
 import { useLocation, useNavigate } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
+import ThemedDataTable from "../../components/wrappers/ThemedDataTable";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ManagerCompanies() {
     const [companies, setCompanies] = useState([]);
@@ -152,11 +154,9 @@ export default function ManagerCompanies() {
     ];
 
     return (
-        <Container sx={{ mt: 4 }}>
-            <Box sx={{ background: '#4285f4', color: 'white', borderRadius: 2, p: 2, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>Companies (Manager)</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} sx={{ background: 'white', color: '#4285f4', fontWeight: 600, boxShadow: 0 }} onClick={()=>navigate("/manager/company/add")}>Add Company</Button>
-            </Box>
+        <Box>
+            <PageHeader title="Companies" btnIcon={<AddIcon/>} btnText="Add Company"
+                      onBtnClick={() => navigate("add")}/>
             {loading && <Typography>Loading...</Typography>}
             {error && <Typography color="error">{error}</Typography>}
             <DataTable 
@@ -193,6 +193,6 @@ export default function ManagerCompanies() {
                     </IconButton>
                 }
             />
-        </Container>
+        </Box>
     );
 }

@@ -4,6 +4,8 @@ import { Box, Button, Card, CardContent, Container, Typography, useTheme } from 
 import axiosManager from "../../api/axiosManager";
 import JobForm from "../../components/common/JobForm";
 import JobFiltersForm from "../../components/common/JobFiltersForm";
+import PageHeader from "../../components/common/PageHeader";
+
 
 export default function ManagerEditJob() {
     const { job_id } = useParams();
@@ -180,7 +182,7 @@ export default function ManagerEditJob() {
 
     return (
         <Container sx={{ mt: 4 }}>
-            <Typography variant="h5" mb={2}>Edit Job (Manager)</Typography>
+            <PageHeader title="Edit Job" />
             <form onSubmit={handleFormSubmit}>
                 <Card sx={{ mb: 4, borderLeft: `6px solid ${theme.palette.info.main}` }}>
                     <CardContent>

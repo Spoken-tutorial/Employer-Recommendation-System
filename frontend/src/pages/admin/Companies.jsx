@@ -1,19 +1,18 @@
 import React, { useState } from "react";
-import DataTable from "react-data-table-component";
 import {
   Box,
   Typography,
   Chip,
   Select,
   MenuItem,
-  Avatar,
-  InputAdornment,
 } from "@mui/material";
 import BusinessIcon from "@mui/icons-material/Business";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
+import ThemedDataTable from "../../components/wrappers/ThemedDataTable";
 
 // Dummy data
 const initialCompanies = [
@@ -151,14 +150,10 @@ export default function Companies() {
   ];
 
   return (
+    
     <Box sx={{ p: { xs: 1, md: 3 } }}>
-      <Typography
-        variant="h5"
-        sx={{ fontWeight: 600, color: "primary.main", mb: 3 }}
-      >
-        Companies
-      </Typography>
-      <DataTable
+      <PageHeader title="Jobs" />
+      <ThemedDataTable
         columns={columns}
         data={companies}
         highlightOnHover
@@ -167,22 +162,6 @@ export default function Companies() {
         responsive
         pagination
         onRowClicked={(row) => navigate(`/companies/${row.id}`)}
-        customStyles={{
-          headCells: {
-            style: {
-              fontWeight: 700,
-              fontSize: "1rem",
-              background: "#e3f2fd",
-              color: "#1976d2",
-            },
-          },
-          rows: {
-            style: {
-              fontSize: "1rem",
-              minHeight: "48px",
-            },
-          },
-        }}
       />
     </Box>
   );

@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, Card, CardContent, Container, Typography, useTheme } from "@mui/material";
 import axiosManager from "../../api/axiosManager";
 import CompanyForm from "../../components/common/CompanyForm";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ManagerCompanyDetail() {
     const { company_id } = useParams();
@@ -139,8 +140,8 @@ export default function ManagerCompanyDetail() {
     };
 
     return (
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h5" mb={2}>Edit Company (Manager)</Typography>
+        <Container>
+            <PageHeader title="Edit Company" />
             {loading ? (
                 <Typography>Loading...</Typography>
             ) : (

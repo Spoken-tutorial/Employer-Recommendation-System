@@ -4,6 +4,7 @@ import CompanyForm from "../../components/common/CompanyForm";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosManager from "../../api/axiosManager";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ManagerAddCompany() {
     const theme = useTheme();
@@ -89,8 +90,8 @@ export default function ManagerAddCompany() {
     };
 
     return (
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h5" mb={2}>Add Company (Manager)</Typography>
+        <Container >
+            <PageHeader title="Add Company" />
             <form onSubmit={handleFormSubmit}>
                 <Card sx={{ mb: 4, borderLeft: `6px solid ${theme.palette.info.main}` }}>
                     <CardContent>

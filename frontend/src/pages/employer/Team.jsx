@@ -5,6 +5,7 @@ import {
   Container
 } from "@mui/material";
 import { EmailOutlined, Person, PersonOutline } from "@mui/icons-material";
+import PageHeader from "../../components/common/PageHeader";
 
 const dummyTeam = [
   { id: 1, firstName: "Alice", lastName: "Smith", email: "alice@company.com", active: true },
@@ -73,7 +74,9 @@ export default function Team() {
   return (
     <Container>
         <Box sx={{ mx: "auto", mt: 4 }}>
+          <PageHeader title="Team Members"/>
       <Paper sx={{ p: 3, mb: 4 }}>
+
         <Typography variant="h6" gutterBottom>
           Add Team Member
         </Typography>

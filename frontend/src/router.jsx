@@ -111,7 +111,7 @@ const router = createBrowserRouter([
   { path: 'jobs/edit/:job_id', element: <ManagerEditJob /> },
   { path: 'jobs/:job_id', element: <ManagerEditJob /> },
       { path: 'companies', element: <ManagerCompanies /> },
-      { path: 'company/add', element: <ManagerAddCompany /> },
+      { path: 'companies/add', element: <ManagerAddCompany /> },
       { path: 'company/:company_id', element: <ManagerCompanyDetail /> },
     ]
   },

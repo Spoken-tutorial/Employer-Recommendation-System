@@ -7,15 +7,16 @@ import {
   Tooltip,
   IconButton,
   CircularProgress,
-  Snackbar
+  Snackbar,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import { useLocation, useNavigate } from "react-router-dom";
-import DataTable from "react-data-table-component";
 import { useEffect, useRef, useState } from "react";
 import axiosManager from "../../api/axiosManager";
+import PageHeader from "../../components/common/PageHeader";
+import ThemedDataTable from "../../components/wrappers/ThemedDataTable";
 
 const statusMap = {
   0: "draft",
@@ -59,7 +60,7 @@ export default function ManagerJobs() {
       const pageForBlock = blockIndex + 1; 
       try {
         const url = "admin/manager/jobs";
-  const response = await axiosManager.get(url, { params: { page: pageForBlock, page_size: blockSize } });
+        const response = await axiosManager.get(url, { params: { page: pageForBlock, page_size: blockSize } });
         const payload = response?.data;
         const raw = Array.isArray(payload)
           ? payload
@@ -239,14 +240,13 @@ export default function ManagerJobs() {
   ];
 
   return (
-    <Box>
-      <Box sx={{ background: '#4285f4', color: 'white', borderRadius: 2, p: 2, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>Jobs (Manager)</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} sx={{ background: 'white', color: '#4285f4', fontWeight: 600, boxShadow: 0 }} onClick={()=>navigate("add")}>Add Job</Button>
-      </Box>
+    
+    <Box >
+      <PageHeader title="Jobs" btnIcon={<AddIcon/>} btnText="Add job"
+                      onBtnClick={() => navigate("add")}/>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
-      <DataTable
+      <ThemedDataTable
         columns={columns}
         data={pagesCache[currentPage] || []}
         pagination
