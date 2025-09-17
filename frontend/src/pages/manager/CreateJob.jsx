@@ -4,6 +4,7 @@ import JobFiltersForm from "../../components/common/JobFiltersForm";
 import { useEffect, useState } from "react";
 import axiosManager from "../../api/axiosManager";
 import { useNavigate } from "react-router-dom";
+import PageHeader from "../../components/common/PageHeader";
 
 export default function ManagerCreateJob() {
     const theme = useTheme();
@@ -147,8 +148,8 @@ export default function ManagerCreateJob() {
 
     return (
     <>
-        <Container sx={{ mt: 4 }}>
-            <Typography variant="h5" mb={2}>Add Job (Manager)</Typography>
+        <Container>
+            <PageHeader title="Add Job" />
             <form onSubmit={handleFormSubmit}>
         <Card sx={{ mb: 4, borderLeft: `6px solid ${theme.palette.info.main}` }}>
                     <CardContent>
