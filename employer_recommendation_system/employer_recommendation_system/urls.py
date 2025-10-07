@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
+from django.http import JsonResponse
 
 
 
 urlpatterns = [
 
     path('admin/', admin.site.urls),
+    path('api/health/', lambda r: JsonResponse({'ok': True, 'app': 'jrs'})),
     path('events/',include('events.urls')),
     path('',include('emp.urls')),
     path('',include('moodle.urls')),
