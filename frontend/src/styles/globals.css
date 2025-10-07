@@ -1,4 +1,5 @@
-:root { --bg: #0f1422; --fg: #e9edf3; --card: #141b2d; }
+/* :root { --bg: #0f1422; --fg: #e9edf3; --card: #141b2d; }
+:root { --bg: #e9edf3; --fg: #002648; --card: #141b2d; }
 html, body, #root { height: 100%; }
 body { margin: 0; background: var(--bg); color: var(--fg); font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
-a { color: #91c9ff; text-decoration: none; }
+a { color: #91c9ff; text-decoration: none; } */
