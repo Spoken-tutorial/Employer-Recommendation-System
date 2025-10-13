@@ -1,7 +1,6 @@
 from spoken.models import EventTestStatus, Participant, SpokenUser, TestAttendance, Test
 from .models import JobShortlist, Job,STATUS
 from spoken.models import FossMdlCourses, SpokenCity, SpokenState, InstituteType,FossCategory
-import pandas as pd
 import datetime
 from spoken.helper import is_spk_student_role, is_ILW
 from django.conf import settings

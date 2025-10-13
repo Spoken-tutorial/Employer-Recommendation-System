@@ -24,7 +24,7 @@ from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.forms import HiddenInput
 from django import forms
-import pandas as pd
+# import pandas as pd
 import json
 from django.core.files.storage import FileSystemStorage
 from os import listdir
@@ -840,67 +840,67 @@ def job_app_details(request,id):
 
     return render(request,'emp/job_app_status_detail.html',context)
 
-@user_passes_test(is_manager)
-def job_app_details1(request,id):
-    context = {}
-    job = Job.objects.get(id=id)
-    # students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
-    students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id).select_related('student') if x.status==0]
-    students_awaiting1 = [x.student.spk_student_id for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
-    ta = TestAttendance.objects.filter(student_id__in=students_awaiting1)
-    ta = ta.values('student_id','mdluser_id','mdlcourse_id','mdlquiz_id')
-    ta_df=pd.DataFrame(ta)
-    try:
-        mdl_quiz_grades = MdlQuizGrades.objects.using('moodle').filter(userid__in=ta_df['mdluser_id'])
-        mdl_quiz_grades=mdl_quiz_grades.values('quiz','userid','grade')
-        mdl_quiz_grades_df=pd.DataFrame(mdl_quiz_grades)
-        fossmdlcourses=FossMdlCourses.objects.filter(mdlquiz_id__in=mdl_quiz_grades_df['quiz']).values('mdlcourse_id','foss_id','mdlquiz_id')
-        fossmdlcourses_df=pd.DataFrame(fossmdlcourses)
-        fosscategory=FossCategory.objects.filter(id__in=fossmdlcourses_df['foss_id']).values('id','foss')
-        fosscategory_df=pd.DataFrame(fosscategory)
-        df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
-        df1=df1.drop(['id','foss_id'], axis = 1)
-        pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
-        df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
-        df1=df1.drop(['id','foss_id'], axis = 1)
-        d = pd.merge(ta_df,mdl_quiz_grades_df,left_on=['mdlquiz_id','mdluser_id'],right_on=['quiz','userid'])
-        df = pd.merge(d,df1,on='mdlcourse_id')
-        sq = Student.objects.filter(spk_student_id__in=df['student_id'])
-        sq = sq.values('spk_usr_id','address','spk_institute','gender','state','city','spk_student_id')
-        sq_df=pd.DataFrame(sq)
-        df=pd.merge(df,sq_df,left_on='student_id',right_on='spk_student_id')
-        df1=df.drop_duplicates().pivot(index='student_id',columns='foss',values='grade')
-        context['columns']=df1.columns
-        df1.reset_index(inplace=True)
-        dnew=pd.merge(df1,sq_df,left_on='student_id',right_on='spk_student_id').drop(columns= ['spk_student_id'])
-        cols = list(dnew.columns.values)
-        cols.remove('spk_usr_id')
-        cols[0]='spk_usr_id'
-        dnew=dnew[cols]
-        dnew.set_index('spk_usr_id', inplace=True)
-        json_records = dnew.reset_index().to_json(orient ='records')
-        data = []
-        data = json.loads(json_records)
-        context = {'d': data}
-    except:
-        pass
+# @user_passes_test(is_manager)
+# def job_app_details1(request,id):
+#     context = {}
+#     job = Job.objects.get(id=id)
+#     # students_awaiting = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+#     students_awaiting = [(x.student,x.date_created) for x in JobShortlist.objects.filter(job_id=id).select_related('student') if x.status==0]
+#     students_awaiting1 = [x.student.spk_student_id for x in JobShortlist.objects.filter(job_id=id) if x.status==0]
+#     ta = TestAttendance.objects.filter(student_id__in=students_awaiting1)
+#     ta = ta.values('student_id','mdluser_id','mdlcourse_id','mdlquiz_id')
+#     ta_df=pd.DataFrame(ta)
+#     try:
+#         mdl_quiz_grades = MdlQuizGrades.objects.using('moodle').filter(userid__in=ta_df['mdluser_id'])
+#         mdl_quiz_grades=mdl_quiz_grades.values('quiz','userid','grade')
+#         mdl_quiz_grades_df=pd.DataFrame(mdl_quiz_grades)
+#         fossmdlcourses=FossMdlCourses.objects.filter(mdlquiz_id__in=mdl_quiz_grades_df['quiz']).values('mdlcourse_id','foss_id','mdlquiz_id')
+#         fossmdlcourses_df=pd.DataFrame(fossmdlcourses)
+#         fosscategory=FossCategory.objects.filter(id__in=fossmdlcourses_df['foss_id']).values('id','foss')
+#         fosscategory_df=pd.DataFrame(fosscategory)
+#         df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+#         df1=df1.drop(['id','foss_id'], axis = 1)
+#         pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+#         df1 = pd.merge(fossmdlcourses_df,fosscategory_df,left_on='foss_id',right_on='id')
+#         df1=df1.drop(['id','foss_id'], axis = 1)
+#         d = pd.merge(ta_df,mdl_quiz_grades_df,left_on=['mdlquiz_id','mdluser_id'],right_on=['quiz','userid'])
+#         df = pd.merge(d,df1,on='mdlcourse_id')
+#         sq = Student.objects.filter(spk_student_id__in=df['student_id'])
+#         sq = sq.values('spk_usr_id','address','spk_institute','gender','state','city','spk_student_id')
+#         sq_df=pd.DataFrame(sq)
+#         df=pd.merge(df,sq_df,left_on='student_id',right_on='spk_student_id')
+#         df1=df.drop_duplicates().pivot(index='student_id',columns='foss',values='grade')
+#         context['columns']=df1.columns
+#         df1.reset_index(inplace=True)
+#         dnew=pd.merge(df1,sq_df,left_on='student_id',right_on='spk_student_id').drop(columns= ['spk_student_id'])
+#         cols = list(dnew.columns.values)
+#         cols.remove('spk_usr_id')
+#         cols[0]='spk_usr_id'
+#         dnew=dnew[cols]
+#         dnew.set_index('spk_usr_id', inplace=True)
+#         json_records = dnew.reset_index().to_json(orient ='records')
+#         data = []
+#         data = json.loads(json_records)
+#         context = {'d': data}
+#     except:
+#         pass
     
-    # context['df']=df1.to_html()
-    students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
-    students_rejected = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==2]
-    students_shortlisted_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==3] #shortlisted by company
-    students_rejected_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==4] #rejected by company
-    context['job'] = job
-    context['students_awaiting'] = students_awaiting
-    context['students_shortlisted'] = students_shortlisted
-    context['students_rejected'] = students_rejected
-    context['students_shortlisted_comp'] = students_shortlisted_comp
-    context['students_rejected_comp'] = students_rejected_comp
-    context['mass_mail']=settings.MASS_MAIL
+#     # context['df']=df1.to_html()
+#     students_shortlisted = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==1]
+#     students_rejected = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==2]
+#     students_shortlisted_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==3] #shortlisted by company
+#     students_rejected_comp = [x.student for x in JobShortlist.objects.filter(job_id=id) if x.status==4] #rejected by company
+#     context['job'] = job
+#     context['students_awaiting'] = students_awaiting
+#     context['students_shortlisted'] = students_shortlisted
+#     context['students_rejected'] = students_rejected
+#     context['students_shortlisted_comp'] = students_shortlisted_comp
+#     context['students_rejected_comp'] = students_rejected_comp
+#     context['mass_mail']=settings.MASS_MAIL
 
-    #stats
+#     #stats
     
-    return render(request,'emp/job_app_status_detail.html',context)
+#     return render(request,'emp/job_app_status_detail.html',context)
 
 
 class JobShortlistDetailView(DetailView):
