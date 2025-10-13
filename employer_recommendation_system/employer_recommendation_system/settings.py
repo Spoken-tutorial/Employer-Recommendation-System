@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'spoken',
     'ckeditor',
     'events',
+    'mailer',
     # 'crispy_bootstrap4'
 
 ]
