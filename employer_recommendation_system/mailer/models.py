@@ -38,6 +38,11 @@ class EmailContent(models.Model):
         related_name='email_contents'
     )
     created_at = models.DateTimeField(auto_now_add=True)
+    user_id = models.ForeignKey(
+        'auth.User',
+        on_delete=models.CASCADE,
+        related_name='email_contents'
+    )
 
     def __str__(self):
         return f"EmailContent (Subject: {self.subject})"
