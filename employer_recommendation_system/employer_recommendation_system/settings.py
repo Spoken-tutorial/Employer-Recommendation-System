@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # api apps
     'users',
     'employer',
+    'common',
 
 
 ]
