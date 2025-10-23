@@ -25,10 +25,15 @@ urlpatterns = [
 
     path('admin/', admin.site.urls),
     path('api/health/', lambda r: JsonResponse({'ok': True, 'app': 'jrs'})),
+    # path('api/auth/', include('auth.urls')),
+    path('api/auth/', include('users.urls')),
     path('events/',include('events.urls')),
     path('',include('emp.urls')),
     path('',include('moodle.urls')),
     path('',include('accounts.urls')),
+    path('api/employer/',include('employer.urls')),
+
+    # path('',include('accounts.urls')),
     
     # ]
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

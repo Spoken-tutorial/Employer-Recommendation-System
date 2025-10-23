@@ -9,6 +9,7 @@ import os
 from spoken.models import SpokenUser, SpokenState, SpokenCity
 from django.core.validators import RegexValidator
 from ckeditor.fields import RichTextField
+from common.models import State, City
 
 ACTIVATION_STATUS = ((None, "--------"),(1, "Active"),(3, "Deactive"))
 GENDER = [('a','No Criteria'),('f','F-Female Candidates'),('m','M-Male Candidates'),]
@@ -270,6 +271,52 @@ class Foss(models.Model):
     def __str__(self):
         return self.foss
 
+class JobDetail(models.Model):
+    STATUS_CHOICES = [
+        ('draft', 'Draft'),
+        ('waiting_for_approval', 'Waiting for Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('closed', 'Closed'),
+    ]
+    designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)')
+    city = models.ManyToManyField(City, related_name='jobs') # Job is based in this city
+    description = RichTextField(null=True,blank=True,verbose_name="Job Description")
+    domain = models.ForeignKey(Domain,on_delete=models.CASCADE,verbose_name='Job Sector', null=True) #Domain od work Eg. Consultancy, Development, Software etc
+    salary_range_min = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Minimum)')
+    salary_range_max = models.IntegerField(null=True,blank=True,verbose_name='Annual Salary (Maximum)')
+    date_created = models.DateTimeField(auto_now_add=True,null = True, blank = True)
+    date_updated = models.DateTimeField(auto_now=True,null = True, blank = True )
+    job_type = models.ForeignKey(JobType,on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='draft')
+    requirements = RichTextField(null=True,blank=True,verbose_name="Qualifications/Skills Required") #Educational qualifications, other criteria
+    key_job_responsibilities = RichTextField(null=True,blank=True,verbose_name="Key Job Responsibilities")
+    company=models.ForeignKey(Company,null=True,on_delete=models.CASCADE)
+    last_app_date = models.DateTimeField(verbose_name="Last Application Date")
+    num_vacancies = models.IntegerField(default=1,blank=True, null=True)
+    gender = models.CharField(max_length=10,choices=GENDER,default='a')
+
+
+
+# API : Job Eligibility
+class JobEligibleFoss(models.Model):
+    job = models.ForeignKey(JobDetail, on_delete=models.CASCADE, related_name='eligible_courses_map')
+    spk_foss_id = models.IntegerField(db_index=True)
+    class Meta:
+        unique_together = [("job", "spk_foss_id")]
+
+class JobEligibleState(models.Model):
+    job = models.ForeignKey(JobDetail, on_delete=models.CASCADE, related_name='eligible_states_map')
+    state = models.ForeignKey(State, on_delete=models.CASCADE, related_name='eligible_jobs_map')
+    class Meta:
+        unique_together = [("job", "state")]
+
+class JobEligiblCity(models.Model):
+    job = models.ForeignKey(JobDetail, on_delete=models.CASCADE, related_name='eligible_cities_map')
+    city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='eligible_jobs_map')
+    class Meta:
+        unique_together = [("job", "city")]
+
 class Job(models.Model):
     title = models.CharField(max_length=250,verbose_name="Title of the job page") #filter
     designation = models.CharField(max_length=250,verbose_name='Designation (Job Position)') 
@@ -410,3 +457,13 @@ class Feedback(models.Model):
     message = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
 
+class Employer(models.Model):
+    STATUS = (("waiting_for_approval", "waiting for approval"),("approved", "approved"),("rejected", "rejected"), ("inactive", "inactive"))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employer_profile')
+    phone = models.CharField(validators=[phone_regex], max_length=17)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    status = models.CharField(choices=STATUS, max_length=50)
+    approved_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name='employers_approved')
+    approved_on = models.DateTimeField()
+    date_created = models.DateField(auto_now_add=True, null=True,blank=True)
+    date_updated = models.DateTimeField(auto_now=True)
