@@ -50,6 +50,13 @@ INSTALLED_APPS = [
     'events',
     'mailer',
     # 'crispy_bootstrap4'
+    'rest_framework',
+    'rest_framework_simplejwt',
+    # api apps
+    'users',
+    'employer',
+    'common',
+
 
 ]
 
@@ -240,3 +247,18 @@ PROFILE_EMAIL_LOG_FILE = os.path.join(BASE_DIR, 'static', 'profile_email_logs')
 LOGIN_URL="https://jrs.spoken-tutorial.org/login/"
 SITE_URL="https://jrs.spoken-tutorial.org/"
 NO_REPLY_SPOKEN_MAIL=NO_REPLY_SPOKEN_MAIL
+
+# global settings/configuration for a REST framework API 
+REST_FRAMEWORK = {
+    # 'DEFAULT_PERMISSION_CLASSES': [
+
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+# global settings/configuration for a Simple JWT
+SIMPLE_JWT = {
+    "TOKEN_OBTAIN_SERIALIZER": "auth.serializers.CustomTokenObtainPairSerializer",
+}
