@@ -262,3 +262,24 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "TOKEN_OBTAIN_SERIALIZER": "auth.serializers.CustomTokenObtainPairSerializer",
 }
+# EMAIL_CONFIG is a dictionary in config.py
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = EMAIL_HOST
+EMAIL_PORT = EMAIL_PORT
+EMAIL_USE_TLS = EMAIL_USE_TLS
+EMAIL_USE_SSL = EMAIL_USE_SSL
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
+
+
+# -------------------------------------------------------
+# 14. CELERY + RABBITMQ SETTINGS (loaded from config.py)
+# -------------------------------------------------------
+CELERY_BROKER_URL ='amqp://guest:guest@localhost:5672//'
+#CELERY_RESULT_BACKEND = 'CELERY_RESULT_BACKEND', 'rpc://')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+CELERY_TASK_TRACK_STARTED = True  # Tracks when a task is started
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 min hard time limit
