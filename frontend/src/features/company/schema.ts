@@ -37,3 +37,15 @@ export const registrationSchema = z.object({
 })
 
 export type RegistrationPayload = z.infer<typeof registrationSchema>
+
+// Admin Company Addition (simplified, just company details)
+export const adminCompanySchema = z.object({
+    name: z.string().min(2, 'Required'),
+    website: z.url('Invalid URL').optional().or(z.literal('')),
+    domain: z.string().min(1, 'Required'),
+    state: z.string().min(1, 'Required'),
+    city: z.string().min(2, 'Required'),
+    address: z.string().min(5, 'Required'),
+})
+
+export type AdminCompanyForm = z.infer<typeof adminCompanySchema>
