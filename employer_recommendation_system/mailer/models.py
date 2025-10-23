@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -8,19 +9,22 @@ class EmailRecord(models.Model):
     Stores individual email addresses and their sending status.
     Each row corresponds to one email address from the uploaded CSV file.
     """
-    email_address = models.EmailField(unique=True)
+    email_address = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=20,
         choices=[
-            ('pending'),
-            ('sent',),
-            ('failed',),
+            ('pending', 'Pending'),
+            ('sent', 'Sent'),
+            ('failed', 'Failed'),
         ],
         default='pending'
     )
     sent_at = models.DateTimeField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+    
+    class Meta:
+    indexes = [models.Index(fields=['email_address'])]
 
     def __str__(self):
         return f"{self.email_address} - {self.status}"
@@ -38,8 +42,8 @@ class EmailContent(models.Model):
         related_name='email_contents'
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    user_id = models.ForeignKey(
-        'auth.User',
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name='email_contents'
     )
