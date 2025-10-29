@@ -7,7 +7,7 @@ export default function AdminCompanyForm({
 }: { domains: string[]; states: { code: string; name: string }[] }) {
   return (
     <Stack spacing={2}>
-      <RHFTextField name="name" label="Company Name" fullWidth />
+      <RHFTextField name="name" label="Company Name" fullWidth autoFocus />
       <RHFTextField name="website" label="Website" placeholder="https://example.com" fullWidth />
       <RHFAutocomplete
         name="domain"

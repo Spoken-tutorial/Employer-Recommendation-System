@@ -1,7 +1,7 @@
 // src/features/company/pages/AdminCompanyAddPage.tsx
 import { useState } from 'react'
 import {
-  Box, Button, Stack, Typography, Paper, Divider
+  Box, Button, Stack, Typography, Paper, Divider, Skeleton
 } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -69,9 +69,21 @@ export default function AdminCompanyAddPage() {
       <Typography variant="h4">Add New Company</Typography>
 
       <FormProvider {...methods}>
-        <Paper sx={{ p: 3 }}>
+        <Paper component="form" noValidate onSubmit={methods.handleSubmit(onSubmit)} sx={{ p: 3 }}>
           {loadingMeta ? (
-            <Typography>Loading options…</Typography>
+            <Stack spacing={3}>
+              <Skeleton variant="text" width="40%" height={32} />
+              <Skeleton variant="rectangular" height={56} />
+              <Skeleton variant="text" width="40%" height={32} />
+              <Skeleton variant="rectangular" height={56} />
+              <Stack direction="row" spacing={2}>
+                <Skeleton variant="rectangular" width="50%" height={56} />
+                <Skeleton variant="rectangular" width="50%" height={56} />
+              </Stack>
+              <Skeleton variant="text" width="40%" height={32} />
+              <Skeleton variant="rectangular" height={56} />
+              <Skeleton variant="rectangular" height={120} />
+            </Stack>
           ) : (
             <AdminCompanyForm
               domains={options?.domains ?? ['Software', 'EdTech', 'Finance']}
@@ -84,9 +96,9 @@ export default function AdminCompanyAddPage() {
               Cancel
             </Button>
             <Button
+              type="submit"
               variant="contained"
-              onClick={methods.handleSubmit(onSubmit)}
-              disabled={addCompany.isPending}
+              disabled={loadingMeta || addCompany.isPending || methods.formState.isSubmitting}
             >
               {addCompany.isPending ? 'Adding...' : 'Add Company'}
             </Button>
