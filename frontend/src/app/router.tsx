@@ -28,6 +28,7 @@ import AdminCompanies from '@features/admin/AdminCompanies';
 import AdminJobs from '@features/admin/AdminJobs';
 import AdminStudents from '@features/admin/AdminStudents';
 import AdminEmails from '@features/admin/AdminEmails';
+import AdminCompanyAddPage from '@features/company/pages/AdminCompanyAddPage';
 
 
 export const router = createBrowserRouter([
@@ -72,6 +73,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboard /> },
       { path: "companies", element: <AdminCompanies /> },
+      { path: "companies/add", element: <AdminCompanyAddPage /> },
       { path: "jobs", element: <AdminJobs /> },
       { path: "students", element: <AdminStudents /> },
       { path: "emails", element: <AdminEmails /> },
