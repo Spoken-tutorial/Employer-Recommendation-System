@@ -735,9 +735,7 @@ def student_profile(request,pk):
     context['form']=student_form
     context['education_form'] = c_education_form
     context['institutes'] = AcademicCenter.objects.values('id','institution_name').order_by('institution_name')
-    # context['scores'] = fetch_ta_scores(student)
-    context['scores'] = fetch_moodle_score(student)
-    print("========",context['scores'])
+    context['scores'] = fetch_ta_scores(student)
     if has_ilw_role(student):
         context['ilw_scores']=fetch_ilw_scores(student)
     context['projects'] = student.projects.all()

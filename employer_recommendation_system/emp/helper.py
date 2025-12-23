@@ -8,8 +8,6 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.functional import wraps
 from django.utils import timezone
-from moodle.models import MdlUser, MdlQuizGrades, MdlQuiz
-
 
 RATING = {
     'ONLY_VISIBLE_TO_ADMIN_HR':0,
@@ -150,7 +148,6 @@ def fetch_ta_scores(student):
                 print("Test does not exist")
         scores = unique_foss_scores(scores)
     return scores
-
 
 def get_participant(student):
     participant = None
@@ -314,58 +311,3 @@ def get_role(user):
             return 'MANAGER'
         elif list(set(['STUDENT','STUDENT_ILW']).intersection([x.name for x in user.groups.all()])):
             return 'STUDENT'
-        
-def fetch_moodle_score(student):
-    """
-    Fetch Moodle quiz scores for a logged-in student
-    using EMAIL as the bridge between ERS and Moodle.
-    """
-    scores = []
-        # 1. Spoken user email (login email)
-    email = student.user.email
-    if not email:
-        return scores
-    # 2. Find Moodle user using same email
-    mdl_user = (MdlUser.objects.using('moodle').filter(email__iexact=email.strip()).first())
-
-    if not mdl_user:
-        return scores
-    # 3. Fetch quiz grades for this Moodle user
-    quiz_grades = (MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user).order_by('-timemodified'))
-
-    # 4. Fetch quizzes once (performance-safe)
-    quiz_ids = [q.quiz for q in quiz_grades]
-    quizzes = {
-        q.id: q
-        for q in MdlQuiz.objects.using('moodle').filter(id__in=quiz_ids)
-    }
-
-    # 5. Map quiz name → FOSS
-    foss_list = FossCategory.objects.all()
-
-    for qg in quiz_grades:
-        quiz = quizzes.get(qg.quiz)
-        if not quiz:
-            continue
-
-        # Match quiz name with FOSS name
-        foss_obj = None
-        quiz_name = quiz.name.lower()
-
-        for foss in foss_list:
-            if foss.foss.lower() in quiz_name:
-                foss_obj = foss
-                break
-            
-        if not foss_obj:
-            continue
-
-        scores.append({
-            'name': foss_obj.foss,
-            'grade': float(qg.grade),
-            'updated': datetime.datetime.fromtimestamp(qg.timemodified),
-        })
-
-    return scores
-
-       
