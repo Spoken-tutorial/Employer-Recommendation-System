@@ -188,7 +188,7 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
     scores = []    
     groups = [x.name for x in student.user.groups.all()]
     if 'STUDENT' in groups:
-        s = fetch_ta_scores(student)
+        s = fetch_moodle_score(student)
         scores = scores + s
         
     if 'STUDENT_ILW' in groups:
@@ -279,7 +279,7 @@ def get_recommended_jobs(student):
     jobs = [x for x in jobs if x not in applied_jobs ]
     
     if has_spk_student_role(student):
-        scores = fetch_ta_scores(student)
+        scores = fetch_moodle_score(student)
         for job in jobs:
             if is_job_recommended_ta(job,student,scores):
                 rec_jobs.append(job)
@@ -315,57 +315,108 @@ def get_role(user):
         elif list(set(['STUDENT','STUDENT_ILW']).intersection([x.name for x in user.groups.all()])):
             return 'STUDENT'
         
+
 def fetch_moodle_score(student):
     """
     Fetch Moodle quiz scores for a logged-in student
     using EMAIL as the bridge between ERS and Moodle.
+    Output format matches emp/student_form.html
     """
     scores = []
-        # 1. Spoken user email (login email)
     email = student.user.email
     if not email:
         return scores
-    # 2. Find Moodle user using same email
-    mdl_user = (MdlUser.objects.using('moodle').filter(email__iexact=email.strip()).first())
 
+    mdl_user = (MdlUser.objects.using('moodle').filter(email__iexact=email.strip()).values('id').first())
     if not mdl_user:
         return scores
-    # 3. Fetch quiz grades for this Moodle user
-    quiz_grades = (MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user).order_by('-timemodified'))
+    mdl_user_id = mdl_user['id']
 
-    # 4. Fetch quizzes once (performance-safe)
-    quiz_ids = [q.quiz for q in quiz_grades]
-    quizzes = {
-        q.id: q
-        for q in MdlQuiz.objects.using('moodle').filter(id__in=quiz_ids)
+    quiz_grades = (MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user_id).values('quiz', 'grade', 'timemodified').order_by('-timemodified'))
+    if not quiz_grades:
+        return scores
+    quiz_ids = [q['quiz'] for q in quiz_grades]
+    quiz_foss_map = (FossMdlCourses.objects.filter(mdlquiz_id__in=quiz_ids).select_related('foss').values('mdlquiz_id', 'foss__foss', 'foss__id'))
+
+    quiz_to_foss = {
+        q['mdlquiz_id']: q['foss__foss']
+        for q in quiz_foss_map
     }
 
-    # 5. Map quiz name → FOSS
-    foss_list = FossCategory.objects.all()
+    quiz_to_foss_id = {
+        q['mdlquiz_id']: q['foss__id']
+        for q in quiz_foss_map
+    }
 
-    for qg in quiz_grades:
-        quiz = quizzes.get(qg.quiz)
-        if not quiz:
+
+    seen_foss = set()
+    for q in quiz_grades:
+        foss_name = quiz_to_foss.get(q['quiz'])
+        foss_id = quiz_to_foss_id.get(q['quiz'])
+        if not foss_name:
             continue
 
-        # Match quiz name with FOSS name
-        foss_obj = None
-        quiz_name = quiz.name.lower()
-
-        for foss in foss_list:
-            if foss.foss.lower() in quiz_name:
-                foss_obj = foss
-                break
-            
-        if not foss_obj:
+        if foss_name in seen_foss:
             continue
 
-        scores.append({
-            'name': foss_obj.foss,
-            'grade': float(qg.grade),
-            'updated': datetime.datetime.fromtimestamp(qg.timemodified),
+        seen_foss.add(foss_name)
+
+        scores.append({'foss': foss_id,'name': foss_name,'grade': float(q['grade']),'updated': datetime.datetime.fromtimestamp(q['timemodified']).date(),
         })
-
     return scores
+
+        
+# def fetch_moodle_score(student):
+#     """
+#     Fetch Moodle quiz scores for a logged-in student
+#     using EMAIL as the bridge between ERS and Moodle.
+#     """
+#     scores = []
+#         # 1. Spoken user email (login email)
+#     email = student.user.email
+#     if not email:
+#         return scores
+#     # 2. Find Moodle user using same email
+#     mdl_user = (MdlUser.objects.using('moodle').filter(email__iexact=email.strip()).first())
+
+#     if not mdl_user:
+#         return scores
+#     # 3. Fetch quiz grades for this Moodle user
+#     quiz_grades = (MdlQuizGrades.objects.using('moodle').filter(userid=mdl_user).order_by('-timemodified'))
+
+#     # 4. Fetch quizzes once (performance-safe)
+#     quiz_ids = [q.quiz for q in quiz_grades]
+#     quizzes = {
+#         q.id: q
+#         for q in MdlQuiz.objects.using('moodle').filter(id__in=quiz_ids)
+#     }
+
+#     # 5. Map quiz name → FOSS
+#     foss_list = FossCategory.objects.all()
+
+#     for qg in quiz_grades:
+#         quiz = quizzes.get(qg.quiz)
+#         if not quiz:
+#             continue
+
+#         # Match quiz name with FOSS name
+#         foss_obj = None
+#         quiz_name = quiz.name.lower()
+
+#         for foss in foss_list:
+#             if foss.foss.lower() in quiz_name:
+#                 foss_obj = foss
+#                 break
+            
+#         if not foss_obj:
+#             continue
+
+#         scores.append({
+#             'name': foss_obj.foss,
+#             'grade': float(qg.grade),
+#             'updated': datetime.datetime.fromtimestamp(qg.timemodified),
+#         })
+
+#     return scores
 
        
