@@ -151,29 +151,21 @@ def student_homepage(request):
     context={}
     # Top 6 jobs & company to display on student homepage
     company_display = Company.objects.filter(rating=DISPLAY_ON_HOMEPAGE,status=ACTIVE).values('name','logo').order_by('date_updated')[:6]
-    print(f"\033[92m 1 \033[0m")
     context['company_display']=company_display
     rec_student = Student.objects.get(user=request.user)
-    print(f"\033[92m 2 \033[0m")
     applied_jobs = get_applied_jobs(rec_student)
     context['applied_jobs'] = applied_jobs if len(applied_jobs)<4 else applied_jobs[:4]
     jobs_to_display = get_jobs_to_display(rec_student) 
-    print(f"\033[92m 3 \033[0m")
     context['jobs_to_display'] = jobs_to_display if len(jobs_to_display)<6 else jobs_to_display[:6]
-    print(f"\033[92m 3.1 \033[0m")
     rec_jobs = get_recommended_jobs(rec_student)
-    print(f"\033[92m 3.2 \033[0m")
     context['rec_jobs'] = rec_jobs if len(applied_jobs)<3 else rec_jobs[:3]
-    print(f"\033[92m 4 \033[0m")
     active_event = Event.objects.filter(status=1,type='JOBFAIR').order_by('-start_date').first()
-    print(f"\033[92m 5 \033[0m")
     if active_event:
         jobfair = JobFair.objects.get(event=active_event)
         context['active_event'] = active_event
         context['jobfair'] = jobfair
         # context['is_registered_for_jobfair'] = JobFair.objects.filter(event=active_event,students=rec_student).exists()
         context['is_registered_for_jobfair'] = JobFairAttendance.objects.filter(event=active_event,student=rec_student).exists()
-    print(f"\033[92m 6 \033[0m")
     return render(request,'emp/student_homepage.html',context)
 
 @user_passes_test(is_manager)

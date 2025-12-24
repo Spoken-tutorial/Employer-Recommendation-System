@@ -188,7 +188,7 @@ def fetch_student_scores(student):  #parameter : recommendation student obj
     scores = []    
     groups = [x.name for x in student.user.groups.all()]
     if 'STUDENT' in groups:
-        s = fetch_ta_scores(student)
+        s = fetch_moodle_score(student)
         scores = scores + s
         
     if 'STUDENT_ILW' in groups:
@@ -279,7 +279,7 @@ def get_recommended_jobs(student):
     jobs = [x for x in jobs if x not in applied_jobs ]
     
     if has_spk_student_role(student):
-        scores = fetch_ta_scores(student)
+        scores = fetch_moodle_score(student)
         for job in jobs:
             if is_job_recommended_ta(job,student,scores):
                 rec_jobs.append(job)
@@ -323,7 +323,6 @@ def fetch_moodle_score(student):
     Output format matches emp/student_form.html
     """
     scores = []
-
     email = student.user.email
     if not email:
         return scores
@@ -337,17 +336,23 @@ def fetch_moodle_score(student):
     if not quiz_grades:
         return scores
     quiz_ids = [q['quiz'] for q in quiz_grades]
-
-    quiz_foss_map = (FossMdlCourses.objects.filter(mdlquiz_id__in=quiz_ids).select_related('foss').values('mdlquiz_id', 'foss__foss'))
+    quiz_foss_map = (FossMdlCourses.objects.filter(mdlquiz_id__in=quiz_ids).select_related('foss').values('mdlquiz_id', 'foss__foss', 'foss__id'))
 
     quiz_to_foss = {
         q['mdlquiz_id']: q['foss__foss']
         for q in quiz_foss_map
     }
 
+    quiz_to_foss_id = {
+        q['mdlquiz_id']: q['foss__id']
+        for q in quiz_foss_map
+    }
+
+
     seen_foss = set()
     for q in quiz_grades:
         foss_name = quiz_to_foss.get(q['quiz'])
+        foss_id = quiz_to_foss_id.get(q['quiz'])
         if not foss_name:
             continue
 
@@ -356,9 +361,8 @@ def fetch_moodle_score(student):
 
         seen_foss.add(foss_name)
 
-        scores.append({'name': foss_name,'grade': float(q['grade']),'updated': datetime.datetime.fromtimestamp(q['timemodified']),
+        scores.append({'foss': foss_id,'name': foss_name,'grade': float(q['grade']),'updated': datetime.datetime.fromtimestamp(q['timemodified']).date(),
         })
-
     return scores
 
         
